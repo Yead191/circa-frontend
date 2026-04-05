@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-
-
 import {
   Bell,
   Package,
@@ -13,7 +11,6 @@ import {
   Truck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -130,17 +127,20 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f11] text-white font-sans">
+    <div className=" bg-[#0f0f11] text-white font-sans">
       {/* ── Header ── */}
-      <div className="mx-auto px-4 sm:px-6 pt-10 pb-4">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">            
-            <h1 className="text-lg font-semibold tracking-tight">
+   
+        <div className="flex items-center justify-between flex-wrap gap-3 mx-auto px-4 sm:px-6 pb-4 ">
+          <div className="flex flex-col">
+            <h1 className="text-lg font-semibold ">
               Notifications
-            </h1>            
+            </h1>
+            <p className="text-white/40 text-sm mt-1">
+              Recent activity and updates
+            </p>
           </div>
 
-          <Button            
+          <Button
             size="sm"
             onClick={handleReadAll}
             disabled={unreadCount === 0}
@@ -151,13 +151,9 @@ export default function NotificationsPage() {
           </Button>
         </div>
 
-        <p className="text-white/40 text-sm mt-1">
-          Recent activity and updates
-        </p>
-      </div>
 
       {/* ── Section Label ── */}
-      <div className=" mx-auto px-4 sm:px-6">        
+      <div className=" mx-auto px-4 sm:px-6">
 
         {/* ── Notification List ── */}
         <div className="rounded-xl overflow-hidden border border-white/[0.07] bg-[#161618]">

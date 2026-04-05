@@ -1,21 +1,27 @@
+"use client";
 import { Check } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../dialog";
 
 // ── Static data ────────────────────────────────────────────────────────────────
-const SUBS: any[] = [
-  { id: 1, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety",  price: "$4.99", status: "Active",  seed: "cam1" },
-  { id: 2, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety",  price: "$4.99", status: "Active",  seed: "cam2" },
-  { id: 3, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety",  price: "$4.99", status: "Active",  seed: "cam3" },
-  { id: 4, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety",  price: "$4.99", status: "Expired", seed: "cam4" },
-  { id: 5, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety",  price: "$4.99", status: "Active",  seed: "cam5" },
-  { id: 6, name: "Cameron", exp: "11 Oct, 2025", tier: "Diamond", price: "$9.99", status: "Active",  seed: "cam6" },
+const SUBS = [
+  { id: 1, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety", price: "$4.99", status: "Active", seed: "cam1" },
+  { id: 2, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety", price: "$4.99", status: "Active", seed: "cam2" },
+  { id: 3, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety", price: "$4.99", status: "Active", seed: "cam3" },
+  { id: 4, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety", price: "$4.99", status: "Expired", seed: "cam4" },
+  { id: 5, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety", price: "$4.99", status: "Active", seed: "cam5" },
+  { id: 6, name: "Cameron", exp: "11 Oct, 2025", tier: "Diamond", price: "$9.99", status: "Active", seed: "cam6" },
   { id: 7, name: "Cameron", exp: "11 Oct, 2025", tier: "Diamond", price: "$9.99", status: "Expired", seed: "cam7" },
-  { id: 8, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety",  price: "$4.99", status: "Active",  seed: "cam8" },
+  { id: 8, name: "Cameron", exp: "11 Oct, 2025", tier: "Sweety", price: "$4.99", status: "Active", seed: "cam8" },
 ];
 
-const FEATURES = ["Follow to updates", "See all post", "New feature unlock", "See all post", "Follow to updates"];
-
+const FEATURES = [
+  "Follow to updates",
+  "See all post",
+  "New feature unlock",
+  "See all post",
+  "Follow to updates",
+];
 
 export default function MySubscription() {
   const [selected, setSelected] = useState<any | null>(null);
@@ -28,51 +34,36 @@ export default function MySubscription() {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div className="flex flex-col gap-2.5">
         {SUBS.map((sub) => (
           <button
             key={sub.id}
             onClick={() => handleOpen(sub)}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              background: "#13141f",
-              border: "none",
-              borderRadius: 14,
-              padding: "14px 16px",
-              cursor: "pointer",
-            }}
+            className="flex items-center justify-between bg-[#13141f] rounded-xl px-4 py-3.5 cursor-pointer hover:bg-[#1a1b2e] transition"
           >
-            <div style={{ display: "flex", gap: 12 }}>
+            {/* Left */}
+            <div className="flex items-center gap-3">
               <img
                 src={`https://api.dicebear.com/7.x/personas/svg?seed=${sub.seed}`}
-                style={{
-                  width: 46,
-                  height: 46,
-                  borderRadius: "50%",
-                  background: "#1a1b2e",
-                }}
+                className="w-11.5 h-11.5 rounded-full bg-[#1a1b2e]"
               />
-              <div>
-                <div style={{ color: "#fff" }}>{sub.name}</div>
-                <div style={{ color: "#aaa", fontSize: 13 }}>
-                  Exp: {sub.exp}
-                </div>
+              <div className="text-left">
+                <div className="text-white text-sm font-medium">{sub.name}</div>
+                <div className="text-gray-400 text-xs">Exp: {sub.exp}</div>
               </div>
             </div>
 
-            <div>
-              <div style={{ color: "#e879a0" }}>{sub.tier}</div>
-              <div style={{ color: "#9ca3af", fontSize: 12 }}>
-                {sub.price}
-              </div>
+            {/* Middle */}
+            <div className="text-right">
+              <div className="text-pink-400 text-sm font-medium">{sub.tier}</div>
+              <div className="text-gray-400 text-xs">{sub.price}</div>
             </div>
 
+            {/* Right */}
             <div
-              style={{
-                color:
-                  sub.status === "Active" ? "#22c55e" : "#ef4444",
-              }}
+              className={`text-sm font-medium ${
+                sub.status === "Active" ? "text-green-500" : "text-red-500"
+              }`}
             >
               {sub.status}
             </div>
@@ -96,122 +87,65 @@ export default function MySubscription() {
   );
 }
 
-
 function SubscriptionDetail({ sub }: { sub: any | null }) {
-    return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ background: "#13141f", borderRadius: 18, padding: 20 }}>
-
-                {/* Header */}
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        marginBottom: 16,
-                        flexWrap: "wrap",
-                        gap: 10,
-                    }}
-                >
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>                    
-                        <img
-                            src={`https://api.dicebear.com/7.x/personas/svg?seed=${sub?.seed ?? "robert"}`}
-                            alt=""
-                            style={{
-                                width: 50, height: 50, borderRadius: "50%",
-                                objectFit: "cover", flexShrink: 0,                                
-                                background: "#1a1b2e",
-                            }}
-                        />
-                        <div>
-                            <div style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>
-                                {sub?.name ?? "Robert Fox"}
-                            </div>
-                            <div style={{ color: "#6b7280", fontSize: 13 }}>
-                                11 Oct, 2025
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* STATIC STATUS */}
-                    <span
-                        style={{
-                            background: "#16a34a20",
-                            color: "#22c55e",
-                            borderRadius: 8,
-                            padding: "4px 12px",
-                            fontSize: 13,
-                            fontWeight: 600,
-                        }}
-                    >
-                        Active
-                    </span>
-                </div>
-
-                {/* STATIC PLAN */}
-                <div
-                    style={{
-                        color: "#8b7cf8",
-                        fontWeight: 700,
-                        fontSize: 16,
-                        marginBottom: 6,
-                    }}
-                >
-                    Diamond Plan
-                </div>
-
-                <div style={{ marginBottom: 8 }}>
-                    <span style={{ color: "#fff", fontWeight: 800, fontSize: 26 }}>
-                        $4.99
-                    </span>
-                    <span style={{ color: "#6b7280", fontSize: 14 }}> /m</span>
-                </div>
-
-                {/* STATIC INFO */}
-                <div style={{ color: "#6b7280", fontSize: 13, marginBottom: 4 }}>
-                    Follow along for public updates
-                </div>
-                <div style={{ color: "#6b7280", fontSize: 13, marginBottom: 2 }}>
-                    Purchase Date: 17/1/2026
-                </div>
-                <div style={{ color: "#6b7280", fontSize: 13, marginBottom: 16 }}>
-                    Expired Date: 17/2/2026
-                </div>
-
-                {/* FEATURES */}
-                <div
-                    style={{
-                        borderTop: "1px solid #ffffff10",
-                        paddingTop: 16,
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 10,
-                    }}
-                >
-                    {FEATURES.map((f, i) => (
-                        <div
-                            key={i}
-                            style={{ display: "flex", alignItems: "center", gap: 12 }}
-                        >
-                            <div
-                                style={{
-                                    width: 22,
-                                    height: 22,
-                                    borderRadius: "50%",
-                                    background: "#22c55e",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    flexShrink: 0,
-                                }}
-                            >
-                                <Check size={12} color="#fff" strokeWidth={3} />
-                            </div>
-                            <span style={{ color: "#e5e7eb", fontSize: 14 }}>{f}</span>
-                        </div>
-                    ))}
-                </div>
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="bg-[#13141f] rounded-2xl p-5">
+        {/* Header */}
+        <div className="flex items-center justify-between flex-wrap gap-2.5 mb-4">
+          <div className="flex items-center gap-3">
+            <img
+              src={`https://api.dicebear.com/7.x/personas/svg?seed=${sub?.seed ?? "robert"}`}
+              className="w-12.5 h-12.5 rounded-full bg-[#1a1b2e]"
+            />
+            <div>
+              <div className="text-white font-semibold text-sm">
+                {sub?.name ?? "Robert Fox"}
+              </div>
+              <div className="text-gray-500 text-xs">
+                {sub?.exp ?? "11 Oct, 2025"}
+              </div>
             </div>
+          </div>
+
+          <span className="bg-green-500/20 text-green-500 text-xs font-semibold px-3 py-1 rounded-md">
+            Active
+          </span>
         </div>
-    );
+
+        {/* Plan */}
+        <div className="text-[#8b7cf8] font-semibold text-base mb-1">
+          Diamond Plan
+        </div>
+
+        <div className="mb-2">
+          <span className="text-white font-bold text-2xl">$4.99</span>
+          <span className="text-gray-500 text-sm"> /m</span>
+        </div>
+
+        {/* Info */}
+        <div className="text-gray-500 text-xs mb-1">
+          Follow along for public updates
+        </div>
+        <div className="text-gray-500 text-xs mb-1">
+          Purchase Date: 17/1/2026
+        </div>
+        <div className="text-gray-500 text-xs mb-4">
+          Expired Date: 17/2/2026
+        </div>
+
+        {/* Features */}
+        <div className="border-t border-white/10 pt-4 flex flex-col gap-2.5">
+          {FEATURES.map((f, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-5.5 h-5.5 rounded-full bg-green-500 flex items-center justify-center">
+                <Check size={12} className="text-white" strokeWidth={3} />
+              </div>
+              <span className="text-gray-200 text-sm">{f}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
