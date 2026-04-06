@@ -106,3 +106,30 @@ export interface Pagination {
     page: number;
     totalPage: number;
 }
+
+export type PlanStatus = "active" | "inactive";
+export type PlanCategory = "Monthly" | "Weekly" | "Yearly";
+
+export interface PlanFeature {
+    _id: string;
+    name: string;
+    status: boolean;
+    discount: number;
+}
+
+export interface Plan {
+    _id: string;
+    name: string;
+    subtitle: string;
+    price: number;
+    features: PlanFeature[];
+    status: PlanStatus;
+    category: PlanCategory;
+    duration: number;
+    emoji: string;
+    user: string;
+    fromAdmin: boolean;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+}

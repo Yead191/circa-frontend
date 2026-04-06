@@ -1,186 +1,211 @@
-import { ChevronDown, Plus, X } from "lucide-react";
-import { useState } from "react";
+'use client';
 
-interface PlanItem {
-    id: number;
-    label: string;
-    percentage?: string;
-}
+import React, { useState, useEffect } from "react";
+import { Plus, Star, Info, Hash, Smile, Calendar, Check, CheckCircle2, ChevronLeft } from "lucide-react";
+import { PlanFeature, PlanCategory } from '@/types';
+import { myFetch } from '../../../../../helpers/myFetch';
+import { revalidateTags } from '../../../../../helpers/revalidateTags';
+import { toast } from 'sonner';
 
-export default function CreatePlan() {
-    const [planName, setPlanName] = useState("");
-    const [subtitle, setSubtitle] = useState("");
-    const [category, setCategory] = useState("Select");
-    const [duration, setDuration] = useState("Select");
-    const [price, setPrice] = useState("");
-    const [emoji, setEmoji] = useState("");
-    const [selectedPlan, setSelectedPlan] = useState("Select Plan");
-    const [planPercentage, setPlanPercentage] = useState("0.00%");
-    const [items, setItems] = useState<PlanItem[]>([
-        { id: 1, label: "Distribution Platforms", percentage: "25%" },
-        { id: 2, label: "Distribution Platforms" },
-        { id: 3, label: "Distribution Platforms", percentage: "15%" },
-        { id: 4, label: "Distribution Platforms" },
-    ]);
+export default function CreatePlan({ features }: { features: string[] }) {
+    const [name, setName] = useState('');
+    const [subtitle, setSubtitle] = useState('');
+    const [price, setPrice] = useState<number | string>('');
+    const [category, setCategory] = useState<PlanCategory>('Monthly');
+    const [duration, setDuration] = useState<number | string>(1);
+    const [emoji, setEmoji] = useState('🚀');
+    const [formFeatures, setFormFeatures] = useState<Partial<PlanFeature>[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const removeItem = (id: number) => setItems(prev => prev.filter(item => item.id !== id));
+    useEffect(() => {
+        if (features) {
+            const initialFeatures = features.map(fName => ({
+                name: fName,
+                status: false,
+                discount: 0
+            }));
+            setFormFeatures(initialFeatures);
+        }
+    }, [features]);
 
-    const addItem = () => {
-        const newId = Math.max(...items.map(i => i.id), 0) + 1;
-        setItems(prev => [...prev, { id: newId, label: "Distribution Platforms" }]);
+    const toggleFeature = (name: string) => {
+        setFormFeatures(prev => prev.map(f =>
+            f.name === name ? { ...f, status: !f.status } : f
+        ));
     };
 
-    const inputClass =
-        "w-full bg-[#1c1e2e] rounded-xl px-4 py-3.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/40 transition-all border-0";
+    const updateDiscount = (name: string, discount: number) => {
+        setFormFeatures(prev => prev.map(f =>
+            f.name === name ? { ...f, discount: Math.max(0, Math.min(100, discount)) } : f
+        ));
+    };
 
-    const selectClass =
-        "w-full bg-[#1c1e2e] rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500/40 appearance-none cursor-pointer border-0";
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-    const labelClass = "text-[13px] text-gray-300 font-medium mb-1.5 block";
+        const enabledFeatures = formFeatures.filter(f => f.status);
+        if (enabledFeatures.length === 0) {
+            toast.error("Please enable at least one feature for the plan");
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        const payload = {
+            name,
+            subtitle,
+            price: Number(price),
+            category,
+            duration: Number(duration),
+            emoji,
+            features: formFeatures.map(f => ({
+                name: f.name,
+                status: f.status,
+                discount: Number(f.discount)
+            }))
+        };
+
+        toast.promise(myFetch('/plan', {
+            method: 'POST',
+            body: payload,
+        }), {
+            loading: 'Creating membership plan...',
+            success: (res) => {
+                if (res?.success) {
+                    revalidateTags(['plan']);
+                    // Reset form or navigate back
+                    setName('');
+                    setSubtitle('');
+                    setPrice('');
+                    setEmoji('🚀');
+                    setFormFeatures(features.map(fName => ({ name: fName, status: false, discount: 0 })));
+                    return res?.message || 'Plan created successfully';
+                }
+                throw new Error(res?.message || 'Failed to create plan');
+            },
+            error: (err) => err?.message || 'Failed to create plan',
+            finally: () => setIsSubmitting(false)
+        });
+    };
+
+    const inputClass = "w-full bg-[#1a1a24] border border-white/5 rounded-2xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-indigo-500/50 transition-all placeholder:text-gray-700";
+    const labelClass = "flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1 mb-1.5";
 
     return (
-        <div className="space-y-4 bg-[#0d0e1a] min-h-screen p-5">
-            {/* Plan Name */}
-            <div>
-                <label className={labelClass}>Plan Name</label>
-                <input
-                    type="text"
-                    value={planName}
-                    onChange={e => setPlanName(e.target.value)}
-                    className={inputClass}
-                />
+        <div className="max-w-3xl mx-auto space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+            {/* Header section moved to parent index.tsx header or handled here */}
+            <div className="space-y-1">
+                <h2 className="text-2xl font-black tracking-tight text-white uppercase">Create New Plan</h2>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Define your membership benefits & pricing</p>
             </div>
 
-            {/* Subtitle */}
-            <div>
-                <label className={labelClass}>Subtitle</label>
-                <input
-                    type="text"
-                    value={subtitle}
-                    onChange={e => setSubtitle(e.target.value)}
-                    className={inputClass}
-                />
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-8">
 
-            {/* Select Categories */}
-            <div>
-                <label className={labelClass}>Select Categories</label>
-                <div className="relative">
-                    <select
-                        value={category}
-                        onChange={e => setCategory(e.target.value)}
-                        className={selectClass}
-                    >
-                        {["Select", "Music", "Video", "Podcast", "Art"].map(o => (
-                            <option key={o} value={o} className="bg-[#1c1e2e]">{o}</option>
-                        ))}
-                    </select>
-                    <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-                </div>
-            </div>
-
-            {/* Duration */}
-            <div>
-                <label className={labelClass}>Duration</label>
-                <div className="relative">
-                    <select
-                        value={duration}
-                        onChange={e => setDuration(e.target.value)}
-                        className={selectClass}
-                    >
-                        {["Select", "Monthly", "Quarterly", "Yearly"].map(o => (
-                            <option key={o} value={o} className="bg-[#1c1e2e]">{o}</option>
-                        ))}
-                    </select>
-                    <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-                </div>
-            </div>
-
-            {/* Price */}
-            <div>
-                <label className={labelClass}>Price</label>
-                <input
-                    type="text"
-                    value={price}
-                    onChange={e => setPrice(e.target.value)}
-                    placeholder="$0.00"
-                    className={inputClass}
-                />
-            </div>
-
-            {/* Choose Emoji */}
-            <div>
-                <label className={labelClass}>Choose Emoji</label>
-                <input
-                    type="text"
-                    value={emoji}
-                    onChange={e => setEmoji(e.target.value)}
-                    placeholder="Select Emoji"
-                    className={inputClass}
-                />
-            </div>
-
-            {/* Plan Description */}
-            <div>
-                <label className={labelClass}>Plan Description</label>
-                <div className="flex gap-2 mb-3">
-                    {/* Select Plan dropdown */}
-                    <div className="relative flex-1">
-                        <select
-                            value={selectedPlan}
-                            onChange={e => setSelectedPlan(e.target.value)}
-                            className="w-full bg-[#1c1e2e] rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500/40 appearance-none cursor-pointer border-0"
-                        >
-                            {["Select Plan", "Subscription list", "Feature list"].map(o => (
-                                <option key={o} value={o} className="bg-[#1c1e2e]">{o}</option>
-                            ))}
-                        </select>
-                        <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-                    </div>
-                    {/* Percentage input */}
-                    <input
-                        type="text"
-                        value={planPercentage}
-                        onChange={e => setPlanPercentage(e.target.value)}
-                        className="w-20 bg-[#1c1e2e] rounded-xl px-3 py-3.5 text-white text-sm text-center focus:outline-none focus:ring-1 focus:ring-indigo-500/40 border-0"
-                    />
-                    {/* Add button */}
-                    <button
-                        onClick={addItem}
-                        className="w-12 h-12 bg-indigo-500 hover:bg-indigo-600 rounded-xl flex items-center justify-center text-white transition-colors flex-shrink-0"
-                    >
-                        <Plus size={18} />
-                    </button>
-                </div>
-
-                {/* Plan items list */}
-                <div className="space-y-2.5">
-                    {items.map((item, idx) => (
-                        <div
-                            key={item.id}
-                            className="flex items-center justify-between px-4 py-3.5 bg-[#1c1e2e] rounded-xl"
-                        >
-                            <span className="text-gray-300 text-sm">
-                                {idx + 1}. {item.label}
-                                {item.percentage && (
-                                    <span className="text-gray-400"> &nbsp;|&nbsp; {item.percentage}</span>
-                                )}
-                            </span>
-                            <button
-                                onClick={() => removeItem(item.id)}
-                                className="text-gray-500 hover:text-gray-300 transition-colors ml-3"
-                            >
-                                <X size={16} />
-                            </button>
+                {/* Basic Info Card */}
+                <div className="bg-[#111118] border border-white/5 rounded-4xl p-6 space-y-6 shadow-2xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div className="space-y-1.5">
+                            <label className={labelClass}><Info size={11} className="text-indigo-400" /> Plan Name</label>
+                            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Premium Lover" className={inputClass} required />
                         </div>
-                    ))}
-                </div>
-            </div>
+                        <div className="space-y-1.5">
+                            <label className={labelClass}><Smile size={11} className="text-indigo-400" /> Emoji Icon</label>
+                            <input type="text" value={emoji} onChange={e => setEmoji(e.target.value)} placeholder="🚀" className={inputClass} />
+                        </div>
+                    </div>
 
-            {/* Create button */}
-            <button className="w-full py-4 rounded-xl font-semibold text-sm text-white bg-indigo-400 hover:bg-indigo-500 transition-all mt-2">
-                Create
-            </button>
+                    <div className="space-y-1.5">
+                        <label className={labelClass}><Info size={11} className="text-indigo-400" /> Subtitle</label>
+                        <input type="text" value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="e.g. Best for growing fans" className={inputClass} />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                        <div className="space-y-1.5">
+                            <label className={labelClass}><Hash size={11} className="text-indigo-400" /> Price ($)</label>
+                            <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" className={inputClass} required />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className={labelClass}><Calendar size={11} className="text-indigo-400" /> Category</label>
+                            <select value={category} onChange={e => setCategory(e.target.value as PlanCategory)} className={inputClass + " appearance-none"}>
+                                <option value="Free">Free</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Yearly">Yearly</option>
+                            </select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className={labelClass}><Calendar size={11} className="text-indigo-400" /> Duration (Mo)</label>
+                            <input type="number" value={duration} onChange={e => setDuration(e.target.value)} placeholder="1" className={inputClass} required />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Features Selection Card */}
+                <div className="bg-[#111118] border border-white/5 rounded-4xl p-6 space-y-6 shadow-2xl">
+                    <label className={labelClass}><CheckCircle2 size={11} className="text-emerald-400" /> Select Plan Benefits</label>
+                    <div className="grid grid-cols-1 gap-3">
+                        {formFeatures.map((f) => (
+                            <div
+                                key={f.name}
+                                className={`flex flex-col sm:flex-row items-center justify-between p-4 rounded-3xl border transition-all duration-300 ${f.status
+                                    ? 'bg-[#1a1a24] border-indigo-500/30 ring-1 ring-indigo-500/20'
+                                    : 'bg-[#0d0d12] border-white/5 opacity-60 hover:opacity-100'}`}
+                            >
+                                <div className="flex items-center gap-4 w-full sm:w-auto mb-4 sm:mb-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleFeature(f.name!)}
+                                        className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-lg ${f.status
+                                            ? 'bg-indigo-600 text-white shadow-indigo-500/20'
+                                            : 'bg-[#1c1d27] text-gray-600'}`}
+                                    >
+                                        <Check size={24} strokeWidth={3} className={f.status ? "scale-100" : "scale-0"} />
+                                    </button>
+                                    <div>
+                                        <p className="text-sm font-black text-white uppercase tracking-tight">{f.name}</p>
+                                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{f.status ? 'Feature Enabled' : 'Click to enable'}</p>
+                                    </div>
+                                </div>
+
+                                {f.status && (
+                                    <div className="flex items-center gap-3 w-full sm:w-auto animate-in fade-in slide-in-from-right-2 duration-300">
+                                        <div className="relative flex-1 sm:w-36">
+                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">% Discount</span>
+                                            <input
+                                                type="number"
+                                                value={f.discount}
+                                                onChange={e => updateDiscount(f.name!, Number(e.target.value))}
+                                                className="w-full bg-[#0d0d12] border border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500/50 transition-all"
+                                                placeholder="0"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Submit Action */}
+                <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-sm uppercase tracking-[0.2em] transition-all shadow-2xl active:scale-[0.98] ${isSubmitting
+                        ? 'bg-[#1a1a24] text-gray-600 cursor-not-allowed'
+                        : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/40 hover:-translate-y-0.5'}`}
+                >
+                    {isSubmitting ? (
+                        <>
+                            <div className="h-5 w-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            Creating Plan...
+                        </>
+                    ) : (
+                        <>
+                            Create Membership Plan <Plus size={18} strokeWidth={3} />
+                        </>
+                    )}
+                </button>
+            </form>
         </div>
     );
 }
