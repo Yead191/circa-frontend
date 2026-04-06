@@ -1,11 +1,41 @@
 
-import FanProfile from "@/components/ui/fans/profile/profile";
-import React from "react";
+import ProfileMenu from "@/components/ui/fans/profile/ProfileMenu";
+import Link from "next/link";
+
 
 export default function ProfilePage() {
   return (
-    <div className="space-y-6">      
-      <FanProfile />
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row gap-3 justify-between mb-7">
+
+        {/* Left */}
+        <div className="flex flex-col items-center md:flex-row gap-3">
+          <img
+            src="https://api.dicebear.com/7.x/personas/svg?seed=jhonlur"
+            alt=""
+            className="w-[58px] h-[58px] rounded-full object-cover border-[2.5px] border-[#8b7cf8] bg-[#1a1b2e]"
+          />
+
+          <div className="text-center md:text-left">
+            <div className="text-white font-bold">
+              Jhon Lura
+            </div>
+            <div className="text-gray-400 text-sm">
+              jhonlura@mail.com
+            </div>
+          </div>
+        </div>
+
+        {/* Right */}
+        <Link href="/become-creator">
+          <button className="w-full sm:w-auto bg-[#8b7cf8] text-white rounded-xl px-5 py-2.5 font-medium hover:opacity-90 transition">
+            Be Creator
+          </button>
+        </Link>
+
+      </div>
+
+      <ProfileMenu />
     </div>
   );
 }

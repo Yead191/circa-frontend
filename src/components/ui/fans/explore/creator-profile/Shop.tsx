@@ -8,11 +8,10 @@ import { imageFormatter } from "../../../../../../helpers/imageFormatter";
 const Shop = async ({ creatorId }: { creatorId: string }) => {
   const data = await myFetch(`/product/user/${creatorId}`);
   const shopData = data?.data || [];
-  // console.log("ShopData", shopData);
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 mt-4 pb-12">
       {shopData.map((item: { _id: string; image: string; name: string; price: string }) => (
-        <Link href={`/explore/creator-profile/product-details?id=${item._id}`} key={item._id} className="flex flex-col gap-3 group cursor-pointer">
+        <Link href={`/explore/creator-profile/product-details?productId=${item._id}&id=${creatorId}`} key={item._id} className="flex flex-col gap-3 group cursor-pointer">
           <div className="relative w-full rounded-[22px] overflow-hidden bg-[#1c1c20]">
 
             <Image

@@ -26,21 +26,21 @@ interface MenuItem {
 }
 
 const MENU_ITEMS: MenuItem[] = [
-  { id: "about-us",   label: "About Us",         icon: Info,        danger: false },
-  { id: "terms",      label: "Terms & Condition", icon: FileText,    danger: false },
-  { id: "privacy",    label: "Privacy Policy",    icon: ShieldCheck, danger: false },
-  { id: "contact-us", label: "Contact Us",        icon: Mail,        danger: false },
-  { id: "delete",     label: "Delete Account",    icon: Trash2,      danger: true  },
+  { id: "about-us", label: "About Us", icon: Info, danger: false },
+  { id: "terms", label: "Terms & Condition", icon: FileText, danger: false },
+  { id: "privacy", label: "Privacy Policy", icon: ShieldCheck, danger: false },
+  { id: "contact-us", label: "Contact Us", icon: Mail, danger: false },
+  { id: "delete", label: "Delete Account", icon: Trash2, danger: true },
 ];
 
 function PageRenderer({ page }: { page: PageId }) {
   switch (page) {
-    case "about-us":   return <AboutUs />;
-    case "terms":      return <Termsandcondition />;
-    case "privacy":    return <PrivacyPolicy />;
+    case "about-us": return <AboutUs />;
+    case "terms": return <Termsandcondition />;
+    case "privacy": return <PrivacyPolicy />;
     case "contact-us": return <ContactUs />;
-    case "delete":     return <DeleteAccount />;
-    default:           return null;
+    case "delete": return <DeleteAccount />;
+    default: return null;
   }
 }
 
@@ -53,7 +53,7 @@ function SettingsMenu({ onNav }: { onNav: (page: PageId) => void }) {
           <button
             key={item.id}
             onClick={() => onNav(item.id)}
-            className="w-full flex items-center justify-between px-4 py-3.5 rounded-lg bg-[#1a1b2e] hover:bg-[#1f2040] transition-colors group"
+            className="w-full flex items-center justify-between px-4 py-3.5 rounded-lg bg-[#13141f] hover:bg-[#1a1b2e] transition-colors group"
           >
             <div className="flex items-center gap-3">
               <Icon
@@ -81,7 +81,7 @@ export default function Settings() {
   const [page, setPage] = useState<PageId>("main");
 
   return (
-    <div className="bg-[#0f1020] px-6 py-6">
+    <div className="px-6 py-6">
       {page !== "main" && (
         <button
           onClick={() => setPage("main")}

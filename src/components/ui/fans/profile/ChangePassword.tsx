@@ -1,3 +1,4 @@
+"use client";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
@@ -41,9 +42,7 @@ export default function ChangePassword() {
           <span className="absolute right-3">{eyeBtn(shConf, setShConf)}</span>
         </div>
       </div>
-       <button
-      
-      className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all bg-primary`}
+       <button className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all bg-primary`}
     >
       Save
     </button>
