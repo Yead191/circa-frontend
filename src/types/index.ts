@@ -133,3 +133,51 @@ export interface Plan {
     updatedAt: string;
     __v: number;
 }
+
+export interface OrderItem {
+    name: string;
+    image: string;
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+    _id: string;
+}
+
+export interface AddressBreakdown {
+    country: string;
+    city: string;
+    postal_code: string;
+    street_address: string;
+    contact_number: string;
+}
+
+export interface PriceBreakdown {
+    products_price: number;
+    serviceFee: number;
+    delivery_charge: number;
+    discount_amount: number;
+    total_price: number;
+    tax: number;
+    subtotal: number;
+}
+
+export interface Order {
+    _id: string;
+    user: UserInfo;
+    items: OrderItem[];
+    creator: UserInfo;
+    status: string;
+    payment_status: "paid" | "unpaid";
+    order_id: string;
+    price_breakdown: PriceBreakdown;
+    total_items: number;
+    formatted_address: string;
+    address_breakdown: AddressBreakdown;
+    contact_number: string;
+    discount_percentage: number;
+    discount_amount: number;
+    createdAt: string;
+    updatedAt: string;
+    payment_intent_id: string;
+    transaction_id: string;
+}

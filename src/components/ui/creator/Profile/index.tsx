@@ -216,18 +216,20 @@ interface PageRendererProps {
   user: User;
   plans: Plan[];
   features: string[];
+  notification: any;
+  orderList: any[];
 }
 
-function PageRenderer({ page, onNav, onViewUser, user, plans, features }: PageRendererProps) {
+function PageRenderer({ page, onNav, onViewUser, user, plans, features, notification, orderList }: PageRendererProps) {
   switch (page) {
     case "main": return <ProfileMain onNav={onNav} user={user} />;
     case "edit-profile": return <EditProfile user={user} />;
     case "membership-plan": return <MembershipPlan onCreate={() => onNav("create-plan")} plans={plans} features={features} />;
     case "create-plan": return <CreatePlan features={features} />;
-    case "notification-settings": return <NotificationSettings />;
+    case "notification-settings": return <NotificationSettings notification={notification} />;
     case "change-password": return <ChangePassword />;
     case "change-your-vive": return <ChangeYourVive />;
-    case "order-list": return <OrderList />;
+    case "order-list": return <OrderList orderList={orderList} />;
     case "member-list": return <MemberList />;
     case "block-list": return <BlockList />;
     case "subscribers": return <SubscribersList onViewUser={onViewUser} />;
@@ -238,7 +240,7 @@ function PageRenderer({ page, onNav, onViewUser, user, plans, features }: PageRe
 
 // ─── CreatorProfile (Root) ────────────────────────────────────────────────────
 
-export default function CreatorProfile({ user, plans, features }: { user: any, plans: Plan[], features: string[] }) {
+export default function CreatorProfile({ user, plans, features, notification, orderList }: { user: any, plans: Plan[], features: string[], notification: any, orderList: any[] }) {
   const [page, setPage] = useState<PageId>("main");
   const [history, setHistory] = useState<PageId[]>([]);
   const [viewingUser, setViewingUser] = useState("");
@@ -268,7 +270,7 @@ export default function CreatorProfile({ user, plans, features }: { user: any, p
       />
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
-        <PageRenderer page={page} onNav={navigate} onViewUser={handleViewUser} user={user} plans={plans} features={features} />
+        <PageRenderer page={page} onNav={navigate} onViewUser={handleViewUser} user={user} plans={plans} features={features} notification={notification} orderList={orderList} />
       </div>
     </div>
   );
