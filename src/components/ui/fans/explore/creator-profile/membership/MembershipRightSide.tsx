@@ -2,26 +2,47 @@
 
 import { Post } from "@/types/post";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { myFetch } from "../../../../../../../helpers/myFetch";
 import { useEffect, useState } from "react";
 import { imageFormatter } from "../../../../../../../helpers/imageFormatter";
 
 const MembershipRightSide = () => {
-  const params = useSearchParams();  
+  const params = useSearchParams();
+  const router = useRouter();
   const id = params.get("creatorId");
 
   const [creator, setCreator] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isMessaging, setIsMessaging] = useState(false);
+
+  const handleMessage = async () => {
+    if (!creator?._id) return;
+    setIsMessaging(true);
+    try {
+      const res = await myFetch(`/chat/${creator._id}`, {
+        method: "POST",
+      });
+      if (res?.success) {
+        router.push('/message');
+      } else {
+        console.error("Failed to start chat:", res?.message);
+      }
+    } catch (error) {
+      console.error("Message fetch error:", error);
+    } finally {
+      setIsMessaging(false);
+    }
+  };
 
 
   useEffect(() => {
-      if (!id) return;
-      
-      const fetchCreator = async () => {
-          try {
-              const res = await myFetch(`/user/creator/${id}`);
-              console.log("creator", res);
+    if (!id) return;
+
+    const fetchCreator = async () => {
+      try {
+        const res = await myFetch(`/user/creator/${id}`);
+        console.log("creator", res);
         setCreator(res?.data);
       } catch (error) {
         console.error("Failed to fetch creator:", error);
@@ -61,8 +82,12 @@ const MembershipRightSide = () => {
             {creator?.short_bio}
           </p>
 
-          <button className="w-full bg-[#D08BFF] hover:bg-[#b070de] text-black font-medium py-3 rounded-xl text-white text-sm transition-colors">
-            Message
+          <button
+            onClick={handleMessage}
+            disabled={isMessaging}
+            className="w-full bg-[#D08BFF] cursor-pointer hover:bg-[#b070de] text-black font-medium py-3 rounded-xl text-white text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isMessaging ? "Starting chat..." : "Message"}
           </button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 
-import { RiSearch2Line } from "react-icons/ri";
+
 import Breadcrumbs from "../ui/Breadcrumbs";
 
 export function Navbar({

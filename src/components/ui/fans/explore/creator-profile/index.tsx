@@ -1,10 +1,11 @@
 import Image from "next/image";
-import { MessageSquare, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Posts from "./Posts";
 import Shop from "./Shop";
 import Link from "next/link";
 import { imageFormatter } from "../../../../../../helpers/imageFormatter";
+import MessageButton from "./MessageButton";
 
 
 const CreatorProfile = ({ creatorData, creatorId }: any) => {
@@ -15,9 +16,7 @@ const CreatorProfile = ({ creatorData, creatorId }: any) => {
     <div className="w-full ">
       {/* Main Header Card */}
       <div className="flex flex-col md:flex-row gap-6 lg:gap-8  bg-[#0c0c0e]/40  relative">
-        <button className="md:hidden absolute top-4 right-4 flex items-center justify-center p-2 rounded-xl border border-[#B698F4] text-[#B698F4] hover:bg-[#B698F4]/10 transition-colors">
-          <MessageSquare size={18} />
-        </button>
+        <MessageButton creatorId={creatorData?._id} variant="mobile" />
 
         {/* Avatar */}
         <div className="shrink-0 flex justify-center md:justify-start">
@@ -57,10 +56,7 @@ const CreatorProfile = ({ creatorData, creatorId }: any) => {
             </div>
 
             {/* Desktop Message Button */}
-            <button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl border border-[#B698F4] text-[#B698F4] text-[15px] font-medium hover:bg-[#B698F4]/10 transition-colors">
-              <MessageSquare size={18} />
-              Message
-            </button>
+            <MessageButton creatorId={creatorData?._id} variant="desktop" />
           </div>
 
           {/* Bio Text */}

@@ -5,8 +5,6 @@ import { Navbar } from "./Navbar";
 import { RightSidebar } from "./RightSidebar";
 import { ContentWrapper } from "./ContentWrapper";
 import { RightSidebarNav } from "./RightSidebarNav";
-import store from "@/store/store";
-import { Provider } from "react-redux";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -22,7 +20,7 @@ export function DashboardLayout({
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
- <div className="flex h-screen w-full text-white font-sans overflow-hidden">
+    <div className="flex h-screen w-full text-white font-sans overflow-hidden">
       {/* LEFT SIDEBAR */}
       <div className="hidden md:flex md:w-[220px] lg:w-[240px] xl:w-[260px] flex-shrink-0 h-screen sticky top-0">
         <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -35,14 +33,14 @@ export function DashboardLayout({
 
 
       {/* MIDDLE CONTENT */}
-         <div className="flex-1 border-x border-[#242424] flex flex-col min-h-dvh overflow-y-auto w-full min-w-0">
+      <div className="flex-1 border-x border-[#242424] flex flex-col min-h-dvh overflow-y-auto w-full min-w-0">
         <Navbar title={breadcrumbs} onMenuClick={() => setSidebarOpen(true)} />
         <ContentWrapper>
           <main className="p-3 sm:p-4 w-full flex-1">{children}</main>
         </ContentWrapper>
       </div>
 
-     {/* RIGHT SIDEBAR — hidden below lg */}
+      {/* RIGHT SIDEBAR — hidden below lg */}
       <div className="hidden lg:flex lg:w-[260px] xl:w-[300px] flex-shrink-0 flex-col min-h-dvh overflow-y-auto">
         <RightSidebarNav />
         <ContentWrapper>

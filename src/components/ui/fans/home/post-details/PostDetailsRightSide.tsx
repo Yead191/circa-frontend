@@ -3,24 +3,30 @@ import { Post } from '@/types/post';
 import { CheckCircle2, Crown } from "lucide-react";
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { myFetch } from '../../../../../../helpers/myFetch';
 import { useEffect, useState } from 'react';
 import { imgUrl } from '../../../../../../helpers/imgUrl';
 
 const PostDetailsRightSide = () => {
     const params = useSearchParams();
+    const router = useRouter();
     const type = params.get("type");
     const id = params.get("id");
 
     const [postData, setPostData] = useState<any>(null);
     const [membershipPlan, setMembershipPlan] = useState<any>(null);
+    const user = type === "product" ? postData?.author : postData?.user;
 
-    // ✅ Fetch post
     const getPostData = async () => {
         try {
-            const res = await myFetch(`/post/${id}`);
-            setPostData(res?.data);
+            if (type === "product") {
+                const res = await myFetch(`/product/${id}`);
+                setPostData(res?.data);
+            } else {
+                const res = await myFetch(`/post/${id}`);
+                setPostData(res?.data);
+            }
         } catch (error) {
             console.error("Post fetch error:", error);
         }
@@ -45,11 +51,31 @@ const PostDetailsRightSide = () => {
 
     // ✅ Then load membership when postData is available
     useEffect(() => {
-        if (postData?.user?._id) {
-            getMemberShipPackage(postData.user._id);
+        if (user?._id) {
+            getMemberShipPackage(user._id);
         }
-    }, [postData]);
+    }, [user]);
 
+    const [isMessaging, setIsMessaging] = useState(false);
+
+    const handleMessage = async () => {
+        if (!user?._id) return;
+        setIsMessaging(true);
+        try {
+            const res = await myFetch(`/chat/${user._id}`, {
+                method: "POST",
+            });
+            if (res?.success) {
+                router.push('/message');
+            } else {
+                console.error("Failed to start chat:", res?.message);
+            }
+        } catch (error) {
+            console.error("Message fetch error:", error);
+        } finally {
+            setIsMessaging(false);
+        }
+    };
 
     return (
         <div>
@@ -59,10 +85,10 @@ const PostDetailsRightSide = () => {
                     <div className="w-20 h-20 rounded-full overflow-hidden mb-3">
                         <Image
                             src={
-                                postData?.user?.image && postData?.user?.image.startsWith('http')
-                                    ? postData?.user?.image
-                                    : postData?.user?.image
-                                        ? `${imgUrl}${postData?.user?.image}`
+                                user?.image && user?.image.startsWith('http')
+                                    ? user?.image
+                                    : user?.image
+                                        ? `${imgUrl}${user?.image}`
                                         : '/default-avatar.jpg'
                             }
                             alt="user image"
@@ -71,14 +97,18 @@ const PostDetailsRightSide = () => {
                         />
                     </div>
                     <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
-                        {postData?.user?.nickname}
+                        {user?.nickname}
                     </p>
-                    <h3 className="font-bold text-xl mb-3">{postData?.user?.name}</h3>
+                    <h3 className="font-bold text-xl mb-3">{user?.name}</h3>
                     <p className="text-sm text-gray-400 mb-6 px-2 leading-relaxed">
-                        {postData?.user?.short_bio} ✨
+                        {user?.short_bio} ✨
                     </p>
-                    <button className="w-full bg-[#D08BFF] hover:bg-[#b070de] text-black font-medium py-2 rounded-xl text-white text-sm transition-colors">
-                        Message
+                    <button
+                        onClick={handleMessage}
+                        disabled={isMessaging}
+                        className="w-full bg-[#D08BFF] cursor-pointer hover:bg-[#b070de] text-black font-medium py-2 rounded-xl text-white text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isMessaging ? "Starting chat..." : "Message"}
                     </button>
                 </div>
 
@@ -89,7 +119,7 @@ const PostDetailsRightSide = () => {
                             <Crown className="w-5 h-5 text-yellow-500" />
                             Membership
                         </h3>
-                        <Link href={`/explore/creator-profile/membership?creatorId=${postData?.user?._id}`}><button className='text-xs cursor-pointer'>View All</button></Link>
+                        <Link href={`/explore/creator-profile/membership?creatorId=${user?._id}`}><button className='text-xs cursor-pointer'>View All</button></Link>
                     </div>
 
                     <div className="bg-[#2A2B3D] rounded-xl p-5 border border-gray-700/50">
@@ -112,7 +142,7 @@ const PostDetailsRightSide = () => {
                         </ul>
 
                         <div className='w-full flex items-center justify-end'>
-                            <Link href={`/explore/creator-profile/membership?creatorId=${postData?.user?._id}`} className={`w-full ${!membershipPlan?.isSubscribed && "cursor-not-allowed"} bg-[#7971FF] hover:bg-[#6c64e6] text-white font-semibold py-2.5 text-center rounded-xl text-sm transition-colors`}>
+                            <Link href={`/explore/creator-profile/membership?creatorId=${user?._id}`} className={`w-full ${!membershipPlan?.isSubscribed && "cursor-not-allowed"} bg-[#7971FF] hover:bg-[#6c64e6] text-white font-semibold py-2.5 text-center rounded-xl text-sm transition-colors`}>
                                 Join
                             </Link>
                         </div>
