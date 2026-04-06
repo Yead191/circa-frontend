@@ -1,14 +1,15 @@
-import React from 'react'
+
 import EarningOverview from './EarningOverview'
 import AnalyticsCharts from './AnalyticsCharts'
 import RecentTransaction from './RecentTransaction'
+import { Statistics } from '@/types'
 
-const EarningPage = () => {
+const EarningPage = ({ statistics }: { statistics: Statistics }) => {
   return (
     <div>
-        <EarningOverview />
-        <AnalyticsCharts />
-        <RecentTransaction />
+      <EarningOverview statistics={statistics} />
+      <AnalyticsCharts />
+      <RecentTransaction />
     </div>
   )
 }

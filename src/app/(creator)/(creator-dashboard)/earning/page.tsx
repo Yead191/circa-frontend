@@ -1,9 +1,14 @@
 import EarningPage from '@/components/ui/creator/Earning'
-import React from 'react'
+import { myFetch } from '../../../../../helpers/myFetch'
 
-const page = () => {
+
+const page = async () => {
+  const statisticsRes = await myFetch('/wallet', {
+    method: "GET"
+  })
+  const statistics = statisticsRes?.data || {};
   return (
-    <EarningPage />
+    <EarningPage statistics={statistics} />
   )
 }
 

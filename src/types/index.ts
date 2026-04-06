@@ -57,3 +57,15 @@ export interface Comment {
     isLike?: boolean
 }
 
+export interface Analytics {
+    totalSale: number;
+    totalEarning: number;
+    totalMembers: number;
+}
+
+export interface Statistics {
+    _id: string;
+    credit: number;
+    balance: number;
+    analatys: Analytics;
+}
