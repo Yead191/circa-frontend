@@ -10,7 +10,6 @@ import { io } from "socket.io-client";
 import { getImageUrl } from "@/utils/getImageUrl";
 
 import { useRouter } from "next/navigation";
-import { imgUrl } from "../../../../helpers/imgUrl";
 import { myFetch } from "../../../../helpers/myFetch";
 
 // Sub-components for better organization
@@ -78,7 +77,7 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
   const otherParticipant = Array.isArray(activeUser?.participants)
     ? activeUser?.participants?.find((p: any) => p._id !== currentUserId)
     : activeUser?.participants;
-  console.log(messages)
+
   return (
     <div className="flex flex-col h-full bg-[#0d0e14] relative overflow-hidden">
       {/* Chat Header */}

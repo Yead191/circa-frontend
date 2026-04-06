@@ -54,7 +54,7 @@ export default function CreatorPost() {
         />
       </div>
 
-      <CreatePostModal isOpen={postOpen} onClose={() => setPostOpen(false)} onPublish={(formdata) => console.log(formdata)} />
+      <CreatePostModal isOpen={postOpen} onClose={() => setPostOpen(false)} />
       <UploadProductDialog isOpen={productOpen} onClose={() => setProductOpen(false)} />
 
 

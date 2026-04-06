@@ -28,9 +28,9 @@ const nextConfig = {
     serverSourceMaps: false, // ✅ Fixes invalid source map error
     serverActions: {
       // Increase the maximum request body size
-      bodySizeLimit: "10mb",
+      bodySizeLimit: "20mb",
     },
-    
+
   },
   //  allowedDevOrigins: [
   //   "http://localhost",
@@ -43,7 +43,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true, // 🚀 skips ESLint during build
   },
-  
+
 };
 
 export default nextConfig;
