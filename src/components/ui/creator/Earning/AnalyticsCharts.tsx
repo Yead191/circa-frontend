@@ -1,6 +1,4 @@
 'use client'
-
-import React from 'react'
 import {
     BarChart,
     Bar,
@@ -13,9 +11,32 @@ import {
 } from 'recharts';
 import { Star, MessageSquare, ShoppingBag } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../../select';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 
-const ChartCard = ({ title, icon, iconBg, iconColor, barColor }: any) => {
+
+const ChartCard = ({ title, icon, iconBg, iconColor, barColor, data, paramKey }: any) => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const currentType = searchParams.get(paramKey) || 'month';
+
+    const handleTypeChange = (value: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(paramKey, value);
+        router.push(`?${params.toString()}`, { scroll: false });
+    };
+
+    // Map API data to chart format
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const chartData = data?.map((item: any) => ({
+        day: item.date,
+        value: item.total
+    })) || [];
+
+    // Calculate max value for Y-axis scaling
+    const maxVal = Math.max(...chartData.map((d: any) => d.value), 10);
+    const yAxisMax = Math.ceil(maxVal / 10) * 10;
+
     return (
         <div className="flex flex-col gap-4 w-full">
             <div className="flex items-center justify-between">
@@ -27,15 +48,14 @@ const ChartCard = ({ title, icon, iconBg, iconColor, barColor }: any) => {
                     <span>{title}</span>
                 </div>
 
-                <Select>
+                <Select value={currentType} onValueChange={handleTypeChange}>
                     <SelectTrigger className="w-32">
-                        <SelectValue placeholder="Year" />
+                        <SelectValue placeholder="Period" />
                     </SelectTrigger>
                     <SelectContent className='bg-black'>
                         <SelectGroup>
                             <SelectItem value="week">Week</SelectItem>
                             <SelectItem value="month">Month</SelectItem>
-                            <SelectItem value="year">Year</SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>
@@ -47,7 +67,7 @@ const ChartCard = ({ title, icon, iconBg, iconColor, barColor }: any) => {
                 <div className="h-48 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart
-                            data={data}
+                            data={chartData}
                             margin={{ top: 10, right: 0, left: -25, bottom: 0 }}
                             barGap={8}
                         >
@@ -67,8 +87,8 @@ const ChartCard = ({ title, icon, iconBg, iconColor, barColor }: any) => {
                                 axisLine={false}
                                 tickLine={false}
                                 tick={{ fill: '#9ca3af', fontSize: 12 }}
-                                domain={[0, 100]}
-                                ticks={[0, 50, 100]}
+                                domain={[0, yAxisMax]}
+                                allowDecimals={false}
                             />
                             <Tooltip
                                 cursor={{ fill: 'rgba(255,255,255,0.05)' }}
@@ -85,7 +105,7 @@ const ChartCard = ({ title, icon, iconBg, iconColor, barColor }: any) => {
                                 radius={[4, 4, 0, 0]}
                                 barSize={24}
                             >
-                                {data.map((entry, index) => (
+                                {chartData.map((entry: any, index: number) => (
                                     <Cell key={`cell-${index}`} fill={barColor} fillOpacity={0.8} />
                                 ))}
                             </Bar>
@@ -99,33 +119,33 @@ const ChartCard = ({ title, icon, iconBg, iconColor, barColor }: any) => {
                         className="w-3 h-3 rounded-sm"
                         style={{ backgroundColor: barColor }}
                     ></div>
-                    <span className="text-gray-400 text-xs font-medium">Day</span>
+                    <span className="text-gray-400 text-xs font-medium">Earnings</span>
                 </div>
             </div>
         </div>
     );
 };
 
-const data = [
-    { day: 'Sun', value: 28 },
-    { day: 'Mon', value: 42 },
-    { day: 'Tue', value: 88 },
-    { day: 'Wed', value: 44 },
-    { day: 'Thu', value: 72 },
-    { day: 'Fri', value: 15 },
-    { day: 'Sat', value: 38 },
-];
+interface AnalyticsChartsProps {
+    tierData: any[];
+    messageData: any[];
+    shopData: any[];
+}
 
-const AnalyticsCharts = () => {
+const AnalyticsCharts = ({ tierData, messageData, shopData }: AnalyticsChartsProps) => {
+
+
     return (
         <div>
-            <div className=" w-full">
+            <div className=" w-full mt-10">
                 {/* Responsive Grid: 1 column on mobile, 3 columns on large screens */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     {/* Chart 1: Orange/Gold */}
                     <ChartCard
                         title={"Tier"}
+                        paramKey="tier_type"
+                        data={tierData}
                         icon={<Star size={20} fill="currentColor" />}
                         iconBg="bg-orange-500/10"
                         iconColor="#d97706"
@@ -135,6 +155,8 @@ const AnalyticsCharts = () => {
                     {/* Chart 2: Blue */}
                     <ChartCard
                         title={"Message"}
+                        paramKey="message_type"
+                        data={messageData}
                         icon={<MessageSquare size={20} fill="currentColor" />}
                         iconBg="bg-blue-500/10"
                         iconColor="#3b82f6"
@@ -144,6 +166,8 @@ const AnalyticsCharts = () => {
                     {/* Chart 3: Red/Pink */}
                     <ChartCard
                         title={"Shop"}
+                        paramKey="shop_type"
+                        data={shopData}
                         icon={<ShoppingBag size={20} fill="currentColor" />}
                         iconBg="bg-red-500/10"
                         iconColor="#ef4444"

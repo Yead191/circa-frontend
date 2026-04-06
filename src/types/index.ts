@@ -69,3 +69,40 @@ export interface Statistics {
     balance: number;
     analatys: Analytics;
 }
+
+export interface UserInfo {
+    _id: string;
+    name: string;
+    email: string;
+    image: string;
+}
+
+export type TransactionStatus = "Success" | "Pending" | "Failed";
+export type TransactionType = "Debit" | "Credit";
+export type TransactionCategory = "Gift" | "Purchase" | "Refund" | "Transfer";
+
+export interface Transaction {
+    _id: string;
+    user: UserInfo;
+    creator: UserInfo;
+    total_price: number;
+    payment_received: number;
+    credit_received: number;
+    discount_percentage: number;
+    discount_amount: number;
+    platform_fee: number;
+    status: TransactionStatus;
+    type: TransactionType;
+    category: TransactionCategory;
+    createdAt: string;
+    updatedAt: string;
+    transaction_id: string;
+    prev_transaction_id: string;
+    __v: number;
+}
+export interface Pagination {
+    total: number;
+    limit: number;
+    page: number;
+    totalPage: number;
+}

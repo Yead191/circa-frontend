@@ -1,7 +1,7 @@
 import { Statistics } from "@/types"
 
 const EarningOverview = ({ statistics }: { statistics: Statistics }) => {
-  console.log(statistics)
+
   return (
     <div className="mb-5">
       <div className="bg-cardBg text-white p-6 rounded-2xl border border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
