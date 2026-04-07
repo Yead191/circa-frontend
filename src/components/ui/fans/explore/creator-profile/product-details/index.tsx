@@ -3,9 +3,59 @@ import Image from "next/image";
 import { Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { getImageUrl } from "@/utils/getImageUrl";
+import { myFetch } from "../../../../../../../helpers/myFetch";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const ProductDetails = ({ productDetails }: { productDetails: any }) => {
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState(1); 
+    const router = useRouter();
+ 
+    console.log("ProductDetails Component Received:", quantity);
+    const handleBuy = async (product: string) => {
+        try {
+            const response = await myFetch("/cart", { method: "POST", body: { product, quantity } })
+
+            if (response?.success) {
+                toast.success(response?.message)
+                router.replace('/add-to-card');
+            } else {
+                if (response?.error && Array.isArray(response.error)) {
+                    response.error.forEach((err: { message: string }) => {
+                        toast.error(err.message, { id: "cart" });
+                    });
+                } else {
+                    toast.error(response?.message || "Something went wrong!", {
+                        id: "cart",
+                    });
+                }
+            }
+        } catch (err) {
+            console.error('cart error:', err);
+        }
+    };  
+
+    const handleAddToCart = async (product: string) => {
+        try {
+            const response = await myFetch("/cart", { method: "POST", body: { product, quantity } })
+
+            if (response?.success) {
+                toast.success(response?.message)
+            } else {
+                if (response?.error && Array.isArray(response.error)) {
+                    response.error.forEach((err: { message: string }) => {
+                        toast.error(err.message, { id: "cart" });
+                    });
+                } else {
+                    toast.error(response?.message || "Something went wrong!", {
+                        id: "cart",
+                    });
+                }
+            }
+        } catch (err) {
+            console.error('cart error:', err);
+        }
+    }; 
 
     console.log("ProductDetails", productDetails);
     return (
@@ -61,10 +111,10 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 w-full">
-                <button className="flex-1 py-3 rounded-xl bg-[#9EA4F9] text-white text-[15px] font-medium hover:bg-[#8e95f5] transition-colors tracking-wide">
+                <button className="flex-1 py-3 rounded-xl bg-[#9EA4F9] text-white text-[15px] font-medium hover:bg-[#8e95f5] transition-colors tracking-wide" onClick={() => handleBuy(productDetails?._id)}>
                     Buy Now
                 </button>
-                <button className="flex-1 py-3 rounded-xl bg-[#131118] text-[#D4D4D8] text-[15px] font-medium hover:bg-[#1a1824] border border-[#2A2A30] transition-colors tracking-wide">
+                <button className="flex-1 py-3 rounded-xl bg-[#131118] text-[#D4D4D8] text-[15px] font-medium hover:bg-[#1a1824] border border-[#2A2A30] transition-colors tracking-wide" onClick={() => handleAddToCart(productDetails?._id)}>
                     Add to Cart
                 </button>
             </div>

@@ -5,29 +5,42 @@ export const generateBreadcrumbs = (
   const segments = pathname.split("/").filter(Boolean);
 
   const nameMap: Record<string, string> = {
-    home: "Home",
     explore: "Explore",
     "creator-profile": "Creator Profile",
     "post-details": "Post",
     "product-details": "Product",
     membership: "Membership",
     about: "About",
+    message: "Message",
   };
 
-  const breadcrumbs = segments.map((segment, index) => {
-    return {
+  let breadcrumbs: { label: string; href: string }[] = [];
+
+  // ✅ Special case: /message/:id → only show "Message"
+  if (segments[0] === "message") {
+    return [
+      {
+        label: "Message",
+        href: "/message",
+      },
+    ];
+  }
+
+  // ✅ Normal breadcrumb generation
+  segments.forEach((segment, index) => {
+    breadcrumbs.push({
       label: nameMap[segment] || segment,
       href: "/" + segments.slice(0, index + 1).join("/"),
-    };
+    });
   });
 
-  // 👉 handle query tab (important for you)
-  if (pathname === "/explore" && exploreTab === "browse") {
-    breadcrumbs.push({
-      label: "Browse Creators",
-      href: "#",
-    });
-  }
+  // // ✅ explore tab handling
+  // if (pathname.startsWith("/explore") && exploreTab === "browse") {
+  //   breadcrumbs.push({
+  //     label: "Browse Creators",
+  //     href: "#",
+  //   });
+  // }
 
   return breadcrumbs;
 };

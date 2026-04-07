@@ -1,8 +1,7 @@
 'use client'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import { Heart } from 'lucide-react'
-import { imgUrl } from '../../../../../../helpers/imgUrl'
 import ReplyInput from './ReplyInput'
 import { imageFormatter } from '../../../../../../helpers/imageFormatter'
 
@@ -44,11 +43,11 @@ const CommentCard = ({ comment, profileData }: CommentCardProps) => {
                     </span>
                     <span className="text-xs text-gray-500">• {timeAgo}</span>
                 </div>
-                <p className="text-sm text-gray-300 mb-2">{comment.comment_text}</p>
+                <p className="text-sm text-gray-300 mb-2">{comment?.comment_text}</p>
                 <div className="flex flex-row items-center gap-3 text-xs text-gray-400 font-medium">
                     <button className="flex items-center gap-1 hover:text-white transition-colors">
                         <Heart className="w-3.5 h-3.5" />
-                        {comment.like_count ?? 0}
+                        {comment?.like_count ?? 0}
                     </button>
                     <button
                         onClick={() => setShowReply((prev) => !prev)}
@@ -76,7 +75,7 @@ const CommentCard = ({ comment, profileData }: CommentCardProps) => {
                                 <div key={reply._id} className="flex gap-3">
                                     <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 relative">
                                         <Image
-                                            src={imageFormatter(replyAuthor.image)}
+                                            src={imageFormatter(replyAuthor?.image)}
                                             alt={replyAuthor?.name || 'User'}
                                             fill
                                             className="object-cover"
@@ -88,7 +87,7 @@ const CommentCard = ({ comment, profileData }: CommentCardProps) => {
                                                 {replyAuthor?.name || 'Unknown User'}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-gray-300">{reply.comment_text}</p>
+                                        <p className="text-sm text-gray-300">{reply?.comment_text}</p>
                                     </div>
                                 </div>
                             );

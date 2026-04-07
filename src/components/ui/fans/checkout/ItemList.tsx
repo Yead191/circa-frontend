@@ -1,36 +1,79 @@
-import { Minus, Package, Plus, Search, ShoppingCart, Trash2 } from 'lucide-react'
-import React, { useState } from 'react'
-import { Input } from '../../input'
+"use client";
 
+import { Minus, Plus, Search, ShoppingCart, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Input } from "../../input";
+import { getImageUrl } from "@/utils/getImageUrl";
+import { myFetch } from "../../../../../helpers/myFetch";
+import { revalidateTags } from "../../../../../helpers/revalidateTags";
 
-const PRODUCT_IMAGE = "https://images.unsplash.com/photo-1485965120184-e220f721d03e?q=80&w=1200&auto=format&fit=crop";
- 
-
-const ItemList = ({ cart, setCart }: any) => {
+const ItemList = ({ cart, setIsRevalidate }: any) => {
     const [search, setSearch] = useState("");
+    const [localCart, setLocalCart] = useState<any[]>([]);
 
-    const filteredCart = cart?.filter((i: any) =>
-        i.name.toLowerCase().includes(search.toLowerCase())
+    useEffect(() => {
+        setLocalCart(cart || []);
+    }, [cart]);
+
+    const filteredCart = localCart.filter((item: any) =>
+        item?.product?.name?.toLowerCase().includes(search.toLowerCase())
     );
+    const updateCartQty = async (id: string, amount: number) => {
+        try {
+            const res = await myFetch(`/cart/${id}`, {
+                method: "PATCH",
+                body: { amount }, // 🔥 important
+            });
 
-    const handleQtyChange = (id: number, delta: number) => {
-        setCart((prev: any) =>
-            prev.map((i: any) => (i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i))
-        );
+            if (res?.success) {
+                revalidateTags(["cart"]);
+                setIsRevalidate(true);
+            }
+        } catch (error) {
+            console.error("Update failed:", error);
+        }
     };
 
-    const handleRemove = (id: number) => {
-        setCart((prev: any) => prev.filter((i: any) => i.id !== id));
+    const handleQtyChange = (id: string, delta: number) => {
+        const currentItem = localCart.find((i) => i._id === id);
+        if (!currentItem) return;
+
+        if (currentItem.quantity <= 1 && delta === -1) return;
+
+        setLocalCart((prev) =>
+            prev.map((item) =>
+                item._id === id
+                    ? { ...item, quantity: item.quantity + delta }
+                    : item
+            )
+        );
+        updateCartQty(id, delta);
+    };
+
+    const handleRemove = async (id: string) => {
+        try {
+            const res = await myFetch(`/cart/${id}`, {
+                method: "DELETE",
+            });
+
+            if (res?.success) {
+                revalidateTags(["cart"]);
+                setIsRevalidate(true);
+            }
+        } catch (error) {
+            console.error("Delete failed:", error);
+        }
     };
 
     return (
         <div className="md:col-span-3 bg-[#161619] border border-white/[0.07] rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                    <ShoppingCart className="w-4 h-4 text-indigo-400" />
-                    <h2 className="text-base font-semibold">Cart</h2>
-                    <span className="text-xs text-white/40 ml-1">({cart?.length})</span>
-                </div>
+            {/* Header */}
+            <div className="flex items-center gap-2 mb-4">
+                <ShoppingCart className="w-4 h-4 text-indigo-400" />
+                <h2 className="text-base font-semibold">Cart</h2>
+                <span className="text-xs text-white/40">
+                    ({localCart.length})
+                </span>
             </div>
 
             {/* Search */}
@@ -40,47 +83,57 @@ const ItemList = ({ cart, setCart }: any) => {
                     placeholder="Search items..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-9 bg-white/5 border-white/10 text-white text-xs placeholder:text-white/30 h-9 focus-visible:ring-indigo-500/50"
+                    className="pl-9 bg-white/5 border-white/10 text-white text-xs h-9"
                 />
             </div>
 
             {/* Items */}
             <div className="divide-y divide-white/[0.06]">
-                {filteredCart?.length === 0 ? (
+                {filteredCart.length === 0 ? (
                     <p className="py-8 text-center text-sm text-white/30">
                         No items found
                     </p>
                 ) : (
-                    filteredCart?.map((item: any) => (
-                        <div key={item.id} className="flex items-center gap-4 py-3 group">
-                            {/* Thumbnail */}
-                            <div className="w-20 h-20 rounded-lg flex-shrink-0 overflow-hidden border border-white/10">
+                    filteredCart.map((item: any) => (
+                        <div
+                            key={item._id}
+                            className="flex items-center gap-4 py-3 group"
+                        >
+                            {/* Image */}
+                            <div className="w-20 h-20 rounded-lg overflow-hidden border border-white/10">
                                 <img
-                                    src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?q"
-                                    alt={item.name}
+                                    src={getImageUrl(item?.product?.image)}
+                                    alt={item?.product?.name}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
 
                             {/* Info */}
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-white truncate">{item.name}</p>
-                                <p className="text-indigo-400 text-sm font-medium mt-0.5">
-                                    ${item.price.toFixed(2)}
+                                <p className="text-sm font-semibold text-white truncate">
+                                    {item?.product?.name}
                                 </p>
 
-                                {/* Qty Controls */}
+                                <p className="text-indigo-400 text-sm mt-1">
+                                    ${item?.unit_price?.toFixed(2)}
+                                </p>
+
+                                {/* Quantity */}
                                 <div className="flex items-center gap-2 mt-2">
                                     <button
-                                        onClick={() => handleQtyChange(item.id, -1)}
-                                        className="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                                        onClick={() => handleQtyChange(item._id, -1)}
+                                        className="w-6 h-6 bg-white/10 hover:bg-white/20 flex items-center justify-center"
                                     >
                                         <Minus className="w-3 h-3 text-white/70" />
                                     </button>
-                                    <span className="text-xs text-white/80 w-4 text-center">{item.qty}</span>
+
+                                    <span className="w-6 text-center text-sm">
+                                        {item.quantity}
+                                    </span>
+
                                     <button
-                                        onClick={() => handleQtyChange(item.id, 1)}
-                                        className="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                                        onClick={() => handleQtyChange(item._id, 1)}
+                                        className="w-6 h-6 bg-white/10 hover:bg-white/20 flex items-center justify-center"
                                     >
                                         <Plus className="w-3 h-3 text-white/70" />
                                     </button>
@@ -89,8 +142,8 @@ const ItemList = ({ cart, setCart }: any) => {
 
                             {/* Remove */}
                             <button
-                                onClick={() => handleRemove(item.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-red-500/20 text-white/40 hover:text-red-400"
+                                onClick={() => handleRemove(item._id)}
+                                className="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-500/20 text-white/40 hover:text-red-400"
                             >
                                 <Trash2 className="w-4 h-4" />
                             </button>
@@ -99,7 +152,7 @@ const ItemList = ({ cart, setCart }: any) => {
                 )}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default ItemList
+export default ItemList;
