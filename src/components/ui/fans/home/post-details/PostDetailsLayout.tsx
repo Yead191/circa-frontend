@@ -11,13 +11,13 @@ interface PostDetailsLayoutProps {
 }
 
 export default function PostDetailsLayout({ post }: PostDetailsLayoutProps) {
-  const isPremium = post?.isPrimium; 
+  const isPremium = post?.isPrimium;
   const authorImage = post?.user?.image;
   const authorName = post?.user?.name;
-  const postImage = post?.images?.[0]; 
+  const postImage = post?.images?.[0];
 
   return (
-    <div className="w-full mx-auto bg-[#0a0a0a] min-h-screen text-white pb-10">
+    <div className="max-w-2xl mx-auto bg-[#0a0a0a] min-h-screen text-white pb-10">
       {/* Left Column - Main Post Content */}
       <div className="flex flex-col">
         {/* Post Card */}
