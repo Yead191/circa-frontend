@@ -1,14 +1,14 @@
 "use client";
 
-
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { IconType } from "react-icons";
-import { FiHome, FiCompass, FiMessageCircle, FiUser } from "react-icons/fi";
+import { FiHome, FiCompass, FiMessageCircle, FiUser, FiLogOut } from "react-icons/fi";
 import { IoMdWallet } from "react-icons/io";
 import { IoDiamondSharp, IoSettingsOutline } from "react-icons/io5";
+import Cookies from "js-cookie";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -30,6 +30,11 @@ const navItems: NavItem[] = [
 ];
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
+  const handleLogout = () => {
+    Cookies.remove("accessToken");
+    window.location.href = "/login";
+  };
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -46,62 +51,75 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         className={`fixed md:relative inset-y-0 left-0 h-full w-[240px] md:w-full border-r border-[#242424] flex flex-col pt-2 pb-8 px-4 z-40 bg-[#0a0a0a] transition-transform duration-300
     ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
-        {/* Logo */}
-        <div className="flex items-center justify-between px-2 h-[85px] mb-5">
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt="Circa Logo"
-              width={40}
-              height={40}
-              className="w-10 h-10"
-            />
-            <span className="text-xl font-medium text-primary tracking-wide">
-              Circa
-            </span>
-          </Link>
+        <div className="flex flex-col h-full">
+          {/* Logo */}
+          <div className="flex items-center justify-between px-2 h-[85px] mb-5">
+            <Link href="/" className="flex items-center gap-3">
+              <Image
+                src="/logo.png"
+                alt="Circa Logo"
+                width={40}
+                height={40}
+                className="w-10 h-10"
+              />
+              <span className="text-xl font-medium text-primary tracking-wide">
+                Circa
+              </span>
+            </Link>
 
-          <button
-            onClick={onClose}
-            className="md:hidden text-gray-400 hover:text-white text-xl p-1"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* 🔥 Nav Items (Mapped) */}
-        <div className=" pb-16 border-b border-[#242424] flex flex-col gap-2">
-          {navItems.map((item) => (
-            <SidebarLink
-              key={item.href}
-              href={item.href}
-              icon={item.icon}
+            <button
               onClick={onClose}
+              className="md:hidden text-gray-400 hover:text-white text-xl p-1"
             >
-              {item.label}
-            </SidebarLink>
-          ))}
-        </div>
-
-        {/* Bottom Card */}
-        <div className=" bg-[#F2CC0D0A] mt-6 rounded-xl p-4 border border-[#2D2D2D]">
-          <div className="flex items-center justify-between mb-4">
-            <span className=" text-white font-medium">Balance</span>
-            <span className="">
-              <IoDiamondSharp color="#B07BB7" size={18} />
-            </span>
+              ✕
+            </button>
           </div>
 
-          <div className="text-[#F2CC0D] font-medium text-xl mb-4 flex items-center gap-2">
-            <span>
-              <IoMdWallet color="#F2CC0D" size={18} />
-            </span>{" "}
-            120 Credits
+          {/* 🔥 Nav Items (Mapped) */}
+          <div className=" pb-8 border-b border-[#242424] flex flex-col gap-2">
+            {navItems.map((item) => (
+              <SidebarLink
+                key={item.href}
+                href={item.href}
+                icon={item.icon}
+                onClick={onClose}
+              >
+                {item.label}
+              </SidebarLink>
+            ))}
           </div>
 
-          <button className="w-full py-2 bg-primary hover:bg-opacity-90 transition-opacity text-white font-medium rounded-lg text-sm cursor-pointer">
-            Buy
-          </button>
+          {/* Bottom Card */}
+          <div className=" bg-[#F2CC0D0A] mt-6 rounded-xl p-4 border border-[#2D2D2D]">
+            <div className="flex items-center justify-between mb-4">
+              <span className=" text-white font-medium">Balance</span>
+              <span className="">
+                <IoDiamondSharp color="#B07BB7" size={18} />
+              </span>
+            </div>
+
+            <div className="text-[#F2CC0D] font-medium text-xl mb-4 flex items-center gap-2">
+              <span>
+                <IoMdWallet color="#F2CC0D" size={18} />
+              </span>{" "}
+              120 Credits
+            </div>
+
+            <button className="w-full py-2 bg-primary hover:bg-opacity-90 transition-opacity text-white font-medium rounded-lg text-sm cursor-pointer">
+              Buy
+            </button>
+          </div>
+
+          {/* Logout Button */}
+          <div className="mt-auto pt-4 border-t border-[#242424]">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-all text-gray-400 hover:text-red-500 hover:bg-red-500/10 cursor-pointer"
+            >
+              <FiLogOut className="text-2xl" />
+              <span>LogOut</span>
+            </button>
+          </div>
         </div>
       </aside>
     </>

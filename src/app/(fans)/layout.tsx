@@ -30,7 +30,7 @@ export default function DashboardGroup({
     "/explore/creator-profile/post-details": <PostDetailsRightSide />,
     "/explore/creator-profile/product-details": <PostDetailsRightSide />,
     "/explore/creator-profile/membership": <MembershipRightSide />,
-    "/explore/creator-profile/about": <PostDetailsRightSide />,
+    // "/explore/creator-profile/about": <PostDetailsRightSide />,
   };
 
   const rightSidebarContent = rightSidebarMap[pathname] || null;
