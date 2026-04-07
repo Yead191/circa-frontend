@@ -9,7 +9,7 @@ const EarningOverview = ({ statistics }: { statistics: Statistics }) => {
         <div className="space-y-2">
           <h3 className="text-gray-400 text-sm font-medium">Total Earning</h3>
           <div className="flex items-baseline gap-4">
-            <h1 className="text-2xl md:text-3xl font-semibold text-[#b085f5]">${(statistics?.analatys?.totalEarning).toFixed(2)}</h1>
+            <h1 className="text-2xl md:text-3xl font-semibold text-[#b085f5]">${(statistics?.analatys?.totalEarning)?.toFixed(2)}</h1>
           </div>
           <div className="flex items-center gap-2 pt-2">
             <span className="flex items-center gap-1 text-green-500 bg-green-500/10 px-2 py-1 rounded-full text-xs font-bold">
