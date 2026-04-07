@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { myFetch } from "../../../../helpers/myFetch";
 
 export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: any }) {
-  console.log(activeUser)
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [isSending, setIsSending] = useState(false);

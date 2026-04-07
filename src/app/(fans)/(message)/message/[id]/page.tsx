@@ -78,9 +78,7 @@ export default function ChatDetailPage({ params }: PageProps) {
       <div className="shrink-0 bg-[#0d0e14]">
         <ChatInput
           chatId={id}
-          onMessageSent={() => {
-            // Logic to refresh or scroll if needed
-          }}
+          activeUser={activeUser}
         />
       </div>
 

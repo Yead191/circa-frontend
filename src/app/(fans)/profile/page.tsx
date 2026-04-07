@@ -1,9 +1,13 @@
 
 import ProfileMenu from "@/components/ui/fans/profile/ProfileMenu";
+import getProfile from "@/utils/getProfile";
 import Link from "next/link";
+import { imageFormatter } from "../../../../helpers/imageFormatter";
 
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const user = await getProfile();
+  console.log(user);
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-3 justify-between mb-7">
@@ -11,17 +15,17 @@ export default function ProfilePage() {
         {/* Left */}
         <div className="flex flex-col items-center md:flex-row gap-3">
           <img
-            src="https://api.dicebear.com/7.x/personas/svg?seed=jhonlur"
+            src={imageFormatter(user?.image)}
             alt=""
             className="w-[58px] h-[58px] rounded-full object-cover border-[2.5px] border-[#8b7cf8] bg-[#1a1b2e]"
           />
 
           <div className="text-center md:text-left">
             <div className="text-white font-bold">
-              Jhon Lura
+              {user?.name}
             </div>
             <div className="text-gray-400 text-sm">
-              jhonlura@mail.com
+              {user?.email}
             </div>
           </div>
         </div>

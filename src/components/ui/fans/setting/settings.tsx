@@ -35,9 +35,9 @@ const MENU_ITEMS: MenuItem[] = [
 
 function PageRenderer({ page }: { page: PageId }) {
   switch (page) {
-    case "about-us": return <AboutUs />;
-    case "terms": return <Termsandcondition />;
-    case "privacy": return <PrivacyPolicy />;
+    case "about-us": return <AboutUs about="" />;
+    case "terms": return <Termsandcondition terms="" />;
+    case "privacy": return <PrivacyPolicy privacy="" />;
     case "contact-us": return <ContactUs />;
     case "delete": return <DeleteAccount />;
     default: return null;
