@@ -1,409 +1,192 @@
 'use client'
+
+import React from 'react';
 import {
-    ArrowUpRight
+  ArrowRightLeft,
+  CheckCircle2,
+  AlertCircle,
+  TrendingUp,
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
-import Link from 'next/link';
-import React, { useState } from 'react';
+import {
+  Dialog,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Pagination, Transaction } from '@/types';
+import TransactionDetailsModal, {
+  formatCurrency,
+  formatDate,
+  getStatusColor
+} from '../../Earning/TransactionDetailsModal';
 
-// ─────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────
-export type TransactionStatus = 'completed' | 'pending' | 'failed' | 'refunded';
-export type TransactionType = 'sale' | 'withdrawal' | 'refund' | 'tip';
-export type ContentType = 'shop' | 'illustration' | 'video' | 'locked';
+const TransactionsPage = ({ transactionData, pagination }: { transactionData: Transaction[], pagination: Pagination }) => {
+  console.log(pagination)
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-export interface Transaction {
-    id: string;
-    title: string;
-    contentType: ContentType;
-    image: string;
-    buyerName: string;
-    buyerAvatar: string;
-    amount: number;
-    fee: number;
-    net: number;
-    type: TransactionType;
-    status: TransactionStatus;
-    time: string;
-    txRef: string;
-}
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', newPage.toString());
+    router.push(`?${params.toString()}`);
+  };
 
-// ─────────────────────────────────────────────
-// MOCK DATA
-// ─────────────────────────────────────────────
-const TRANSACTIONS: Transaction[] = [
-    {
-        id: 't1',
-        title: 'Premium Watercolor Brush Set',
-        contentType: 'shop',
-        image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=200',
-        buyerName: 'Alex Morgan',
-        buyerAvatar: 'https://i.pravatar.cc/40?img=1',
-        amount: 29.99,
-        fee: 2.70,
-        net: 27.29,
-        type: 'sale',
-        status: 'completed',
-        time: '2 hr ago',
-        txRef: 'TXN-00123',
-    },
-    {
-        id: 't2',
-        title: 'Forest Walk — 4K Timelapse',
-        contentType: 'video',
-        image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=200',
-        buyerName: 'Jamie Lee',
-        buyerAvatar: 'https://i.pravatar.cc/40?img=5',
-        amount: 14.99,
-        fee: 1.35,
-        net: 13.64,
-        type: 'sale',
-        status: 'pending',
-        time: '5 hr ago',
-        txRef: 'TXN-00122',
-    },
-    {
-        id: 't3',
-        title: 'Abstract Neon Series — Vol. 3',
-        contentType: 'locked',
-        image: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=200',
-        buyerName: 'Riley Kim',
-        buyerAvatar: 'https://i.pravatar.cc/40?img=9',
-        amount: 9.99,
-        fee: 0.90,
-        net: 9.09,
-        type: 'sale',
-        status: 'completed',
-        time: '1 day ago',
-        txRef: 'TXN-00121',
-    },
-    {
-        id: 't4',
-        title: 'Midnight City Illustration',
-        contentType: 'illustration',
-        image: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?w=200',
-        buyerName: 'Dana Park',
-        buyerAvatar: 'https://i.pravatar.cc/40?img=12',
-        amount: 49.00,
-        fee: 4.41,
-        net: 44.59,
-        type: 'sale',
-        status: 'failed',
-        time: '1 day ago',
-        txRef: 'TXN-00120',
-    },
-    {
-        id: 't5',
-        title: 'Forest Walk — 4K Timelapse',
-        contentType: 'video',
-        image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=200',
-        buyerName: 'Chris Wade',
-        buyerAvatar: 'https://i.pravatar.cc/40?img=15',
-        amount: 14.99,
-        fee: 1.35,
-        net: 13.64,
-        type: 'refund',
-        status: 'refunded',
-        time: '2 days ago',
-        txRef: 'TXN-00119',
-    },
-    {
-        id: 't6',
-        title: 'Earnings Withdrawal',
-        contentType: 'shop',
-        image: 'https://i.pravatar.cc/40?img=20',
-        buyerName: 'You',
-        buyerAvatar: 'https://i.pravatar.cc/40?img=20',
-        amount: -150.00,
-        fee: 1.50,
-        net: -151.50,
-        type: 'withdrawal',
-        status: 'completed',
-        time: '3 days ago',
-        txRef: 'TXN-00118',
-    },
-     {
-    id: 't7',
-    title: 'Product Purchase',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=21',
-    buyerName: 'Rahim Ahmed',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=21',
-    amount: 320.00,
-    fee: 3.20,
-    net: 316.80,
-    type: 'sale',
-    status: 'completed',
-    time: '1 hour ago',
-    txRef: 'TXN-00119',
-  },
-  {
-    id: 't8',
-    title: 'Earnings Withdrawal',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=22',
-    buyerName: 'You',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=22',
-    amount: -200.00,
-    fee: 2.00,
-    net: -202.00,
-    type: 'withdrawal',
-    status: 'pending',
-    time: '5 hours ago',
-    txRef: 'TXN-00120',
-  },
-  {
-    id: 't9',
-    title: 'Service Payment',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=23',
-    buyerName: 'Nusrat Jahan',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=23',
-    amount: 500.00,
-    fee: 5.00,
-    net: 495.00,
-    type: 'sale',
-    status: 'completed',
-    time: 'Yesterday',
-    txRef: 'TXN-00121',
-  },
-  {
-    id: 't10',
-    title: 'Refund Issued',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=24',
-    buyerName: 'Sabbir Khan',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=24',
-    amount: -120.00,
-    fee: 0,
-    net: -120.00,
-    type: 'refund',
-    status: 'completed',
-    time: '2 days ago',
-    txRef: 'TXN-00122',
-  },
-  {
-    id: 't11',
-    title: 'Subscription Payment',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=25',
-    buyerName: 'Mehedi Hasan',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=25',
-    amount: 99.00,
-    fee: 0.99,
-    net: 98.01,
-    type: 'sale',
-    status: 'completed',
-    time: '3 days ago',
-    txRef: 'TXN-00123',
-  },
-  {
-    id: 't12',
-    title: 'Earnings Withdrawal',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=26',
-    buyerName: 'You',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=26',
-    amount: -75.00,
-    fee: 0.75,
-    net: -75.75,
-    type: 'withdrawal',
-    status: 'failed',
-    time: '4 days ago',
-    txRef: 'TXN-00124',
-  },
-  {
-    id: 't13',
-    title: 'Product Sale',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=27',
-    buyerName: 'Tanvir Islam',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=27',
-    amount: 850.00,
-    fee: 8.50,
-    net: 841.50,
-    type: 'sale',
-    status: 'completed',
-    time: '5 days ago',
-    txRef: 'TXN-00125',
-  },
-  {
-    id: 't14',
-    title: 'Order Payment',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=28',
-    buyerName: 'Jannat Akter',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=28',
-    amount: 260.00,
-    fee: 2.60,
-    net: 257.40,
-   type: 'sale',
-    status: 'completed',
-    time: '6 days ago',
-    txRef: 'TXN-00126',
-  },
-  {
-    id: 't15',
-    title: 'Commission Earned',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=29',
-    buyerName: 'Affiliate System',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=29',
-    amount: 45.00,
-    fee: 0,
-    net: 45.00,
-    type: 'sale',
-    status: 'completed',
-    time: '1 week ago',
-    txRef: 'TXN-00127',
-  },
-  {
-    id: 't16',
-    title: 'Manual Adjustment',
-    contentType: 'shop',
-    image: 'https://i.pravatar.cc/40?img=30',
-    buyerName: 'Admin',
-    buyerAvatar: 'https://i.pravatar.cc/40?img=30',
-    amount: -30.00,
-    fee: 0,
-    net: -30.00,
-    type: 'sale',
-    status: 'completed',
-    time: '1 week ago',
-    txRef: 'TXN-00128',
-  }
-];
+  return (
+    <div className="mt-8 mb-12">
+      {/* Header */}
+      <div className="flex flex-col gap-1 mb-8">
+        <h2 className="text-3xl font-black text-white tracking-tight">Financial History</h2>
+        <p className="text-gray-500 font-medium">Track and manage every transaction in your dashboard</p>
+      </div>
 
-function fmt(n: number): string {
-    const abs = Math.abs(n).toFixed(2);
-    return n < 0 ? `-$${abs}` : `+$${abs}`;
-}
-
-// ─────────────────────────────────────────────
-// MAIN COMPONENT
-// ─────────────────────────────────────────────
-const TransactionsPage: React.FC = () => {
-   const [selectedTx, setSelectedTx] = useState<any>(null);
-    return (
-        <div className="mt-5">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-1">
-                <h2 className="text-xl font-black text-white tracking-tight">Transactions</h2>
-            </div>
-            <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-gray-500">Recent activity</p>
-                <Link
-                    href="/transactions"
-                    className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
+      {/* Transaction List */}
+      <div className="space-y-3">
+        {transactionData?.length > 0 ? (
+          transactionData.map((tx, index) => (
+            <Dialog key={tx._id || index}>
+              <DialogTrigger asChild>
+                <div
+                  className="group flex items-center gap-4 px-6 py-5 rounded-3xl border border-[#2a2a35]/30 bg-[#121218]/50 hover:bg-[#16161e] hover:border-emerald-500/30 transition-all duration-300 cursor-pointer shadow-sm active:scale-[0.995]"
                 >
-                    View All <ArrowUpRight size={12} />
-                </Link>
-            </div>
-
-            {/* Transaction List */}
-            <div className="space-y-1">
-                {TRANSACTIONS.map((tx, index) => (
-                    <div key={index}  onClick={() => setSelectedTx(tx)} className="group flex items-center gap-4 px-4 py-3.5 rounded-2xl border border-transparent hover:bg-[#16161e] hover:border-[#2a2a35] transition-all duration-200 cursor-pointer">
-                        {/* Thumbnail */}
-                        <div className="relative shrink-0">
-                            <img
-                                // @TS-ignorenpm ru
-                                src={tx?.image}
-                                alt={tx.title}
-                                className="w-11 h-11 rounded-xl object-cover border border-[#2a2a35]"
-                            />
-                            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#0d0d12] border border-[#2a2a35] flex items-center justify-center">
-                                {/* <ContentTypeIcon size={10} className="text-gray-400" /> */}
-                            </div>
-                        </div>
-
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-0.5">
-                                <span className="font-normal text-sm text-white truncate">{tx.title}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <img src={tx.buyerAvatar} alt={tx.buyerName} className="w-4 h-4 rounded-full object-cover" />
-                                <span className="text-gray-400 text-[15px] truncate">{tx.buyerName}</span>
-                                <span className="text-gray-500 text-[13px]">•</span>
-                                <span className="text-gray-500 text-[15px] shrink-0">{tx.time}</span>
-                            </div>
-                        </div>
-                        {/* Amount */}
-                        <div className="shrink-0 text-right">
-                            <div className={`flex items-center gap-1 justify-end text-sm text-emerald-400`}>
-                                {fmt(tx.net)}
-                            </div>
-                            <div className="text-primary text-sm mt-0.5">
-                                Shop
-                            </div>
-                        </div>
+                  {/* Thumbnail */}
+                  <div className="relative shrink-0">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden border border-[#2a2a35] bg-[#1a1a23]">
+                      <img
+                        src={tx?.user?.image || "/api/placeholder/56/56"}
+                        alt={tx?.user?.name || "User"}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
                     </div>
-                ))}
-            </div>
-            {selectedTx && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-    <div className="w-full max-w-md bg-[#0d0d12] text-white rounded-2xl border border-[#2a2a35] p-6 relative">
+                    <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#0d0d12] border border-[#2a2a35] flex items-center justify-center`}>
+                      {tx.status === 'Success' ? (
+                        <CheckCircle2 size={14} className="text-emerald-500" />
+                      ) : (
+                        <AlertCircle size={14} className="text-amber-500" />
+                      )}
+                    </div>
+                  </div>
 
-      {/* Close Button */}
-      <button
-        onClick={() => setSelectedTx(null)}
-        className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"
-      >
-        ✕
-      </button>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="font-bold text-lg text-white truncate group-hover:text-emerald-400 transition-colors">
+                        {tx?.user?.name || "Unknown User"}
+                      </span>
+                      <Badge variant="outline" className={`text-[11px] uppercase font-black tracking-widest py-0.5 px-2 h-5 ${getStatusColor(tx.status)}`}>
+                        {tx.status}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-gray-400 text-sm font-medium flex items-center gap-1.5">
+                        <TrendingUp size={14} /> {tx.category}
+                      </span>
+                      <span className="text-gray-600 font-black">•</span>
+                      <span className="text-gray-500 text-sm font-medium shrink-0">{formatDate(tx.createdAt)}</span>
+                    </div>
+                  </div>
 
-      {/* Title */}
-      <h2 className="text-lg font-semibold mb-6">Details</h2>
+                  {/* Amount */}
+                  <div className="shrink-0 text-right">
+                    <div className={`font-black text-xl ${tx.type === 'Credit' ? 'text-emerald-400' : 'text-gray-300'}`}>
+                      {tx.type === 'Credit' ? '+' : ''}{formatCurrency(tx.credit_received || tx.total_price)}
+                    </div>
+                    <div className="flex items-center justify-end gap-1.5 text-xs font-black uppercase tracking-[0.2em] text-[#4a4a58] mt-0.5">
+                      {tx.type} <MoreHorizontal size={12} />
+                    </div>
+                  </div>
+                </div>
+              </DialogTrigger>
 
-      {/* Plan */}
-      <div className="mb-5">
-        <p className="text-sm text-indigo-400">Plan</p>
-        <p className="text-lg">Membership</p>
+              <TransactionDetailsModal tx={tx} />
+            </Dialog>
+          ))
+        ) : (
+          <div className="py-24 flex flex-col items-center justify-center bg-[#121218] border border-dashed border-[#2a2a35] rounded-[2.5rem]">
+            <ArrowRightLeft className="text-gray-800 mb-4" size={48} />
+            <h3 className="text-white text-xl font-bold mb-1">No transaction history</h3>
+            <p className="text-gray-600 font-medium">Your historical records will appear here</p>
+          </div>
+        )}
       </div>
 
-      <hr className="border-[#2a2a35] my-4" />
-
-      {/* Account + Time */}
-      <div className="flex justify-between mb-5">
-        <div>
-          <p className="text-sm text-indigo-400">Account</p>
-          <p>{selectedTx.buyerName}</p>
-          <p className="text-sm text-gray-400">ID: {selectedTx.txRef}</p>
-        </div>
-
-        <div className="text-right">
-          <p className="text-sm text-indigo-400">Time & Date</p>
-          <p>{new Date().toLocaleTimeString()}</p>
-          <p className="text-sm text-gray-400">
-            {new Date().toDateString()}
+      {/* Pagination */}
+      {pagination?.totalPage > 1 && (
+        <div className="mt-12 flex items-center justify-between px-2">
+          <p className="text-sm text-gray-500 font-bold uppercase tracking-widest">
+            Page <span className="text-white">{pagination.page}</span> of{" "}
+            <span className="text-white">{pagination.totalPage}</span>
           </p>
-        </div>
-      </div>
 
-      <hr className="border-[#2a2a35] my-4" />
+          <div className="flex items-center gap-2">
+            {/* Previous */}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={pagination.page <= 1}
+              onClick={() => handlePageChange(pagination.page - 1)}
+              className="cursor-pointer bg-[#121218] border-[#2a2a35] text-white hover:bg-[#1a1a23] disabled:opacity-30 rounded-xl px-4 h-10 font-bold group"
+            >
+              <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+            </Button>
 
-      {/* Amount + Fee */}
-      <div className="flex justify-between">
-        <div>
-          <p className="text-sm text-indigo-400">Amount</p>
-          <p className="text-xl text-emerald-400">
-            ${Math.abs(selectedTx.amount).toFixed(2)}
-          </p>
-        </div>
+            {/* Page Numbers */}
+            {Array.from({ length: pagination.totalPage }, (_, i) => i + 1)
+              .filter((page) => {
+                const current = pagination.page;
+                return (
+                  page === 1 ||
+                  page === pagination.totalPage ||
+                  Math.abs(page - current) <= 1
+                );
+              })
+              .reduce<(number | "...")[]>((acc, page, idx, arr) => {
+                if (idx > 0 && page - (arr[idx - 1] as number) > 1) {
+                  acc.push("...");
+                }
+                acc.push(page);
+                return acc;
+              }, [])
+              .map((item, idx) =>
+                item === "..." ? (
+                  <span key={`ellipsis-${idx}`} className="text-gray-500 px-1">
+                    ...
+                  </span>
+                ) : (
+                  <Button
+                    key={item}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(item as number)}
+                    className={`cursor-pointer rounded-xl w-10 h-10 font-bold text-sm transition-all
+                ${pagination.page === item
+                        ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-400"
+                        : "bg-[#121218] border-[#2a2a35] text-gray-400 hover:bg-[#1a1a23] hover:text-white"
+                      }`}
+                  >
+                    {item}
+                  </Button>
+                )
+              )}
 
-        <div className="text-right">
-          <p className="text-sm text-indigo-400">Fee</p>
-          <p className="text-red-400">
-            -${selectedTx.fee.toFixed(2)}
-          </p>
+            {/* Next */}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={pagination.page >= pagination.totalPage}
+              onClick={() => handlePageChange(pagination.page + 1)}
+              className="cursor-pointer bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 disabled:opacity-30 rounded-xl px-4 h-10 font-bold group"
+            >
+              <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
-  </div>
-)}
-        </div>
-    );
+  );
 };
 
 export default TransactionsPage;

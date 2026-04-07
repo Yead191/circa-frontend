@@ -37,7 +37,7 @@ const TabBarWithContent = ({ posts, shops }: { posts: Post[], shops: Product[] }
               <PostCard key={post._id} post={post} />
             ))}
           </div>) : (
-          <div className="space-y-2 pb-20">
+          <div className="space-2 pb-20 grid grid-cols-1 md:grid-cols-2  gap-2">
             {shops?.map((shop) => (
               <ShopCard key={shop._id} shop={shop} />
             ))}

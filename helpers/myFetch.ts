@@ -2,11 +2,18 @@
 "use server";
 import { getAccessToken } from "./getAccessToken";
 
+interface Pagination {
+  total: number;
+  limit: number;
+  page: number;
+  totalPage: number;
+}
 export interface FetchResponse<T = any> {
   success: boolean;
   message?: string;
   data?: T;
   error?: string | null;
+  pagination?: Pagination;
 }
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -33,7 +40,7 @@ export const myFetch = async <T = any>(
 ): Promise<FetchResponse<T>> => {
   const accessToken = await getAccessToken();
   const isFormData = body instanceof FormData;
-   const hasBody = body !== undefined && method !== "GET";
+  const hasBody = body !== undefined && method !== "GET";
 
   const reqHeaders: Record<string, string> = {
     Accept: "application/json",
@@ -67,6 +74,7 @@ export const myFetch = async <T = any>(
       message: json?.message,
       data: json?.data,
       error: null,
+      pagination: json?.pagination
     };
   } catch (err) {
     return {

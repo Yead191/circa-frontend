@@ -29,7 +29,7 @@ function Avatar({ src, name, size = 44 }: any) {
     />
   );
 }
- 
+
 function BlockRow({ member, onUnblock }: BlockRowProps) {
   return (
     <div className="flex items-center justify-between py-3.5 border-b border-white/5 last:border-0">
@@ -40,7 +40,7 @@ function BlockRow({ member, onUnblock }: BlockRowProps) {
           <span className="text-gray-500 text-xs">{member.handle}</span>
         </div>
       </div>
- 
+
       <button
         onClick={() => onUnblock(member.id)}
         className="text-gray-600 hover:text-red-400 transition-colors p-1"
@@ -51,12 +51,13 @@ function BlockRow({ member, onUnblock }: BlockRowProps) {
     </div>
   );
 }
- 
-export default function BlockList() {
+
+export default function BlockList({ blockList }: { blockList: any[] }) {
+  console.log(blockList)
   const [blocked, setBlocked] = useState<any[]>(MEMBERS.slice(0, 7));
- 
+
   const unblock = (id: number) => setBlocked((b) => b.filter((m) => m.id !== id));
- 
+
   if (blocked.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
@@ -65,7 +66,7 @@ export default function BlockList() {
       </div>
     );
   }
- 
+
   return (
     <div className="bg-[#13141f] rounded-2xl border border-white/5 px-4">
       {blocked.map((m) => <BlockRow key={m.id} member={m} onUnblock={unblock} />)}

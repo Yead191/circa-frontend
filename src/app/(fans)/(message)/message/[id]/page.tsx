@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react";
 import { ChatMessages } from "@/components/ui/message/ChatMessages";
 import { ChatInput } from "@/components/ui/message/ChatInput";
 import getProfile from "@/utils/getProfile";
-import { myFetch } from "../../../../../helpers/myFetch";
+import { myFetch } from "../../../../../../helpers/myFetch";
 
 
 interface PageProps {
@@ -23,7 +23,7 @@ export default function ChatDetailPage({ params }: PageProps) {
         const profile = await getProfile();
         if (profile?._id) {
           setCurrentUserId(profile._id);
-          const room = await myFetch(`/message/${id}`, { method: "GET", tags: ["chat"] });
+          const room = await myFetch(`/chat/${id}`, { method: "GET", tags: ["chat"] });
           if (room?.success) setActiveUser(room.data);
         }
       } catch (error) {

@@ -15,7 +15,7 @@ export function Navbar({
         <button className="md:hidden text-white text-2xl" onClick={onMenuClick}>
           ☰
         </button>
-        <Breadcrumbs items={title} />
+        {title.length > 0 && <Breadcrumbs items={title} />}
       </div>
     </header>
   );

@@ -20,15 +20,15 @@ export default function Topbar({
         <Breadcrumbs items={title} />
       </div>
       <div className="flex items-center gap-2 md:gap-3">
-        <div className="flex items-center gap-4">
+        <Link href="/creator-profile" className="flex items-center gap-4">
           <div className="w-10.50 h-10.50  rounded-full bg-gray-100 overflow-hidden border border-[#242424] cursor-pointer">
-            <Image src={getImageUrl(user?.image)} width={100} height={100} alt="avatar" className="w-fit h-[50px] object-contain" />
+            <Image src={getImageUrl(user?.image)} width={100} height={100} alt="avatar" className="w-[50px] h-[50px] object-cover object-top" />
           </div>
           <div>
             <h1 className="text-md font-bold tracking-tight">{user?.name}</h1>
             <p className="text-primary/70 text-sm">{user?.role}</p>
           </div>
-        </div>
+        </Link>
         <Link href="/notifications">  <button className="hidden sm:flex cursor-pointer relative w-11 h-11 rounded-full bg-[#15131A] border border-[#242424] justify-center items-center text-gray-400 hover:text-white transition-colors">
           <MdOutlineNotificationsNone size={25} />
           {/* Badge */}

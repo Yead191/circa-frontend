@@ -12,6 +12,7 @@ export default function CheckoutPage() {
   const [step, setStep] = useState<Step>("cart");
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [priceBreakdown, setPriceBreakdown] = useState<any>({});
+  const [isRevalidate, setIsRevalidate] = useState(false);
 
   const fetchCart = async () => {
     try {
@@ -29,33 +30,40 @@ export default function CheckoutPage() {
     fetchCart();
   }, []);
 
+  useEffect(() => {
+    if (isRevalidate) {
+      fetchCart().then(() => setIsRevalidate(false));
+    }
+  }, [isRevalidate]);
+
   return (
     <div className="text-white flex flex-col">
       <div className="flex-1 flex items-center justify-center px-4 py-10">
         <div className="w-full">
           {step === "cart" && (
-            <CartStep 
-              cart={cartItems} 
-              priceBreakdown={priceBreakdown} 
-              onNext={() => setStep("checkout")} 
-              fetchCart={fetchCart}
+            <CartStep
+              cart={cartItems}
+              priceBreakdown={priceBreakdown}
+              onNext={() => setStep("checkout")}
+              isRevalidate={isRevalidate}
+              setIsRevalidate={setIsRevalidate}
             />
           )}
 
           {step === "checkout" && (
-            <CheckoutStep 
-              total={priceBreakdown?.total_price || 0} 
-              onBack={() => setStep("cart")} 
+            <CheckoutStep
+              total={priceBreakdown?.total_price || 0}
+              onBack={() => setStep("cart")}
               onSuccess={() => setStep("success")}
             />
           )}
 
           {step === "success" && (
-            <SuccessStep 
+            <SuccessStep
               onHome={() => {
                 setStep("cart");
                 fetchCart(); // Or redirect somewhere
-              }} 
+              }}
             />
           )}
         </div>

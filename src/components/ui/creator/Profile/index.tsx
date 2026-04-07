@@ -11,7 +11,7 @@ import {
   Lock,
   MessageSquare,
   TrendingUp,
-  User,
+  User as UserIcon,
   Users,
 } from "lucide-react";
 import { useState } from "react";
@@ -26,6 +26,8 @@ import MembershipPlan from "./MembershipPlan";
 import NotificationSettings from "./NotificationSettings";
 import OrderList from "./OrderList";
 import SubscribersList from "./SubscribersList";
+import { Plan, User } from "@/types";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,7 +44,8 @@ type PageId =
   | "block-list"
   | "subscribers"
   | "privacy"
-  | "user-detail";
+  | "user-detail"
+  | "receive-photo";
 
 interface MenuItem {
   id: PageId;
@@ -54,11 +57,11 @@ interface MenuItem {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const MENU_ITEMS: MenuItem[] = [
-  { id: "edit-profile", label: "Account Information", icon: <User size={14} /> },
+  { id: "edit-profile", label: "Account Information", icon: <UserIcon size={14} /> },
   { id: "membership-plan", label: "Membership Plan", icon: <MessageSquare size={14} /> },
   { id: "notification-settings", label: "Notification Settings", icon: <Bell size={14} /> },
   { id: "change-password", label: "Change Password", icon: <Lock size={14} /> },
-  { id: "change-password", label: "Received Photo from Fans", icon: <TrendingUp size={14} />, hasToggle: true },
+  { id: "receive-photo", label: "Received Photo from Fans", icon: <TrendingUp size={14} />, hasToggle: true },
   { id: "change-your-vive", label: "Change Your Vive", icon: <MdLineStyle size={14} /> },
   { id: "order-list", label: "Order List", icon: <FileText size={14} /> },
   { id: "member-list", label: "Member List", icon: <Users size={14} /> },
@@ -87,7 +90,7 @@ function SmallToggle({ value, onChange }: any) {
     <button
       onClick={() => onChange(!value)}
       style={{ width: 40, height: 22 }}
-      className={`rounded-full relative transition-all flex-shrink-0 ${value ? "bg-indigo-500" : "bg-[#2a2b40]"
+      className={`rounded-full relative transition-all shrink-0 ${value ? "bg-indigo-500" : "bg-[#2a2b40]"
         }`}
     >
       <div
@@ -101,12 +104,12 @@ function SmallToggle({ value, onChange }: any) {
 // ─── ProfileMain ──────────────────────────────────────────────────────────────
 
 
-function ProfileMain({ onNav }: any) {
+function ProfileMain({ onNav, user }: any) {
   const [receiveFanPhotos, setReceiveFanPhotos] = useState(true);
 
   return (
     <div className="space-y-2">
-      <ProfileHeader />
+      <ProfileHeader user={user} />
 
       {MENU_ITEMS.map((item, i) => (
         <MenuRow
@@ -121,22 +124,19 @@ function ProfileMain({ onNav }: any) {
   );
 }
 
-function ProfileHeader() {
+function ProfileHeader({ user }: any) {
   return (
     <div className="flex items-center gap-3 mb-6">
       <div className="relative w-14 h-14 rounded-full overflow-hidden bg-[#1a1b2e]">
         <img
-          src="https://api.dicebear.com/7.x/personas/svg?seed=jina99"
-          alt="Jina Sara avatar"
+          src={getImageUrl(user?.image)}
+          alt={user?.name + " avatar"}
           className="w-full h-full object-cover"
         />
-        <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-indigo-400 flex items-center justify-center">
-          <Edit2 size={7} className="text-white" />
-        </div>
       </div>
       <div>
-        <p className="text-white font-semibold text-sm leading-tight">Jina Sara</p>
-        <p className="text-gray-500 text-xs">@sarasara_late</p>
+        <p className="text-white font-semibold text-sm leading-tight">{user?.name}</p>
+        <p className="text-gray-500 text-xs">{user?.email}</p>
       </div>
     </div>
   );
@@ -147,7 +147,10 @@ function ProfileHeader() {
 function MenuRow({ item, toggleValue, onToggle, onNav }: any) {
   return (
     <button
-      onClick={() => onNav(item.id)}
+      onClick={() => {
+        if (item.id === "receive-photo") return;
+        onNav(item.id);
+      }}
       className="w-full flex items-center justify-between px-4 py-3.5 rounded-lg bg-[#1a1b2e] hover:bg-[#1f2040] transition-colors group"
     >
       <div className="flex items-center gap-3">
@@ -210,20 +213,27 @@ interface PageRendererProps {
   page: PageId;
   onNav: (page: PageId) => void;
   onViewUser: (name: string) => void;
+  user: User;
+  plans: Plan[];
+  features: string[];
+  notification: any;
+  orderList: any[];
+  memberList: any[];
+  blockList: any[];
 }
 
-function PageRenderer({ page, onNav, onViewUser }: PageRendererProps) {
+function PageRenderer({ page, onNav, onViewUser, user, plans, features, notification, orderList, memberList, blockList }: PageRendererProps) {
   switch (page) {
-    case "main": return <ProfileMain onNav={onNav} />;
-    case "edit-profile": return <EditProfile />;
-    case "membership-plan": return <MembershipPlan onCreate={() => onNav("create-plan")} />;
-    case "create-plan": return <CreatePlan />;
-    case "notification-settings": return <NotificationSettings />;
+    case "main": return <ProfileMain onNav={onNav} user={user} />;
+    case "edit-profile": return <EditProfile user={user} />;
+    case "membership-plan": return <MembershipPlan onCreate={() => onNav("create-plan")} plans={plans} features={features} />;
+    case "create-plan": return <CreatePlan features={features} />;
+    case "notification-settings": return <NotificationSettings notification={notification} />;
     case "change-password": return <ChangePassword />;
     case "change-your-vive": return <ChangeYourVive />;
-    case "order-list": return <OrderList />;
-    case "member-list": return <MemberList />;
-    case "block-list": return <BlockList />;
+    case "order-list": return <OrderList orderList={orderList} />;
+    case "member-list": return <MemberList memberList={memberList} />;
+    case "block-list": return <BlockList blockList={blockList} />;
     case "subscribers": return <SubscribersList onViewUser={onViewUser} />;
     case "privacy": return <PrivacyPolicy />;
     default: return null;
@@ -232,7 +242,7 @@ function PageRenderer({ page, onNav, onViewUser }: PageRendererProps) {
 
 // ─── CreatorProfile (Root) ────────────────────────────────────────────────────
 
-export default function CreatorProfile() {
+export default function CreatorProfile({ user, plans, features, notification, orderList, memberList, blockList }: { user: any, plans: Plan[], features: string[], notification: any, orderList: any[], memberList: any[], blockList: any[] }) {
   const [page, setPage] = useState<PageId>("main");
   const [history, setHistory] = useState<PageId[]>([]);
   const [viewingUser, setViewingUser] = useState("");
@@ -262,7 +272,7 @@ export default function CreatorProfile() {
       />
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
-        <PageRenderer page={page} onNav={navigate} onViewUser={handleViewUser} />
+        <PageRenderer page={page} onNav={navigate} onViewUser={handleViewUser} user={user} plans={plans} features={features} notification={notification} orderList={orderList} memberList={memberList} blockList={blockList} />
       </div>
     </div>
   );

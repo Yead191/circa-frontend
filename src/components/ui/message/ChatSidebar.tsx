@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { Search, Filter, Users, Shield, Flag, CheckCircle2, X } from "lucide-react";
+import { useState, } from "react";
+import { Search, Filter, Users, } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -27,12 +27,7 @@ export function ChatSidebar({ chatRooms, currentUserId, isCreator }: { chatRooms
   const [showFilter, setShowFilter] = useState(false);
   const pathname = usePathname();
 
-  // const filteredRooms = useMemo(() => {
-  //   return chatRooms.filter(room => {
-  //     const otherParticipant = room.participants.find(p => p._id !== currentUserId);
-  //     return otherParticipant?.name.toLowerCase().includes(search.toLowerCase());
-  //   });
-  // }, [chatRooms, search, currentUserId]);
+
 
   return (
     <div className="flex flex-col h-full bg-[#0d0e14] border-r border-white/8 shrink-0">
@@ -65,7 +60,7 @@ export function ChatSidebar({ chatRooms, currentUserId, isCreator }: { chatRooms
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {chatRooms?.length > 0 ? (
           chatRooms.map(room => {
-            const otherParticipant = Array.isArray(room.participants) 
+            const otherParticipant = Array.isArray(room.participants)
               ? room.participants.find((p: any) => p._id !== currentUserId)
               : room.participants;
             const isActive = pathname.includes(room._id);

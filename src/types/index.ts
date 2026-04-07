@@ -57,3 +57,127 @@ export interface Comment {
     isLike?: boolean
 }
 
+export interface Analytics {
+    totalSale: number;
+    totalEarning: number;
+    totalMembers: number;
+}
+
+export interface Statistics {
+    _id: string;
+    credit: number;
+    balance: number;
+    analatys: Analytics;
+}
+
+export interface UserInfo {
+    _id: string;
+    name: string;
+    email: string;
+    image: string;
+}
+
+export type TransactionStatus = "Success" | "Pending" | "Failed";
+export type TransactionType = "Debit" | "Credit";
+export type TransactionCategory = "Gift" | "Purchase" | "Refund" | "Transfer";
+
+export interface Transaction {
+    _id: string;
+    user: UserInfo;
+    creator: UserInfo;
+    total_price: number;
+    payment_received: number;
+    credit_received: number;
+    discount_percentage: number;
+    discount_amount: number;
+    platform_fee: number;
+    status: TransactionStatus;
+    type: TransactionType;
+    category: TransactionCategory;
+    createdAt: string;
+    updatedAt: string;
+    transaction_id: string;
+    prev_transaction_id: string;
+    __v: number;
+}
+export interface Pagination {
+    total: number;
+    limit: number;
+    page: number;
+    totalPage: number;
+}
+
+export type PlanStatus = "active" | "inactive";
+export type PlanCategory = "Monthly" | "Weekly" | "Yearly";
+
+export interface PlanFeature {
+    _id: string;
+    name: string;
+    status: boolean;
+    discount: number;
+}
+
+export interface Plan {
+    _id: string;
+    name: string;
+    subtitle: string;
+    price: number;
+    features: PlanFeature[];
+    status: PlanStatus;
+    category: PlanCategory;
+    duration: number;
+    emoji: string;
+    user: string;
+    fromAdmin: boolean;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+}
+
+export interface OrderItem {
+    name: string;
+    image: string;
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+    _id: string;
+}
+
+export interface AddressBreakdown {
+    country: string;
+    city: string;
+    postal_code: string;
+    street_address: string;
+    contact_number: string;
+}
+
+export interface PriceBreakdown {
+    products_price: number;
+    serviceFee: number;
+    delivery_charge: number;
+    discount_amount: number;
+    total_price: number;
+    tax: number;
+    subtotal: number;
+}
+
+export interface Order {
+    _id: string;
+    user: UserInfo;
+    items: OrderItem[];
+    creator: UserInfo;
+    status: string;
+    payment_status: "paid" | "unpaid";
+    order_id: string;
+    price_breakdown: PriceBreakdown;
+    total_items: number;
+    formatted_address: string;
+    address_breakdown: AddressBreakdown;
+    contact_number: string;
+    discount_percentage: number;
+    discount_amount: number;
+    createdAt: string;
+    updatedAt: string;
+    payment_intent_id: string;
+    transaction_id: string;
+}

@@ -1,31 +1,40 @@
-"use client";
 
-import Link from "next/link";
 
 export default function Breadcrumbs({
   items,
 }: {
-  items: { label: string; href: string }[];
+  items: { label: string; stepsBack?: number }[];
 }) {
+
+  const handleBack = (steps: number = 1) => {
+    window.history.go(-steps);
+  };
+
   return (
     <div className="text-sm text-gray-400 flex items-center gap-2 px-4 pt-3">
-      <Link href="/" className="hover:text-white">
+      {/* <span
+        onClick={() => handleBack(1)}
+        className="cursor-pointer hover:text-white"
+      >
         Home
-      </Link>
+      </span> */}
 
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
 
         return (
-          <span key={item.href} className="flex items-center gap-2">
-            <span>{">"}</span>
+          <span key={index} className="flex items-center gap-2">
+            {index > 0 && <span>{'>'}</span>}
 
             {isLast ? (
               <span className="text-white">{item.label}</span>
             ) : (
-              <Link href={item.href} className="hover:text-white">
+              <span
+                onClick={() => handleBack(item.stepsBack || 1)}
+                className="cursor-pointer hover:text-white"
+              >
                 {item.label}
-              </Link>
+              </span>
             )}
           </span>
         );

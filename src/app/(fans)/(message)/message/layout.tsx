@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChatSidebar } from "@/components/ui/message/ChatSidebar";
 import getProfile from "@/utils/getProfile";
-import { myFetch } from "../../../../../helpers/myFetch";
 import { io } from "socket.io-client";
+import { myFetch } from "../../../../../helpers/myFetch";
 
 export default function MessageLayoutWrapper({ children }: { children: React.ReactNode }) {
     const [userId, setUser] = useState(null)
@@ -60,7 +60,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
         <div className="flex h-[calc(100vh-115px)] overflow-hidden bg-[#0a0a10] ">
             {/* Sidebar - Persistent */}
             <div className="w-full lg:w-1/3 xl:w-1/4 shrink-0 h-full">
-                <ChatSidebar chatRooms={chatRooms} currentUserId={currentUserId} isCreator={true} />
+                <ChatSidebar chatRooms={chatRooms} currentUserId={currentUserId} isCreator={false} />
             </div>
 
             {/* Main Content (Conversations) */}

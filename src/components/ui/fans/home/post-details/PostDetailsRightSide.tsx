@@ -1,5 +1,4 @@
 "use client";
-import { Post } from '@/types/post';
 import { CheckCircle2, Crown } from "lucide-react";
 import Image from 'next/image';
 import Link from 'next/link';
@@ -32,7 +31,6 @@ const PostDetailsRightSide = () => {
         }
     };
 
-    // ✅ Fetch membership AFTER postData is ready
     const getMemberShipPackage = async (userId: string) => {
         try {
             const res = await myFetch(`/plan/user/${userId}`);
@@ -42,14 +40,12 @@ const PostDetailsRightSide = () => {
         }
     };
 
-    // ✅ First load post
     useEffect(() => {
         if (id) {
             getPostData();
         }
     }, [id]);
 
-    // ✅ Then load membership when postData is available
     useEffect(() => {
         if (user?._id) {
             getMemberShipPackage(user._id);
@@ -113,41 +109,45 @@ const PostDetailsRightSide = () => {
                 </div>
 
                 {/* Membership Card */}
-                <div className="bg-[#1C1A24] rounded-2xl p-6 border border-gray-800">
-                    <div className="flex items-center justify-between mb-5">
-                        <h3 className="flex items-center gap-2 font-bold">
-                            <Crown className="w-5 h-5 text-yellow-500" />
-                            Membership
-                        </h3>
-                        <Link href={`/explore/creator-profile/membership?creatorId=${user?._id}`}><button className='text-xs cursor-pointer'>View All</button></Link>
-                    </div>
+                {
+                    membershipPlan && (
+                        <div className="bg-[#1C1A24] rounded-2xl p-6 border border-gray-800">
+                            <div className="flex items-center justify-between mb-5">
+                                <h3 className="flex items-center gap-2 font-bold">
+                                    <Crown className="w-5 h-5 text-yellow-500" />
+                                    Membership
+                                </h3>
+                                <Link href={`/explore/creator-profile/membership?creatorId=${user?._id}`}><button className='text-xs cursor-pointer'>View All</button></Link>
+                            </div>
 
-                    <div className="bg-[#2A2B3D] rounded-xl p-5 border border-gray-700/50">
-                        <div className="flex justify-between items-start mb-1">
-                            <h4 className="font-semibold text-[#FF8B94]">{membershipPlan?.name}</h4>
-                            <span className="text-lg">🍭</span>
-                        </div>
-                        <div className="mb-5">
-                            <span className="font-bold text-lg text-white">${membershipPlan?.price}</span>
-                            <span className="text-gray-400 text-xs"> /{membershipPlan?.category}</span>
-                        </div>
+                            <div className="bg-[#2A2B3D] rounded-xl p-5 border border-gray-700/50">
+                                <div className="flex justify-between items-start mb-1">
+                                    <h4 className="font-semibold text-[#FF8B94]">{membershipPlan?.name}</h4>
+                                    <span className="text-lg">🍭</span>
+                                </div>
+                                <div className="mb-5">
+                                    <span className="font-bold text-lg text-white">${membershipPlan?.price}</span>
+                                    <span className="text-gray-400 text-xs"> /{membershipPlan?.category}</span>
+                                </div>
 
-                        <ul className="space-y-3 mb-6">
-                            {membershipPlan?.features?.map((feature: any, i: number) => (
-                                <li key={i} className="flex items-center gap-3 text-xs text-gray-300">
-                                    <CheckCircle2 className="w-4 h-4 text-[#7971FF] shrink-0" />
-                                    {feature?.name}
-                                </li>
-                            ))}
-                        </ul>
+                                <ul className="space-y-3 mb-6">
+                                    {membershipPlan?.features?.map((feature: any, i: number) => (
+                                        <li key={i} className="flex items-center gap-3 text-xs text-gray-300">
+                                            <CheckCircle2 className="w-4 h-4 text-[#7971FF] shrink-0" />
+                                            {feature?.name}
+                                        </li>
+                                    ))}
+                                </ul>
 
-                        <div className='w-full flex items-center justify-end'>
-                            <Link href={`/explore/creator-profile/membership?creatorId=${user?._id}`} className={`w-full ${!membershipPlan?.isSubscribed && "cursor-not-allowed"} bg-[#7971FF] hover:bg-[#6c64e6] text-white font-semibold py-2.5 text-center rounded-xl text-sm transition-colors`}>
-                                Join
-                            </Link>
+                                <div className='w-full flex items-center justify-end'>
+                                    <Link href={`/explore/creator-profile/membership?creatorId=${user?._id}`} className={`w-full bg-[#7971FF] hover:bg-[#6c64e6] text-white font-semibold py-2.5 text-center rounded-xl text-sm transition-colors`}>
+                                        {membershipPlan?.isSubscribed ? "Subscribed" : "Join"}
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    )
+                }
             </div>
         </div>
     );

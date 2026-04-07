@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { myFetch } from "../../../../../helpers/myFetch";
 
 interface Props {
   total: number;
@@ -17,11 +18,45 @@ interface Props {
 }
 
 export default function CheckoutStep({ total, onBack, onSuccess }: Props) {
-  const [country, setCountry] = useState("United States");
-  const [city, setCity] = useState("New York");
-  const [address, setAddress] = useState("House C17/A, B Block, Dhanmondi Dhaka");
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
   const [contact, setContact] = useState("");
-  const [postal, setPostal] = useState("+2938 3048 3498");
+  const [postal, setPostal] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleProcessToPay = async () => {
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        country,
+        city,
+        postal_code: postal,
+        street_address: address,
+        contact_number: contact,
+      };
+
+      const res = await myFetch('/order', {
+        method: "POST",
+        body: payload
+      });
+      console.log(res)
+      if (res?.success && res?.data) {
+        window.location.href = res.data;
+        setCountry("");
+        setCity("");
+        setAddress("");
+        setContact("");
+        setPostal("");
+      } else {
+        console.error("Order submission failed:", res?.message || res?.error);
+      }
+    } catch (error) {
+      console.error("Order submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto w-full bg-cardBg border border-white/[0.07] rounded-2xl p-6">
@@ -30,10 +65,10 @@ export default function CheckoutStep({ total, onBack, onSuccess }: Props) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 sm:col-span-2">
           <Label className="text-xs text-white/50">Country</Label>
           <Select value={country} onValueChange={setCountry}>
-            <SelectTrigger className="bg-white/5 border-white/10 text-white text-sm h-10 focus:ring-indigo-500/50">
+            <SelectTrigger className="w-full bg-white/5 border-white/10 text-white text-sm h-11 focus:ring-indigo-500/50">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-[#1e1e24] border-white/10 text-white">
@@ -90,10 +125,11 @@ export default function CheckoutStep({ total, onBack, onSuccess }: Props) {
           <span className="text-sm font-bold text-white">${(total || 0).toFixed(2)}</span>
         </div>
         <Button
-          onClick={onSuccess}
-          className="w-full mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-xl h-11 transition-all"
+          onClick={handleProcessToPay}
+          disabled={isSubmitting}
+          className="w-full mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-xl h-11 transition-all disabled:opacity-50"
         >
-          Process to Pay
+          {isSubmitting ? "Processing..." : "Process to Pay"}
         </Button>
       </div>
 

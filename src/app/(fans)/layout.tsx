@@ -21,22 +21,22 @@ export default function DashboardGroup({
 
   const rightSidebarMap: Record<string, ReactNode> = {
     "/explore": exploreTab === "browse" ? (
- <BrowseRightSide />
+      <BrowseRightSide />
     ) : null,
 
-    "/home": <HomeRightSide/>,
-    "/": <HomeRightSide/>,
-    "/home/post-details": <PostDetailsRightSide/>,
-    "/explore/creator-profile/post-details": <PostDetailsRightSide/>,
-    "/explore/creator-profile/product-details": <PostDetailsRightSide/>,
-    "/explore/creator-profile/membership": <MembershipRightSide/>,
-    "/explore/creator-profile/about": <PostDetailsRightSide/>,
+    "/home": <HomeRightSide />,
+    "/": <HomeRightSide />,
+    "/home/post-details": <PostDetailsRightSide />,
+    "/explore/creator-profile/post-details": <PostDetailsRightSide />,
+    "/explore/creator-profile/product-details": <PostDetailsRightSide />,
+    "/explore/creator-profile/membership": <MembershipRightSide />,
+    "/explore/creator-profile/about": <PostDetailsRightSide />,
   };
 
   const rightSidebarContent = rightSidebarMap[pathname] || null;
 
   return (
-    <DashboardLayout  breadcrumbs={breadcrumbs} rightSidebar={rightSidebarContent}>
+    <DashboardLayout breadcrumbs={breadcrumbs} rightSidebar={rightSidebarContent}>
       {children}
     </DashboardLayout>
   );

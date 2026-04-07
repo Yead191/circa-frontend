@@ -1,14 +1,27 @@
-import React from 'react'
+
 import EarningOverview from './EarningOverview'
 import AnalyticsCharts from './AnalyticsCharts'
 import RecentTransaction from './RecentTransaction'
+import { Statistics, Transaction } from '@/types'
 
-const EarningPage = () => {
+interface EarningPageProps {
+  statistics: Statistics;
+  tierData: any[];
+  messageData: any[];
+  shopData: any[];
+  transactionData: Transaction[];
+}
+
+const EarningPage = ({ statistics, tierData, messageData, shopData, transactionData }: EarningPageProps) => {
   return (
     <div>
-        <EarningOverview />
-        <AnalyticsCharts />
-        <RecentTransaction />
+      <EarningOverview statistics={statistics} />
+      <AnalyticsCharts
+        tierData={tierData}
+        messageData={messageData}
+        shopData={shopData}
+      />
+      <RecentTransaction transactionData={transactionData} />
     </div>
   )
 }
