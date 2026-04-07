@@ -26,21 +26,21 @@ interface MenuItem {
 }
 
 const MENU_ITEMS: MenuItem[] = [
-  { id: "about-us",   label: "About Us",         icon: Info,        danger: false },
-  { id: "terms",      label: "Terms & Condition", icon: FileText,    danger: false },
-  { id: "privacy",    label: "Privacy Policy",    icon: ShieldCheck, danger: false },
-  { id: "contact-us", label: "Contact Us",        icon: Mail,        danger: false },
-  { id: "delete",     label: "Delete Account",    icon: Trash2,      danger: true  },
+  { id: "about-us", label: "About Us", icon: Info, danger: false },
+  { id: "terms", label: "Terms & Condition", icon: FileText, danger: false },
+  { id: "privacy", label: "Privacy Policy", icon: ShieldCheck, danger: false },
+  { id: "contact-us", label: "Contact Us", icon: Mail, danger: false },
+  { id: "delete", label: "Delete Account", icon: Trash2, danger: true },
 ];
 
-function PageRenderer({ page }: { page: PageId }) {
+function PageRenderer({ page, about, terms, privacy }: { page: PageId, about: string, terms: string, privacy: string }) {
   switch (page) {
-    case "about-us":   return <AboutUs />;
-    case "terms":      return <Termsandcondition />;
-    case "privacy":    return <PrivacyPolicy />;
+    case "about-us": return <AboutUs about={about} />;
+    case "terms": return <Termsandcondition terms={terms} />;
+    case "privacy": return <PrivacyPolicy privacy={privacy} />;
     case "contact-us": return <ContactUs />;
-    case "delete":     return <DeleteAccount />;
-    default:           return null;
+    case "delete": return <DeleteAccount />;
+    default: return null;
   }
 }
 
@@ -77,7 +77,7 @@ function SettingsMenu({ onNav }: { onNav: (page: PageId) => void }) {
   );
 }
 
-export default function SettingsPage() {
+export default function SettingsPage({ about, terms, privacy }: { about: string, terms: string, privacy: string }) {
   const [page, setPage] = useState<PageId>("main");
 
   return (
@@ -94,7 +94,7 @@ export default function SettingsPage() {
       {page === "main" ? (
         <SettingsMenu onNav={setPage} />
       ) : (
-        <PageRenderer page={page} />
+        <PageRenderer page={page} about={about} terms={terms} privacy={privacy} />
       )}
     </div>
   );

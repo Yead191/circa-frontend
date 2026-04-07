@@ -22,7 +22,7 @@ function Avatar({ src, name, size = 44 }: any) {
       width={size}
       height={size}
       style={{ width: size, height: size }}
-      className="rounded-full object-cover bg-[#1e1f35] flex-shrink-0"
+      className="rounded-full object-cover bg-[#1e1f35] shrink-0"
     />
   );
 }

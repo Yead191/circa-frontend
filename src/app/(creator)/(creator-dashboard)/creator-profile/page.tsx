@@ -12,7 +12,8 @@ const page = async () => {
     orderListRes,
     memberListRes,
     blockListRes,
-    categoriesRes
+    categoriesRes,
+    privacyRes
   ] = await Promise.all([
     getProfile(),
     myFetch('/plan', { method: 'GET', cache: 'no-store', tags: ['plan'] }),
@@ -21,7 +22,8 @@ const page = async () => {
     myFetch('/order', { method: 'GET', cache: 'no-store', tags: ['order'] }),
     myFetch('/subscription/memberlist', { method: 'GET', cache: 'no-store', tags: ['memberlist'] }),
     myFetch('/user/block', { method: 'GET', cache: 'no-store', tags: ['blocklist'] }),
-    myFetch('/category', { method: 'GET' })
+    myFetch('/category', { method: 'GET' }),
+    myFetch('/disclaimer?type=privacy', { method: 'GET' })
   ]);
 
   const categories = Array.isArray(categoriesRes?.data)
@@ -34,10 +36,11 @@ const page = async () => {
   const orderList = orderListRes?.data || [];
   const memberList = memberListRes?.data || [];
   const blockList = blockListRes?.data || [];
+  const privacy = privacyRes?.data || "";
   // console.log(plans)
   return (
     <div className="">
-      <CreatorProfile user={user} plans={plans} features={features} notification={notification} orderList={orderList} memberList={memberList} blockList={blockList} categories={categories} />
+      <CreatorProfile user={user} plans={plans} features={features} notification={notification} orderList={orderList} memberList={memberList} blockList={blockList} categories={categories} privacy={privacy} />
     </div>
 
   )

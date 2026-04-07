@@ -4,14 +4,14 @@ import { useState } from "react";
 
 
 const SUBSCRIBERS = [
-  { name: "Thomas Black",    handle: "@thomas_b",    plan: "Lover",  planColor: "text-red-400",    avatar: "thomas" },
-  { name: "Gianna Kovas",    handle: "@giannak",     plan: "Free",   planColor: "text-yellow-300", avatar: "gianna" },
-  { name: "Juneth Lin",      handle: "@juneth_lin",  plan: "Hobby",  planColor: "text-indigo-400", avatar: "juneth" },
-  { name: "Alicia McCoy",    handle: "@aliciamcc",   plan: "Lover",  planColor: "text-red-400",    avatar: "alicia" },
-  { name: "Gael Thermaly",   handle: "@gaelt",       plan: "Free",   planColor: "text-yellow-300", avatar: "gael" },
-  { name: "Ruthlyn Murphy",  handle: "@ruthlynm",    plan: "Hobby",  planColor: "text-indigo-400", avatar: "ruthlyn" },
-  { name: "Annette Black",   handle: "@annetteb",    plan: "Lover",  planColor: "text-red-400",    avatar: "annette" },
-  { name: "Grant Cooper",    handle: "@grantcoop",   plan: "Free",   planColor: "text-yellow-300", avatar: "grant" },
+  { name: "Thomas Black", handle: "@thomas_b", plan: "Lover", planColor: "text-red-400", avatar: "thomas" },
+  { name: "Gianna Kovas", handle: "@giannak", plan: "Free", planColor: "text-yellow-300", avatar: "gianna" },
+  { name: "Juneth Lin", handle: "@juneth_lin", plan: "Hobby", planColor: "text-indigo-400", avatar: "juneth" },
+  { name: "Alicia McCoy", handle: "@aliciamcc", plan: "Lover", planColor: "text-red-400", avatar: "alicia" },
+  { name: "Gael Thermaly", handle: "@gaelt", plan: "Free", planColor: "text-yellow-300", avatar: "gael" },
+  { name: "Ruthlyn Murphy", handle: "@ruthlynm", plan: "Hobby", planColor: "text-indigo-400", avatar: "ruthlyn" },
+  { name: "Annette Black", handle: "@annetteb", plan: "Lover", planColor: "text-red-400", avatar: "annette" },
+  { name: "Grant Cooper", handle: "@grantcoop", plan: "Free", planColor: "text-yellow-300", avatar: "grant" },
 ];
 
 export default function SubscribersList({ onViewUser }: { onViewUser: (name: string) => void }) {
@@ -20,14 +20,14 @@ export default function SubscribersList({ onViewUser }: { onViewUser: (name: str
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [subscribers, setSubscribers] = useState(SUBSCRIBERS);
 
-  const filtered = subscribers.filter((s:any) =>
+  const filtered = subscribers.filter((s: any) =>
     (filter === "All" || s.plan === filter) &&
     (s.name.toLowerCase().includes(search.toLowerCase()) || s.handle.includes(search.toLowerCase()))
   );
 
   return (
     <div className="space-y-4">
-      
+
       {/* Search + Filter */}
       <div className="flex gap-2">
         <div className="flex-1 relative">
@@ -43,7 +43,7 @@ export default function SubscribersList({ onViewUser }: { onViewUser: (name: str
             value={filter} onChange={e => setFilter(e.target.value)}
             className="bg-[#1a1b2e] rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none appearance-none cursor-pointer border-0 pr-7"
           >
-            {["All","Lover","Free","Hobby"].map(o => <option key={o} value={o} className="bg-[#1a1b2e]">{o}</option>)}
+            {["All", "Lover", "Free", "Hobby"].map(o => <option key={o} value={o} className="bg-[#1a1b2e]">{o}</option>)}
           </select>
           <Filter size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
         </div>
@@ -53,8 +53,8 @@ export default function SubscribersList({ onViewUser }: { onViewUser: (name: str
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "Total", value: subscribers.length, color: "text-white" },
-          { label: "Paid",  value: subscribers.filter((s:any) => s.plan !== "Free").length, color: "text-indigo-400" },
-          { label: "Free",  value: subscribers.filter((s:any) => s.plan === "Free").length, color: "text-yellow-300" },
+          { label: "Paid", value: subscribers.filter((s: any) => s.plan !== "Free").length, color: "text-indigo-400" },
+          { label: "Free", value: subscribers.filter((s: any) => s.plan === "Free").length, color: "text-yellow-300" },
         ].map(stat => (
           <div key={stat.label} className="bg-[#1a1b2e] rounded-xl p-3 text-center">
             <p className={`text-lg font-bold ${stat.color}`}>{stat.value}</p>
@@ -65,11 +65,11 @@ export default function SubscribersList({ onViewUser }: { onViewUser: (name: str
 
       {/* List */}
       <div className="space-y-1.5">
-        {filtered.map((sub:any, i:any) => (
+        {filtered.map((sub: any, i: any) => (
           <div key={i} className="flex items-center gap-3 px-4 py-3 bg-[#1a1b2e] rounded-xl hover:bg-[#1f2040] transition-colors group">
             <img
               src={`https://api.dicebear.com/7.x/personas/svg?seed=${sub.avatar}`}
-              className="w-9 h-9 rounded-full bg-[#0d0e16] flex-shrink-0 cursor-pointer"
+              className="w-9 h-9 rounded-full bg-[#0d0e16] shrink-0 cursor-pointer"
               onClick={() => onViewUser(sub.name)}
               alt=""
             />
