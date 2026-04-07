@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Smile, Paperclip, Image as ImageIcon, Send, X, Plus } from "lucide-react";
+import { Smile, Paperclip, Image as ImageIcon, Send, X, Plus, Ban } from "lucide-react";
 import { toast } from "sonner";
 import { myFetch } from "../../../../helpers/myFetch";
 
-export function ChatInput({ chatId, onMessageSent }: { chatId: string; onMessageSent?: () => void }) {
+export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: any }) {
+  console.log(activeUser)
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [isSending, setIsSending] = useState(false);
@@ -47,7 +48,6 @@ export function ChatInput({ chatId, onMessageSent }: { chatId: string; onMessage
       if (res?.success) {
         setText("");
         setFiles([]);
-        if (onMessageSent) onMessageSent();
       } else {
         toast.error(res?.message || "Failed to send message");
       }
@@ -58,6 +58,10 @@ export function ChatInput({ chatId, onMessageSent }: { chatId: string; onMessage
       setIsSending(false);
     }
   };
+
+  const isBlocked = activeUser?.status === "block";
+  const iBlockedThem = activeUser?.blockByMe === true;
+  const theyBlockedMe = isBlocked && !iBlockedThem;
 
   return (
     <div className="px-5 py-4 border-t border-white/8 bg-[#0d0e14] relative z-20">
@@ -85,8 +89,15 @@ export function ChatInput({ chatId, onMessageSent }: { chatId: string; onMessage
       )}
 
       {/* Main Bar */}
-      <div className="flex items-center gap-3 bg-[#1a1b26] border border-white/10 rounded-2xl px-4 py-2.5 shadow-lg focus-within:border-indigo-500/40 transition-all group">
-        <button className="text-gray-500 hover:text-indigo-400 transition-colors shrink-0">
+      <div className={`flex items-center gap-3 border rounded-2xl px-4 py-2.5 shadow-lg transition-all group
+  ${isBlocked
+          ? "bg-[#14151e] border-white/6 opacity-50 cursor-not-allowed"
+          : "bg-[#1a1b26] border-white/10 focus-within:border-indigo-500/40"}`}>
+
+        <button
+          disabled={isBlocked}
+          className="text-gray-500 hover:text-indigo-400 transition-colors shrink-0 disabled:pointer-events-none disabled:text-gray-700"
+        >
           <Smile size={20} />
         </button>
 
@@ -95,9 +106,15 @@ export function ChatInput({ chatId, onMessageSent }: { chatId: string; onMessage
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => e.key === "Enter" && !e.shiftKey && handleSend()}
-          placeholder="Type a message..."
-          disabled={isSending}
-          className="flex-1 bg-transparent text-white text-[14px] placeholder-gray-600 focus:outline-none min-w-0 font-normal"
+          placeholder={
+            iBlockedThem
+              ? "Unblock this user to send messages..."
+              : theyBlockedMe
+                ? "You cannot reply in this conversation..."
+                : "Type a message..."
+          }
+          disabled={isSending || isBlocked}
+          className="flex-1 bg-transparent text-white text-[14px] placeholder-gray-600 focus:outline-none min-w-0 font-normal disabled:cursor-not-allowed"
         />
 
         <div className="flex items-center gap-2 border-l border-white/10 pl-3">
@@ -111,17 +128,17 @@ export function ChatInput({ chatId, onMessageSent }: { chatId: string; onMessage
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="text-gray-500 hover:text-indigo-400 transition-colors 
-            shrink-0"
+            disabled={isBlocked}
+            className="text-gray-500 hover:text-indigo-400 transition-colors shrink-0 disabled:pointer-events-none disabled:text-gray-700"
           >
             <Paperclip size={18} />
           </button>
 
           <button
             onClick={handleSend}
-            disabled={isSending || (!text.trim() && files.length === 0)}
+            disabled={isSending || (!text.trim() && files.length === 0) || isBlocked}
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0
-              ${isSending || (!text.trim() && files.length === 0)
+        ${isSending || (!text.trim() && files.length === 0) || isBlocked
                 ? "bg-[#252636] text-gray-700 cursor-not-allowed"
                 : "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 active:scale-95"}`}
           >

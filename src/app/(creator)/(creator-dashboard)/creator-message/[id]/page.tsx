@@ -23,7 +23,8 @@ export default function ChatDetailPage({ params }: PageProps) {
         const profile = await getProfile();
         if (profile?._id) {
           setCurrentUserId(profile._id);
-          const room = await myFetch(`/chat/${id}`, { method: "GET", tags: ["chat"] });
+          const room = await myFetch(`/chat/${id}`, { method: "GET", tags: ["chat"], cache: "no-store" });
+          console.log(room, "room")
           if (room?.success) setActiveUser(room.data);
         }
       } catch (error) {
@@ -78,9 +79,7 @@ export default function ChatDetailPage({ params }: PageProps) {
       <div className="shrink-0 bg-[#0d0e14]">
         <ChatInput
           chatId={id}
-          onMessageSent={() => {
-            // Logic to refresh or scroll if needed
-          }}
+          activeUser={activeUser}
         />
       </div>
 
