@@ -1,4 +1,4 @@
-import MessagePage from "@/app/(message)/message/page"
+import MessagePage from "@/app/(fans)/(message)/message/page"
 
 const page = () => {
   return (
