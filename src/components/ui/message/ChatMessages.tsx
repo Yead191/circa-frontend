@@ -42,13 +42,13 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const prevScrollHeightRef = useRef<number>(0);
   const updateSourceRef = useRef<"initial" | "pagination" | "new-message">("initial");
   const router = useRouter();
 
-  const socket = useMemo(() => io('http://10.10.7.9:5005'), []);
+  const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://31.97.114.108:5020"), []);
 
   const scrollToBottom = () => {
     if (containerRef.current) {
@@ -72,7 +72,7 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
         method: "GET",
         cache: "no-store"
       });
-      
+
       if (res?.success) {
         const newMessages = res?.data || [];
         if (newMessages.length === 0) {
@@ -228,17 +228,17 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
       >
         {/* Load more indicator */}
         {isLoadingMore && (
-           <div className="flex justify-center py-2 animate-pulse">
-             <div className="w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-           </div>
+          <div className="flex justify-center py-2 animate-pulse">
+            <div className="w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+          </div>
         )}
 
         {!hasMore && messages.length > 0 && (
-           <div className="flex justify-center py-4">
-              <span className="text-[10px] uppercase tracking-widest font-bold text-gray-700 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
-                Beginning of your history
-              </span>
-           </div>
+          <div className="flex justify-center py-4">
+            <span className="text-[10px] uppercase tracking-widest font-bold text-gray-700 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
+              Beginning of your history
+            </span>
+          </div>
         )}
         {messages?.map((msg, idx) => {
           const isMe = msg.sender === currentUserId;

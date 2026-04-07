@@ -11,7 +11,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
     const [chatRooms, setChatRooms] = useState<any[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string>("");
     const [loading, setLoading] = useState(true);
-    const socket = useMemo(() => io('http://10.10.7.9:5005'), []);
+    const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://31.97.114.108:5020"), []);
 
     useEffect(() => {
         const fetchUser = async () => {
