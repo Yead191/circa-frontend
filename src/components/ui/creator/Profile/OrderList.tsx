@@ -1,4 +1,5 @@
-import { ChevronRight, X, Package, MapPin, CreditCard, User, MoreHorizontal, ShoppingCart, Info, CheckCircle2, Clock, Ban } from "lucide-react";
+"use client"
+import { ChevronRight, X, Package, MapPin, CreditCard, User, ShoppingCart, Info, CheckCircle2, Clock, Ban } from "lucide-react";
 import { useState } from "react";
 import { Order } from "@/types";
 import { getImageUrl } from "@/utils/getImageUrl";
