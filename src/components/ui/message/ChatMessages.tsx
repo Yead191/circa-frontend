@@ -20,7 +20,6 @@ import { ReportModal } from "@/components/ui/ReportModal";
 import { useRouter } from "next/navigation";
 import { myFetch } from "../../../../helpers/myFetch";
 import { CgUnblock } from "react-icons/cg";
-import { revalidateTags } from "../../../../helpers/revalidateTags";
 
 // Sub-components for better organization
 function Avatar({ src, size = 10, online }: { src: string; size?: number; online?: boolean }) {
@@ -39,7 +38,14 @@ function Avatar({ src, size = 10, online }: { src: string; size?: number; online
 export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: string; currentUserId: string; activeUser: any }) {
   const [messages, setMessages] = useState<any[]>([]);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  
   const containerRef = useRef<HTMLDivElement>(null);
+  const prevScrollHeightRef = useRef<number>(0);
+  const updateSourceRef = useRef<"initial" | "pagination" | "new-message">("initial");
   const router = useRouter();
 
   const socket = useMemo(() => io('http://10.10.7.9:5005'), []);
@@ -59,30 +65,75 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
     return () => { socket.off(`getMessage::${chatId}`); };
   }, [socket, chatId]);
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (pageNumber: number, isMore: boolean = false) => {
+    if (isMore) setIsLoadingMore(true);
     try {
-      console.log(chatId)
-      const res = await myFetch(`/message/${chatId}`, {
+      const res = await myFetch(`/message/${chatId}?page=${pageNumber}`, {
         method: "GET",
         cache: "no-store"
-        // headers: {
-        //   "Content-Type": "application/json",
-        //   "Authorization": `Bearer ${token}`,
-        // }
       });
-      // console.log(res, 'message res')
-      if (res?.success) setMessages(res?.data?.reverse());
+      
+      if (res?.success) {
+        const newMessages = res?.data || [];
+        if (newMessages.length === 0) {
+          setHasMore(false);
+        } else {
+          const reversedMessages = [...newMessages].reverse();
+          if (isMore) {
+            updateSourceRef.current = "pagination";
+            // Capture scroll height before update
+            if (containerRef.current) {
+              prevScrollHeightRef.current = containerRef.current.scrollHeight;
+            }
+            setMessages((prev) => [...reversedMessages, ...prev]);
+            setPage(pageNumber);
+          } else {
+            updateSourceRef.current = "initial";
+            setMessages(reversedMessages);
+            setIsInitialLoad(false);
+          }
+        }
+      } else {
+        setHasMore(false);
+      }
     } catch (error) {
       console.error("Failed to fetch messages:", error);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
   useEffect(() => {
-    fetchMessages();
+    setPage(1);
+    setHasMore(true);
+    setIsInitialLoad(true);
+    fetchMessages(1);
   }, [chatId]);
 
+  const handleScroll = () => {
+    if (containerRef.current && containerRef.current.scrollTop === 0 && hasMore && !isLoadingMore) {
+      fetchMessages(page + 1, true);
+    }
+  };
+
   useEffect(() => {
-    scrollToBottom();
+    if (!containerRef.current || messages.length === 0) return;
+
+    const source = updateSourceRef.current;
+
+    if (source === "initial") {
+      scrollToBottom();
+    } else if (source === "pagination") {
+      // Maintaining scroll position after loading more
+      if (prevScrollHeightRef.current > 0) {
+        const scrollDiff = containerRef.current.scrollHeight - prevScrollHeightRef.current;
+        containerRef.current.scrollTop = scrollDiff;
+        prevScrollHeightRef.current = 0;
+      }
+    } else if (source === "new-message") {
+      // For now, always scroll to bottom for new messages as requested
+      scrollToBottom();
+    }
   }, [messages]);
 
   const handleReport = () => {
@@ -170,7 +221,25 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
       </div>
 
       {/* Messages List */}
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 custom-scrollbar" ref={containerRef}>
+      <div
+        className="flex-1 overflow-y-auto px-5 py-6 space-y-6 custom-scrollbar"
+        ref={containerRef}
+        onScroll={handleScroll}
+      >
+        {/* Load more indicator */}
+        {isLoadingMore && (
+           <div className="flex justify-center py-2 animate-pulse">
+             <div className="w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+           </div>
+        )}
+
+        {!hasMore && messages.length > 0 && (
+           <div className="flex justify-center py-4">
+              <span className="text-[10px] uppercase tracking-widest font-bold text-gray-700 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
+                Beginning of your history
+              </span>
+           </div>
+        )}
         {messages?.map((msg, idx) => {
           const isMe = msg.sender === currentUserId;
           const showAvatar = !isMe && (idx === 0 || messages[idx - 1]?.sender !== msg.sender);

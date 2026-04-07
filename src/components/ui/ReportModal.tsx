@@ -63,11 +63,11 @@ export function ReportModal({ isOpen, onClose, userId, userName }: ReportModalPr
             Report User
           </DialogTitle>
           <DialogDescription className="text-gray-400">
-            Why are you reporting <span className="text-white font-semibold">{userName}</span>? 
+            Why are you reporting <span className="text-white font-semibold">{userName}</span>?
             This information will help our team investigate.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="py-4">
           <textarea
             value={reason}
