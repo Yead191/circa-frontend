@@ -181,3 +181,9 @@ export interface Order {
     payment_intent_id: string;
     transaction_id: string;
 }
+
+export interface VibeCategory {
+    _id: string
+    name: string
+    image: string
+}
