@@ -105,9 +105,9 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
               120 Credits
             </div>
 
-            <button className="w-full py-2 bg-primary hover:bg-opacity-90 transition-opacity text-white font-medium rounded-lg text-sm cursor-pointer">
+            <Link href="/profile/credits" className="w-full py-2 bg-primary hover:bg-opacity-90 transition-opacity text-white font-medium rounded-lg text-sm cursor-pointer block text-center">
               Buy
-            </button>
+            </Link>
           </div>
 
           {/* Logout Button */}
