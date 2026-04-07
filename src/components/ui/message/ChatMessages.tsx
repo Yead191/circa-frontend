@@ -4,13 +4,23 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import Image from "next/image";
 import {
   Phone, MoreVertical, ChevronLeft, CheckCheck,
-  MessageSquare,
+  MessageSquare, Flag, Ban
 } from "lucide-react";
 import { io } from "socket.io-client";
+import { toast } from "sonner";
 import { getImageUrl } from "@/utils/getImageUrl";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ReportModal } from "@/components/ui/ReportModal";
 
 import { useRouter } from "next/navigation";
 import { myFetch } from "../../../../helpers/myFetch";
+import { CgUnblock } from "react-icons/cg";
+import { revalidateTags } from "../../../../helpers/revalidateTags";
 
 // Sub-components for better organization
 function Avatar({ src, size = 10, online }: { src: string; size?: number; online?: boolean }) {
@@ -28,6 +38,7 @@ function Avatar({ src, size = 10, online }: { src: string; size?: number; online
 
 export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: string; currentUserId: string; activeUser: any }) {
   const [messages, setMessages] = useState<any[]>([]);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -59,7 +70,7 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
         //   "Authorization": `Bearer ${token}`,
         // }
       });
-      console.log(res, 'message res')
+      // console.log(res, 'message res')
       if (res?.success) setMessages(res?.data?.reverse());
     } catch (error) {
       console.error("Failed to fetch messages:", error);
@@ -73,6 +84,30 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleReport = () => {
+    setIsReportModalOpen(true);
+  };
+
+  const handleBlock = () => {
+    toast.promise(myFetch(`/user/block`, {
+      method: "POST",
+      body: {
+        user: otherParticipant?._id,
+      }
+    }), {
+      loading: `Blocking ${otherParticipant?.name || 'user'}...`,
+      success: (res) => {
+        setTimeout(() => {
+          window.location.reload()
+        }, 500)
+        return res?.message || `Blocked ${otherParticipant?.name || 'user'}`
+      },
+      error: (err) => {
+        return err?.message || `Failed to block ${otherParticipant?.name || 'user'}`
+      },
+    })
+  };
 
   const otherParticipant = Array.isArray(activeUser?.participants)
     ? activeUser?.participants?.find((p: any) => p._id !== currentUserId)
@@ -103,9 +138,34 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
           <button className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-all">
             <Phone size={16} />
           </button>
-          <button className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-all">
-            <MoreVertical size={16} />
-          </button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-all outline-none">
+                <MoreVertical size={16} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-[#1a1b26] border-white/10 text-white">
+              <DropdownMenuItem
+                onClick={handleReport}
+                className="gap-3 cursor-pointer focus:bg-white/5 focus:text-white text-gray-300"
+              >
+                <Flag size={16} className="text-amber-500" />
+                <span>Report User</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleBlock}
+                className="gap-3 cursor-pointer focus:bg-red-500/10 focus:text-red-400 text-red-400"
+              >
+                {activeUser?.status === "block" && activeUser?.blockByMe ? (
+                  <CgUnblock size={16} />
+                ) : (
+                  <Ban size={16} />
+                )}
+                <span>{activeUser?.status === "block" && activeUser?.blockByMe ? "Unblock User" : "Block User"}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -212,6 +272,13 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e1e2a; border-radius: 10px; }
       `}</style>
+
+      <ReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        userId={otherParticipant?._id}
+        userName={otherParticipant?.name || "User"}
+      />
     </div>
   );
 }

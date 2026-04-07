@@ -1,13 +1,16 @@
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { myFetch } from "../../../../../helpers/myFetch";
+import { toast } from "sonner";
 
 export default function ChangePassword() {
-  const [cur, setCur]     = useState("");
-  const [nw, setNw]       = useState("");
-  const [conf, setConf]   = useState("");
+  const [cur, setCur] = useState("");
+  const [nw, setNw] = useState("");
+  const [conf, setConf] = useState("");
   const [shCur, setShCur] = useState(false);
-  const [shNw, setShNw]   = useState(false);
+  const [shNw, setShNw] = useState(false);
   const [shConf, setShConf] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const eyeBtn = (show: boolean, setShow: (v: boolean) => void) => (
     <button onClick={() => setShow(!show)} className="text-gray-500 hover:text-white transition-colors">
@@ -15,8 +18,44 @@ export default function ChangePassword() {
     </button>
   );
 
+  const handleSubmit = async () => {
+    if (!cur || !nw || !conf) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    if (nw !== conf) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    toast.promise(myFetch("/auth/change-password", {
+      method: "POST",
+      body: {
+        currentPassword: cur,
+        newPassword: nw,
+        confirmPassword: conf,
+      },
+    }), {
+      loading: "Updating password...",
+      success: (res) => {
+        if (res?.success) {
+          setCur("");
+          setNw("");
+          setConf("");
+          return res?.message || "Password changed successfully";
+        }
+        throw new Error(res?.message || "Failed to change password");
+      },
+      error: (err) => err?.message || "Failed to change password",
+      finally: () => setIsSubmitting(false)
+    });
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-2xl ">
       <div className="space-y-1.5">
         <p className="text-[13px] text-gray-400">Current Password</p>
         <div className="relative flex items-center">
@@ -41,12 +80,13 @@ export default function ChangePassword() {
           <span className="absolute right-3">{eyeBtn(shConf, setShConf)}</span>
         </div>
       </div>
-       <button
-      
-      className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all bg-primary`}
-    >
-      Save
-    </button>
+      <button
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+        className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all bg-primary ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"}`}
+      >
+        {isSubmitting ? "Saving..." : "Save"}
+      </button>
     </div>
   );
 }
