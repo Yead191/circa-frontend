@@ -1,14 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChatSidebar } from "@/components/ui/message/ChatSidebar";
 import getProfile from "@/utils/getProfile";
 import { myFetch } from "../../../../../helpers/myFetch";
+import { io } from "socket.io-client";
 
 export default function MessageLayoutWrapper({ children }: { children: React.ReactNode }) {
+    const [userId, setUser] = useState(null)
     const [chatRooms, setChatRooms] = useState<any[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string>("");
     const [loading, setLoading] = useState(true);
+    const socket = useMemo(() => io('http://10.10.7.9:5005'), []);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const user = await getProfile();
+            setUser(user?._id);
+        };
+
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        socket.on(`chatList::${userId}`, (data) => {
+            console.log(data, 'chat room data');
+
+            setChatRooms((prev) => [...prev, data]);
+        });
+        return () => { socket.off(`chatList::${userId}`); };
+    }, [socket, userId]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -35,7 +56,6 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
             </div>
         );
     }
-    console.log(chatRooms)
     return (
         <div className="flex h-[calc(100vh-115px)] overflow-hidden bg-[#0a0a10] ">
             {/* Sidebar - Persistent */}
