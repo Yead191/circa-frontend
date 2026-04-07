@@ -10,7 +10,6 @@ import MessageButton from "./MessageButton";
 
 const CreatorProfile = ({ creatorData, creatorId }: any) => {
 
-  // console.log("CreatorProfile", creatorData);
 
   return (
     <div className="w-full ">
@@ -46,11 +45,11 @@ const CreatorProfile = ({ creatorData, creatorId }: any) => {
 
               {/* Members Count */}
               <p className="text-[#FF9A85] text-[15px] md:text-base mb-1.5">
-                12,765 members
+                {creatorData?.freeMambers + creatorData?.paidMambers} members
               </p>
 
               {/* About Link */}
-              <Link href={"/explore/creator-profile/about"} className="flex items-center text-[#B698F4] text-[15px] hover:text-[#CBB5F8] transition-colors focus:outline-none cursor-pointer hover:underline">
+              <Link href={`/explore/creator-profile/about?id=${creatorId}`} className="flex items-center text-[#B698F4] text-[15px] hover:text-[#CBB5F8] transition-colors focus:outline-none cursor-pointer hover:underline">
                 About <ChevronRight size={16} className="ml-0.5" />
               </Link>
             </div>

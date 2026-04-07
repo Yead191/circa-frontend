@@ -1,9 +1,11 @@
-import { Check } from "lucide-react";
-import { Button } from "@/components/ui/button"; 
-import { membershipData } from "@/constants/explore-data";
+"use client"
+import { Check, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { myFetch } from "../../../../../../../helpers/myFetch";
 
 
-const Membership = ({plans}:any) => {
+const Membership = ({ plans }: any) => {
+  console.log("sdfds", plans)
   if (!plans || plans.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -16,53 +18,74 @@ const Membership = ({plans}:any) => {
     );
   }
 
+  const handleSubscribe = async (plan: any) => {
+    console.log("plan", plan);
+    try {
+      const res = await myFetch(`/subscription/subscribe/${plan?._id}`, {
+        method: "POST",
+      });
+      console.log(res)
+      if (res?.success && res?.data) {
+        window.location.href = res.data;
+      } else {
+        console.error("Order submission failed:", res?.message || res?.error);
+      }
+    } catch (error) {
+      console.error("Order submission error:", error);
+    }
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {plans.map((tier:any) => (
-        <div
-          key={tier?._id}
-          className="bg-[#15131A] rounded-xl p-8 border border-white/5 flex flex-col justify-between"
-        >
-          <div>
-            <div className="flex items-center justify-between mb-0">
-              <h3 className={`text-lg font-medium ${tier.title === "Free" ? "text-primary" : "text-[#F084A9]"}`}>{tier.title}</h3>
-              <span className="text-2xl">{tier.icon}</span>
+      {plans.map((plan: any) => (
+        <div key={plan._id} className="bg-[#16161e] border border-[#2a2a35] rounded-3xl p-5 flex flex-col gap-4 relative group hover:border-indigo-500/40 transition-all duration-300 shadow-xl overflow-hidden">
+
+          {/* Background Glow */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-500" />
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{plan.emoji || '🚀'}</span>
+              <div className="text-left">
+                <h3 className="text-white font-black text-sm uppercase tracking-wide leading-tight">{plan.name}</h3>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{plan.category}</p>
+              </div>
             </div>
 
-            {tier.price && (
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-semibold text-white">
-                  {tier.price}
-                </span>
-                <span className="text-sm text-gray-500 font-medium">
-                  {tier.frequency}
-                </span>
-              </div>
-            )}
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-black text-white">${plan.price}</span>
+              <span className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">/ {plan.duration} {plan.duration > 1 ? 'Months' : 'Month'}</span>
+            </div>
 
-            <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-              {tier.description}
-            </p>
+            {plan.subtitle && <p className="text-gray-400 text-xs leading-relaxed italic">{plan.subtitle}</p>}
+          </div>
 
-            <div className="w-full h-[1px] bg-white/10 mb-8" />
-
-            <ul className="space-y-4 mb-8">
-              {tier.features.map((feature:Record<string, any>, index:number) => (
-                <li key={index} className="flex items-center gap-3">
-                  <div className="bg-primary size-5 rounded-full flex items-center justify-center shrink-0">
-                    <Check className="text-white size-3 stroke-[4px]" />
+          {/* Features List */}
+          <div className="space-y-2 flex-1 pt-2">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Plan Features</p>
+            <div className="grid grid-cols-1 gap-2">
+              {plan.features?.filter((f: any) => f.status).map((f: any) => (
+                <div key={f._id} className="flex items-center justify-between px-3 py-2 bg-[#1a1a24] rounded-xl border border-white/5">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 size={14} className="text-emerald-500" />
+                    <span className="text-gray-300 text-[11px] font-medium">{f.name}</span>
                   </div>
-                  <span className="text-[15px] text-gray-200">{feature?.name}</span>
-                </li>
+                  {f.discount > 0 && (
+                    <span className="text-[9px] font-black bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-full uppercase tracking-widest">
+                      {f.discount}% OFF
+                    </span>
+                  )}
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
           <Button
-            variant="default"
-            className="w-full bg-[#99a0fd] hover:bg-[#8b91f0] text-white font-bold rounded-xl h-12 text-base transition-colors"
+            className="w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-gray-200 transition-colors mt-2"
+            onClick={() => handleSubscribe(plan)}
+            disabled={plan.isSubscribed}
           >
-            {tier.buttonText}
+            {plan.isSubscribed ? "Subscribed" : "Subscribe"}
           </Button>
         </div>
       ))}
