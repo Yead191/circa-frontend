@@ -1,3 +1,4 @@
+"use client"
 import { Ban, User, Calendar, Info, X, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { myFetch } from "../../../../../helpers/myFetch";

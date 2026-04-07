@@ -1,5 +1,5 @@
-import ChangePassword from "@/components/ui/fans/profile/ChangePassword";
-import React from "react";
+import ChangePassword from "@/components/ui/creator/Profile/ChangePassword";
+
 
 export default function ChangePasswordPage() {
   return (
