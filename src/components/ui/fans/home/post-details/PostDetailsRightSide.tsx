@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { myFetch } from '../../../../../../helpers/myFetch';
 import { useEffect, useState } from 'react';
-import { imgUrl } from '../../../../../../helpers/imgUrl';
 import { getImageUrl } from "@/utils/getImageUrl";
+import { revalidateTags } from "../../../../../../helpers/revalidateTags";
 
 const PostDetailsRightSide = () => {
     const params = useSearchParams();
@@ -63,7 +63,13 @@ const PostDetailsRightSide = () => {
                 method: "POST",
             });
             if (res?.success) {
-                router.push('/message');
+                console.log(res, 'chat res');
+
+                revalidateTags(["chat"]);
+
+                setTimeout(() => {
+                    router.push(`/message/${res?.data?._id}`);
+                }, 500);
             } else {
                 console.error("Failed to start chat:", res?.message);
             }

@@ -11,7 +11,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
     const [chatRooms, setChatRooms] = useState<any[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string>("");
     const [loading, setLoading] = useState(true);
-    const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://31.97.114.108:5020"), []);
+    const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://68.178.164.48:5005"), []);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -24,8 +24,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
 
     useEffect(() => {
         socket.on(`chatList::${userId}`, (data) => {
-            // console.log(data, 'chat room data');
-
+            console.log(data, 'chat room data');
             setChatRooms((prev) => [...prev, data]);
         });
         return () => { socket.off(`chatList::${userId}`); };
@@ -57,7 +56,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
         );
     }
     return (
-        <div className="flex h-[calc(100vh-115px)] overflow-hidden bg-[#0a0a10] ">
+        <div className="flex h-[calc(100vh-118px)] overflow-hidden bg-[#0a0a10] ">
             {/* Sidebar - Persistent */}
             <div className="w-full lg:w-1/3 xl:w-1/4 shrink-0 h-full">
                 <ChatSidebar chatRooms={chatRooms} currentUserId={currentUserId} isCreator={false} />

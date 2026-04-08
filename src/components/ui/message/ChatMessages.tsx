@@ -36,6 +36,7 @@ function Avatar({ src, size = 10, online }: { src: string; size?: number; online
 }
 
 export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: string; currentUserId: string; activeUser: any }) {
+  console.log(activeUser)
   const [messages, setMessages] = useState<any[]>([]);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [page, setPage] = useState(1);

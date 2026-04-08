@@ -39,7 +39,7 @@ export function RightSidebarNav() {
     if (!profileData?._id) return;
 
     const socket = io(
-      process.env.NEXT_PUBLIC_SOCKET_URL || "http://31.97.114.108:5020",
+      process.env.NEXT_PUBLIC_SOCKET_URL || "http://68.178.164.48:5005",
       {
         query: { userId: profileData._id },
       }
