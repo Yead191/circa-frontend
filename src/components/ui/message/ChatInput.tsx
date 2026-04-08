@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Smile, Paperclip, Image as ImageIcon, Send, X, Plus, Ban } from "lucide-react";
+import { Smile, Paperclip, Image as ImageIcon, Send, X, Plus, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { myFetch } from "../../../../helpers/myFetch";
+import { useRouter } from "next/navigation";
 
 export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: any }) {
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [isSending, setIsSending] = useState(false);
+  const [isPurchasing, setIsPurchasing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -41,7 +44,6 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
       const res = await myFetch("/message", {
         method: "POST",
         body: formData,
-        tags: ["chat"]
       });
 
       if (res?.success) {
@@ -58,11 +60,62 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
     }
   };
 
+  const handlePurchase = async () => {
+    setIsPurchasing(true);
+    try {
+      const res = await myFetch(`/message/purchase/${activeUser?._id}`, {
+        method: "POST"
+      });
+      console.log(res)
+      if (res?.success) {
+        toast.success("Credits purchased successfully!");
+        setTimeout(() => {
+          window.location.reload()
+        }, 500)
+      } else {
+        toast.error(res?.message || "Purchase failed");
+      }
+    } catch (error) {
+      toast.error("Failed to process purchase");
+      console.error(error);
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+
   const isBlocked = activeUser?.status === "block";
   const iBlockedThem = activeUser?.blockByMe === true;
   const theyBlockedMe = isBlocked && !iBlockedThem;
-  console.log(activeUser);
+  const hasNoCredit = activeUser?.remaningMessage <= 0;
 
+  if (hasNoCredit && !isBlocked) {
+    return (
+      <div className="px-5 py-4 border-t border-white/8 bg-[#0d0e14] relative z-20">
+        <div className="bg-[#1a1b26] border border-indigo-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_0_20px_rgba(79,70,229,0.1)]">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0">
+              <CreditCard size={24} />
+            </div>
+            <div>
+              <p className="text-white font-semibold text-[15px]">Out of messages</p>
+              <p className="text-gray-400 text-xs">You don't have enough credit to send messages. <span className="text-indigo-400 font-medium">5 Credits / 20 messages</span></p>
+            </div>
+          </div>
+          <button
+            onClick={handlePurchase}
+            disabled={isPurchasing}
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-nowrap"
+          >
+            {isPurchasing ? (
+              <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+            ) : (
+              "Buy 5 Credits"
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-5 py-4 border-t border-white/8 bg-[#0d0e14] relative z-20">
@@ -154,3 +207,4 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
     </div>
   );
 }
+
