@@ -6,7 +6,7 @@ let socket: Socket | null = null;
 export const socketInstance = () => {
   if (!socket) {
     socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
-      transports: ["websocket"], // 🔥 fixes sid issues
+      transports: ["websocket"],
       withCredentials: true,
       autoConnect: true,
       reconnection: true,

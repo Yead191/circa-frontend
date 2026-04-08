@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { myFetch } from '../../../../../../helpers/myFetch';
 import { useEffect, useState } from 'react';
 import { imgUrl } from '../../../../../../helpers/imgUrl';
+import { getImageUrl } from "@/utils/getImageUrl";
 
 const PostDetailsRightSide = () => {
     const params = useSearchParams();
@@ -81,11 +82,7 @@ const PostDetailsRightSide = () => {
                     <div className="w-20 h-20 rounded-full overflow-hidden mb-3">
                         <Image
                             src={
-                                user?.image && user?.image.startsWith('http')
-                                    ? user?.image
-                                    : user?.image
-                                        ? `${imgUrl}${user?.image}`
-                                        : '/default-avatar.jpg'
+                                getImageUrl(user?.image)
                             }
                             alt="user image"
                             width={80}

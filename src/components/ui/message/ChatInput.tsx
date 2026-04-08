@@ -61,6 +61,8 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
   const isBlocked = activeUser?.status === "block";
   const iBlockedThem = activeUser?.blockByMe === true;
   const theyBlockedMe = isBlocked && !iBlockedThem;
+  console.log(activeUser);
+
 
   return (
     <div className="px-5 py-4 border-t border-white/8 bg-[#0d0e14] relative z-20">

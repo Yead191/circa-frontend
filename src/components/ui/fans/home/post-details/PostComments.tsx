@@ -8,7 +8,7 @@ const PostComments = async ({ post }: any) => {
     const response = await myFetch(`/post/comment/${post?._id}?limit=5`, { tags: ['comments'] });
     const comments = response?.data || [];
     const profileData = await getProfile();
-    
+
     return (
         <div className="px-1">
             <h3 className="font-semibold text-lg mb-4">Comments ({post?.comment_count})</h3>

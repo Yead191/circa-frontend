@@ -3,15 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChatSidebar } from "@/components/ui/message/ChatSidebar";
 import getProfile from "@/utils/getProfile";
-import { io } from "socket.io-client";
 import { myFetch } from "../../../../../helpers/myFetch";
+import { io } from "socket.io-client";
 
 export default function MessageLayoutWrapper({ children }: { children: React.ReactNode }) {
     const [userId, setUser] = useState(null)
     const [chatRooms, setChatRooms] = useState<any[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string>("");
     const [loading, setLoading] = useState(true);
-    const socket = useMemo(() => io('http://10.10.7.9:5005'), []);
+    const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://31.97.114.108:5020"), []);
 
     useEffect(() => {
         const fetchUser = async () => {

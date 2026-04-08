@@ -1,20 +1,19 @@
 import CreditsModal from "@/components/modals/fans/CreditsModal";
-import SendGiftModal from "@/components/modals/fans/SendGiftModal";
 import { Lock } from "lucide-react";
 import Image from "next/image";
 import PostComments from "./PostComments";
 import LikeCommentButton from "./LikeCommentButton";
-import { imageFormatter } from "../../../../../../helpers/imageFormatter";
+import { getImageUrl } from "@/utils/getImageUrl";
+import React from "react";
+import PostCarousel from "./PostCarousel";
 
 interface PostDetailsLayoutProps {
   post: any;
 }
 
-export default function PostDetailsLayout({ post }: PostDetailsLayoutProps) {
+export default async function PostDetailsLayout({ post }: PostDetailsLayoutProps) {
   const isPremium = post?.isPrimium;
-  const authorImage = post?.user?.image;
   const authorName = post?.user?.name;
-  const postImage = post?.images?.[0];
 
   return (
     <div className="max-w-2xl mx-auto bg-[#0a0a0a] min-h-screen text-white pb-10">
@@ -28,10 +27,10 @@ export default function PostDetailsLayout({ post }: PostDetailsLayoutProps) {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden relative">
                 <Image
-                  src={imageFormatter(authorImage)}
-                  alt={authorName}
+                  src={getImageUrl(post?.user?.image)}
+                  alt={authorName || "Author"}
                   fill
-                  className="object-cover w-full h-full"
+                  className="object-cover w-10 h-10"
                 />
               </div>
               <div className="flex flex-col">
@@ -41,20 +40,8 @@ export default function PostDetailsLayout({ post }: PostDetailsLayoutProps) {
             </div>
           </div>
 
-          {/* Main Image — only render if image exists */}
-          {postImage && (
-            <div className="relative w-full rounded-xl overflow-hidden mb-4 bg-red-100">
-              <div className="h-136.25 w-full relative">
-                <Image
-                  src={imageFormatter(postImage)}
-                  alt="Post Image"
-                  fill
-                  className="object-cover w-full h-full transition-all duration-300"
-                />
-              </div>
-              <SendGiftModal />
-            </div>
-          )}
+          {/* Main Content Carousel */}
+          <PostCarousel images={post?.images || []} title={post?.title || ""} />
 
           {/* Actions */}
           <LikeCommentButton post={post} />
