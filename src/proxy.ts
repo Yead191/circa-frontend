@@ -17,7 +17,7 @@ const CREATOR_PAGES = [
     "/creator-setting",
 ]
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl
 
     const isAuthPage = AUTH_PAGES.some(p => pathname.startsWith(p))

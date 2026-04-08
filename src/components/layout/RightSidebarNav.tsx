@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { LuShoppingCart } from "react-icons/lu";
 import { MdOutlineNotificationsNone } from "react-icons/md";
 import getProfile from "../../../helpers/getProfile";
-import { imageFormatter } from "../../../helpers/imageFormatter";
 import { io } from "socket.io-client";
 import { myFetch } from "../../../helpers/myFetch";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 export function RightSidebarNav() {
   const [profileData, setProfileData] = useState<any>(null);
@@ -85,11 +85,11 @@ export function RightSidebarNav() {
 
           <Link href="/profile" className="w-10.5 h-10.5 rounded-full bg-gray-100 overflow-hidden border border-[#242424] cursor-pointer">
             <Image
-              src={imageFormatter(profileData?.image)}
+              src={getImageUrl(profileData?.image)}
               width={100}
               height={100}
               alt="avatar"
-              className="w-10.5 h-10.5"
+              className="w-10.5 h-10.5 object-cover"
             />
           </Link>
         </div>
