@@ -9,6 +9,9 @@ import { FiHome, FiCompass, FiMessageCircle, FiUser, FiLogOut } from "react-icon
 import { IoMdWallet } from "react-icons/io";
 import { IoDiamondSharp, IoSettingsOutline } from "react-icons/io5";
 import Cookies from "js-cookie";
+import { myFetch } from "../../../helpers/myFetch";
+import { CloudCog } from "lucide-react";
+import getProfile from "../../../helpers/getProfile";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -30,10 +33,41 @@ const navItems: NavItem[] = [
 ];
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
+  const [creditData, setCreditData] = React.useState(0); 
+  const [profileData, setProfileData] = React.useState<any>(null); 
+  const userRole = profileData?.role || "FAN";
   const handleLogout = () => {
     Cookies.remove("accessToken");
     window.location.href = "/login";
-  };
+  }; 
+
+  const filteredNavItems = navItems.filter((item) => {
+  if (userRole === "CREATOR") {
+    return item.href !== "/profile" && item.href !== "/explore";
+  }
+  return true;
+}); 
+
+  React.useEffect(() => {
+    const fetchCredit = async () => {
+      try {
+        const res = await myFetch("/wallet");
+        setCreditData(res?.data?.credit || 0);
+      } catch (error) {
+        console.error("Failed to fetch credit", error);
+      }
+    };
+
+    fetchCredit();
+  }, []); 
+
+  React.useEffect(() => {
+    const getProfileData = async () => {
+      const response = await getProfile();
+      if (response) setProfileData(response);
+    };
+    getProfileData();
+  }, []);
 
   return (
     <>
@@ -77,7 +111,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
           {/* 🔥 Nav Items (Mapped) */}
           <div className=" pb-8 border-b border-[#242424] flex flex-col gap-2">
-            {navItems.map((item) => (
+            {filteredNavItems.map((item) => (
               <SidebarLink
                 key={item.href}
                 href={item.href}
@@ -102,7 +136,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
               <span>
                 <IoMdWallet color="#F2CC0D" size={18} />
               </span>{" "}
-              120 Credits
+              {creditData} Credits
             </div>
 
             <Link href="/profile/credits" className="w-full py-2 bg-primary hover:bg-opacity-90 transition-opacity text-white font-medium rounded-lg text-sm cursor-pointer block text-center">

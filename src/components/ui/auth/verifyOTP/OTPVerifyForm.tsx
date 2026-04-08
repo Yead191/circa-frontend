@@ -31,7 +31,6 @@ export default function OTPVerifyForm() {
   const userType = searchParams.get("userType");
   const router = useRouter();
 
-  console.log("isExpired", isExpired);
   
   const handleChange = (index: number, value: string): void => {
     if (!/^\d*$/.test(value)) return;

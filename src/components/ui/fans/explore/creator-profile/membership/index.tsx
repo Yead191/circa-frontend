@@ -5,7 +5,7 @@ import { myFetch } from "../../../../../../../helpers/myFetch";
 
 
 const Membership = ({ plans }: any) => {
-  console.log("sdfds", plans)
+
   if (!plans || plans.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -24,7 +24,6 @@ const Membership = ({ plans }: any) => {
       const res = await myFetch(`/subscription/subscribe/${plan?._id}`, {
         method: "POST",
       });
-      console.log(res)
       if (res?.success && res?.data) {
         window.location.href = res.data;
       } else {

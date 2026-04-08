@@ -11,7 +11,8 @@ import { getImageUrl } from "@/utils/getImageUrl";
 export function RightSidebarNav() {
   const [profileData, setProfileData] = useState<any>(null);
   const [notificationCount, setNotificationCount] = useState(0);
-  const [cartCount, setCartCount] = useState(0);
+  const [cartCount, setCartCount] = useState(0); 
+  const userRole = profileData?.role || "FAN";
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -83,7 +84,7 @@ export function RightSidebarNav() {
             </button>
           </Link>
 
-          <Link href="/profile" className="w-10.5 h-10.5 rounded-full bg-gray-100 overflow-hidden border border-[#242424] cursor-pointer">
+          <Link href={`${userRole=== "CREATOR" ? "/creator-home" : "/profile"}`} className="w-10.5 h-10.5 rounded-full bg-gray-100 overflow-hidden border border-[#242424] cursor-pointer">
             <Image
               src={getImageUrl(profileData?.image)}
               width={100}

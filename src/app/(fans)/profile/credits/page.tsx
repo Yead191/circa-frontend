@@ -1,5 +1,4 @@
 import Credits from "@/components/ui/fans/profile/Creadit";
-import React from "react";
 import { myFetch } from "../../../../../helpers/myFetch";
 
 export default async function CreditsPage() {
