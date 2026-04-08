@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Smile, Paperclip, Image as ImageIcon, Send, X, Plus, Ban, CreditCard } from "lucide-react";
+import { Smile, Paperclip, Image as ImageIcon, Send, X, Plus, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { myFetch } from "../../../../helpers/myFetch";
 import { useRouter } from "next/navigation";
@@ -44,13 +44,11 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
       const res = await myFetch("/message", {
         method: "POST",
         body: formData,
-        tags: ["chat"]
       });
 
       if (res?.success) {
         setText("");
         setFiles([]);
-        router.refresh(); // Refresh to update remaining messages
       } else {
         toast.error(res?.message || "Failed to send message");
       }
@@ -71,7 +69,9 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
       console.log(res)
       if (res?.success) {
         toast.success("Credits purchased successfully!");
-        router.refresh();
+        setTimeout(() => {
+          window.location.reload()
+        }, 500)
       } else {
         toast.error(res?.message || "Purchase failed");
       }
@@ -104,7 +104,7 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
           <button
             onClick={handlePurchase}
             disabled={isPurchasing}
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-nowrap"
           >
             {isPurchasing ? (
               <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />

@@ -22,8 +22,7 @@ interface ChatRoom {
   todayisBirthDay?: boolean;
 }
 
-export function ChatSidebar({ chatRooms, currentUserId, isCreator }: { chatRooms: ChatRoom[], currentUserId: string, isCreator?: boolean }) {
-  const [search, setSearch] = useState("");
+export function ChatSidebar({ chatRooms, currentUserId, isCreator, search, setSearch }: { chatRooms: ChatRoom[], currentUserId: string, isCreator?: boolean, search: string, setSearch: (search: string) => void }) {
   const [showFilter, setShowFilter] = useState(false);
   const pathname = usePathname();
 

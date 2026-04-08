@@ -7,6 +7,7 @@ import { myFetch } from "../../../../../helpers/myFetch";
 import { io } from "socket.io-client";
 
 export default function MessageLayoutWrapper({ children }: { children: React.ReactNode }) {
+    const [search, setSearch] = useState("");
     const [userId, setUser] = useState(null)
     const [chatRooms, setChatRooms] = useState<any[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string>("");
@@ -36,7 +37,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
                 const profile = await getProfile();
                 if (profile?._id) {
                     setCurrentUserId(profile._id);
-                    const rooms = await myFetch("/chat", { method: "GET", tags: ["chat"] });
+                    const rooms = await myFetch(`/chat?searchTerm=${search}`, { method: "GET", tags: ["chat"] });
                     if (rooms?.success) setChatRooms(rooms.data);
                 }
             } catch (error) {
@@ -46,7 +47,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
             }
         };
         fetchData();
-    }, []);
+    }, [search]);
 
     if (loading) {
         return (
@@ -59,7 +60,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
         <div className="flex h-[calc(100vh-118px)] overflow-hidden bg-[#0a0a10] ">
             {/* Sidebar - Persistent */}
             <div className="w-full lg:w-1/3 xl:w-1/4 shrink-0 h-full">
-                <ChatSidebar chatRooms={chatRooms} currentUserId={currentUserId} isCreator={false} />
+                <ChatSidebar chatRooms={chatRooms} currentUserId={currentUserId} isCreator={false} search={search} setSearch={setSearch} />
             </div>
 
             {/* Main Content (Conversations) */}
