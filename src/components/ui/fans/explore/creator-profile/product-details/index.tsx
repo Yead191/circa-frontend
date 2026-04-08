@@ -59,7 +59,7 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
 
     // console.log("ProductDetails", productDetails);
     return (
-        <div className="w-full text-white pb-10">
+        <div className="max-w-2xl mx-auto text-white pb-10">
             {/* Image */}
             <div className="relative w-full h-[350px] md:h-[450px] lg:h-[550px] rounded-3xl overflow-hidden mb-8 border border-[#242424] bg-[#1c1c20]">
                 <Image

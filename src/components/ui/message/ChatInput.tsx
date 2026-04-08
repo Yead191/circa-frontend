@@ -5,6 +5,7 @@ import { Smile, Paperclip, Image as ImageIcon, Send, X, Plus, CreditCard } from 
 import { toast } from "sonner";
 import { myFetch } from "../../../../helpers/myFetch";
 import { useRouter } from "next/navigation";
+import { revalidateTags } from "../../../../helpers/revalidateTags";
 
 export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: any }) {
   const [text, setText] = useState("");
@@ -12,7 +13,6 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
   const [isSending, setIsSending] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -49,6 +49,7 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
       if (res?.success) {
         setText("");
         setFiles([]);
+        revalidateTags(["message",])
       } else {
         toast.error(res?.message || "Failed to send message");
       }

@@ -71,7 +71,8 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
     try {
       const res = await myFetch(`/message/${chatId}?page=${pageNumber}`, {
         method: "GET",
-        cache: "no-store"
+        cache: "no-store",
+        tags: ["message"]
       });
 
       if (res?.success) {
