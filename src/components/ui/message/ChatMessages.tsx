@@ -48,7 +48,7 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
   const updateSourceRef = useRef<"initial" | "pagination" | "new-message">("initial");
   const router = useRouter();
 
-  const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://31.97.114.108:5020"), []);
+  const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://68.178.164.48:5005"), []);
 
   const scrollToBottom = () => {
     if (containerRef.current) {
