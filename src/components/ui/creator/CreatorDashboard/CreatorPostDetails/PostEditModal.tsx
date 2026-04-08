@@ -109,7 +109,7 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
                 const existingImages = await Promise.all((post.images.map(async (url, index) => {
                     return createImageItemFromUrl(index.toString(), url)
                 })))
-                console.log(existingImages);
+                // console.log(existingImages);
 
                 setImages(existingImages);
 
@@ -187,7 +187,7 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
                 method: 'PATCH',
                 body: formData,
             });
-            console.log(res)
+            // console.log(res)
             if (res?.success) {
                 toast.success('Post updated successfully');
                 revalidateTags(['post', 'posts']);

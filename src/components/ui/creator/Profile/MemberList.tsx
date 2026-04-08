@@ -213,7 +213,7 @@ function ContextMenu({ items, onClose }: { items: any[]; onClose: () => void }) 
 }
 
 export default function MemberList({ memberList }: { memberList: Member[] }) {
-  console.log(memberList)
+  // console.log(memberList)
   const [selectedUser, setSelectedUser] = useState<Member | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);

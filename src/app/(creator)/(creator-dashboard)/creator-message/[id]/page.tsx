@@ -24,7 +24,7 @@ export default function ChatDetailPage({ params }: PageProps) {
         if (profile?._id) {
           setCurrentUserId(profile._id);
           const room = await myFetch(`/chat/${id}`, { method: "GET", tags: ["chat"], cache: "no-store" });
-          console.log(room, "room")
+          // console.log(room, "room")
           if (room?.success) setActiveUser(room.data);
         }
       } catch (error) {

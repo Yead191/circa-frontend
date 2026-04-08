@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { MOCK_POSTS } from "@/constants/home-data";
 import PostCard from "@/components/ui/fans/home/PostCard";
 import { myFetch } from "../../../helpers/myFetch";
 

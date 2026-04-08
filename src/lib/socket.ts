@@ -13,7 +13,7 @@ export const socketInstance = () => {
     });
 
     socket.on("connect", () => {
-      console.log("Socket connected:", socket?.id);
+      // console.log("Socket connected:", socket?.id);
     });
   }
   return socket;

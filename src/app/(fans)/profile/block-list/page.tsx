@@ -6,7 +6,7 @@ export default async function BlockListPage() {
   const blockedListRes = await myFetch('/user/block', { method: 'GET', cache: 'no-store', tags: ['blocklist'] })
   const blockList = blockedListRes?.data || [];
   return (
-    <div className="space-y-6 pb-6">
+    <div className="space-y-6 pb-6 max-w-2xl mx-auto">
       <BlockList blockList={blockList} />
     </div>
   );

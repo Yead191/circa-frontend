@@ -27,7 +27,7 @@ const page = async ({ searchParams }: { searchParams: Promise<{ [key: string]: s
   const messageData = messageRes?.data || [];
   const shopData = shopRes?.data || [];
   const transactionData = transactionRes?.data || [];
-  console.log(transactionData)
+  // console.log(transactionData)
   return (
     <EarningPage
       statistics={statistics}

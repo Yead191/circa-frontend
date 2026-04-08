@@ -10,7 +10,7 @@ export default async function CreditsPage() {
 
 
   return (
-    <div className="space-y-6 pb-6">
+    <div className="space-y-6 pb-6 max-w-2xl mx-auto">
       <Credits packages={packages} creditData={creditData} />
     </div>
   );

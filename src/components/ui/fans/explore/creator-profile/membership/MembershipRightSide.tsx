@@ -42,7 +42,7 @@ const MembershipRightSide = () => {
     const fetchCreator = async () => {
       try {
         const res = await myFetch(`/user/creator/${id}`);
-        console.log("creator", res);
+        // console.log("creator", res);
         setCreator(res?.data);
       } catch (error) {
         console.error("Failed to fetch creator:", error);

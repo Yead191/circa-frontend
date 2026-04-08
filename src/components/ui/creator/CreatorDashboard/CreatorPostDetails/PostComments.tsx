@@ -69,7 +69,7 @@ const PostComments = ({ comments, user, postId }: { comments: Comment[], user: U
       setCommentText("");
 
     }
-    console.log("Submitting comment:", commentText);
+    // console.log("Submitting comment:", commentText);
   };
 
   return (

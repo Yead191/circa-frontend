@@ -40,7 +40,7 @@ export default function CheckoutStep({ total, onBack, onSuccess }: Props) {
         method: "POST",
         body: payload
       });
-      console.log(res)
+      // console.log(res)
       if (res?.success && res?.data) {
         window.location.href = res.data;
         setCountry("");

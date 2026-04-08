@@ -162,7 +162,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             }), {
                 loading: 'Creating post...',
                 success: (res) => {
-                    console.log(res)
+                    // console.log(res)
                     if (res?.success) {
                         revalidateTags(['post', 'posts']);
                         setShowSuccess(true);

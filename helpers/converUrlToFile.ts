@@ -11,7 +11,7 @@ export async function createImageItemFromUrl(
     id: string,
     url: string
 ): Promise<ImageItem> {
-    console.log(url);
+    // console.log(url);
 
     const response = await fetch(getImageUrl(url));
 
@@ -28,7 +28,7 @@ export async function createImageItemFromUrl(
 
     // Detect MIME type
     const mimeType = blob.type || "image/jpeg";
-    console.log(mimeType);
+    // console.log(mimeType);
     // Create File object
     const file = new File([blob], filename, { type: mimeType });
 

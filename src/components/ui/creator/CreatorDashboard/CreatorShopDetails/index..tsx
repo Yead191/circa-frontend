@@ -162,14 +162,14 @@ const CreatorShopDetails: React.FC<{ product: Product }> = ({ product }) => {
 
   const handleDeleteConfirm = async () => {
     setShowDeleteModal(false);
-    console.log('Deleting product id:', product?._id);
+    // console.log('Deleting product id:', product?._id);
     // await deleteProduct(product.id);
     toast.promise(myFetch(`/product/${product?._id}`, {
       method: 'DELETE',
     }), {
       loading: 'Deleting product...',
       success: (res) => {
-        console.log(res)
+        // console.log(res)
         if (res?.success) {
           revalidateTags(['product', 'shops']);
           router.back();

@@ -146,7 +146,7 @@ const ShopEditModal: React.FC<ShopEditModalProps> = ({
             }), {
                 loading: 'Updating product...',
                 success: (res) => {
-                    console.log(res)
+                    // console.log(res)
                     if (res?.success) {
                         revalidateTags(['product', 'shops']);
                         setShowSuccess(true);

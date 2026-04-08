@@ -8,10 +8,10 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 const ProductDetails = ({ productDetails }: { productDetails: any }) => {
-    const [quantity, setQuantity] = useState(1); 
+    const [quantity, setQuantity] = useState(1);
     const router = useRouter();
- 
-    console.log("ProductDetails Component Received:", quantity);
+
+    // console.log("ProductDetails Component Received:", quantity);
     const handleBuy = async (product: string) => {
         try {
             const response = await myFetch("/cart", { method: "POST", body: { product, quantity } })
@@ -33,7 +33,7 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
         } catch (err) {
             console.error('cart error:', err);
         }
-    };  
+    };
 
     const handleAddToCart = async (product: string) => {
         try {
@@ -55,9 +55,9 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
         } catch (err) {
             console.error('cart error:', err);
         }
-    }; 
+    };
 
-    console.log("ProductDetails", productDetails);
+    // console.log("ProductDetails", productDetails);
     return (
         <div className="w-full text-white pb-10">
             {/* Image */}

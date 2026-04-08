@@ -7,9 +7,9 @@ import { imageFormatter } from "../../../../helpers/imageFormatter";
 
 export default async function ProfilePage() {
   const user = await getProfile();
-  console.log(user);
+  // console.log(user);
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex flex-col md:flex-row gap-3 justify-between mb-7">
 
         {/* Left */}

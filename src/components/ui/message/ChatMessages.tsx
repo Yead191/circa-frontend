@@ -58,7 +58,7 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
 
   useEffect(() => {
     socket.on(`getMessage::${chatId}`, (data) => {
-      console.log(data, 'message data');
+      // console.log(data, 'message data');
 
       setMessages((prev) => [...prev, data]);
     });

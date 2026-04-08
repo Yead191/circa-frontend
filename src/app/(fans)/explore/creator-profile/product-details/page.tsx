@@ -7,9 +7,9 @@ interface PageProps {
 
 const ProductDetailsPage = async ({ searchParams }: PageProps) => {
     const { id } = await searchParams;
-      const data = await myFetch(`/product/${id}`, { tags: ['single-product'] });
-      const productDetails = data?.data || []; 
-    console.log("PostDetailsPage Params:", productDetails)
+    const data = await myFetch(`/product/${id}`, { tags: ['single-product'] });
+    const productDetails = data?.data || [];
+    // console.log("PostDetailsPage Params:", productDetails)
     return (
         <div>
             <ProductDetails productDetails={productDetails} />

@@ -66,7 +66,7 @@ export default function BecomeCreator({ categories }: { categories: any[] }) {
     if (files.sampleContent) {
       formData.append("document", files.sampleContent);
     }
-    console.log(formData);
+    // console.log(formData);
 
     toast.promise(
       myFetch("/user/apply-for-creator", {

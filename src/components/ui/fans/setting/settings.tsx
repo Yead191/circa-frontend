@@ -81,7 +81,7 @@ export default function Settings() {
   const [page, setPage] = useState<PageId>("main");
 
   return (
-    <div className="px-6 py-6">
+    <div className="px-6 py-6 max-w-2xl mx-auto">
       {page !== "main" && (
         <button
           onClick={() => setPage("main")}

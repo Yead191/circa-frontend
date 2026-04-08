@@ -19,7 +19,7 @@ const Membership = ({ plans }: any) => {
   }
 
   const handleSubscribe = async (plan: any) => {
-    console.log("plan", plan);
+    // console.log("plan", plan);
     try {
       const res = await myFetch(`/subscription/subscribe/${plan?._id}`, {
         method: "POST",

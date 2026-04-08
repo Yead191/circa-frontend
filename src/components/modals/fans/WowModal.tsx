@@ -9,19 +9,19 @@ interface WowModalProps {
   friend: any,
 }
 
-const WowModal = ({ children, friend }: WowModalProps) => { 
+const WowModal = ({ children, friend }: WowModalProps) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
 
-    const handleSendWow = async()=>{
+  const handleSendWow = async () => {
     try {
-      const response = await myFetch(`/gift/wow/${friend?._id}`, {method: "POST"});
+      const response = await myFetch(`/gift/wow/${friend?._id}`, { method: "POST" });
 
-      if(response?.success){
+      if (response?.success) {
         toast?.success(response?.message);
         setOpen(false)
-      }else{
-         if (response?.error && Array.isArray(response.error)) {
+      } else {
+        if (response?.error && Array.isArray(response.error)) {
           response.error.forEach((err: { message: string }) => {
             toast.error(err.message, { id: "friends" });
           });
@@ -31,9 +31,9 @@ const WowModal = ({ children, friend }: WowModalProps) => {
           });
         }
       }
-      
+
     } catch (error) {
-      console.log("error", error);    
+      console.log("error", error);
     }
   }
   return (
@@ -45,7 +45,7 @@ const WowModal = ({ children, friend }: WowModalProps) => {
       <DialogContent className="sm:max-w-[540px] bg-[#1c1c20] border-none text-white p-7 sm:rounded-[24px] shadow-2xl [&>button]:text-zinc-400 [&>button]:hover:text-white">
         <DialogHeader className="flex flex-col items-center justify-center p-0 space-y-0">
           <div className="relative mb-2 mt-2">
-            <div 
+            <div
               className="text-[64px] leading-none"
               style={{ filter: "drop-shadow(0 0 25px rgba(255, 180, 0, 0.4))" }}
             >
@@ -83,7 +83,7 @@ const WowModal = ({ children, friend }: WowModalProps) => {
             </span>
           </div>
 
-          <button onClick={()=>handleSendWow()} className="w-full mt-3 py-3.5 rounded-[12px] bg-[#9EA4F9] hover:bg-[#8D94F5] text-white font-medium text-[15.5px] transition-colors duration-200">
+          <button onClick={() => handleSendWow()} className="w-full mt-3 py-3.5 rounded-[12px] bg-[#9EA4F9] hover:bg-[#8D94F5] text-white font-medium text-[15.5px] transition-colors duration-200">
             Send Wow
           </button>
         </div>

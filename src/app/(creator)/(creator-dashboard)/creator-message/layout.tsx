@@ -24,7 +24,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
 
     useEffect(() => {
         socket.on(`chatList::${userId}`, (data) => {
-            console.log(data, 'chat room data');
+            // console.log(data, 'chat room data');
 
             setChatRooms((prev) => [...prev, data]);
         });

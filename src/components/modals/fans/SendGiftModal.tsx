@@ -13,7 +13,7 @@ interface Gift {
   status: string;
 }
 
-const SendGiftModal = () => { 
+const SendGiftModal = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [gifts, setGifts] = useState<Gift[]>([]);
@@ -24,9 +24,9 @@ const SendGiftModal = () => {
   const getGiftsData = async () => {
     setLoading(true);
     try {
-      const response = await myFetch('/gift'); 
-      if(response?.success)     {
-        setGifts(response?.data);      
+      const response = await myFetch('/gift');
+      if (response?.success) {
+        setGifts(response?.data);
       }
     } catch (err) {
       console.error("Failed to fetch gifts", err);
@@ -47,7 +47,7 @@ const SendGiftModal = () => {
         method: 'POST',
         body: JSON.stringify({ giftId: selectedGift._id, message }),
       });
-      console.log("Gift sent", response);
+      // console.log("Gift sent", response);
       setOpen(false);
       setSelectedGift(null);
       setMessage("");
@@ -59,7 +59,7 @@ const SendGiftModal = () => {
   };
 
   return (
-    <div> 
+    <div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button className="absolute top-4 right-4 bg-white text-black font-semibold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg hover:bg-gray-100 transition-colors cursor-pointer">
@@ -82,7 +82,7 @@ const SendGiftModal = () => {
             </div>
             <div className="mt-5 px-5 py-2 rounded-full bg-[#2E2819] text-[#EFC341] text-[14px] flex items-center justify-center gap-2 font-medium">
               <svg width="15" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                <path d="M21 7.5V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2v-1.5M18 12h4v-3h-4a2 2 0 00-2 2v1h-.5a.5.5 0 000 1h.5v1a2 2 0 002 2zM16 12a1 1 0 11-2 0 1 1 0 012 0z"/>
+                <path d="M21 7.5V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2v-1.5M18 12h4v-3h-4a2 2 0 00-2 2v1h-.5a.5.5 0 000 1h.5v1a2 2 0 002 2zM16 12a1 1 0 11-2 0 1 1 0 012 0z" />
               </svg>
               Current Balance : 120 Coins
             </div>
@@ -120,7 +120,7 @@ const SendGiftModal = () => {
                       {isSelected && (
                         <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-[#9EA4F9] flex items-center justify-center">
                           <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                            <path d="M1.5 4L3 5.5L6.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M1.5 4L3 5.5L6.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
                       )}
@@ -131,8 +131,8 @@ const SendGiftModal = () => {
                           src={imageFormatter(gift.image)}
                           height={80}
                           width={80}
-                          alt={gift.name}                          
-                          className="w-14 h-16 object-cover"                         
+                          alt={gift.name}
+                          className="w-14 h-16 object-cover"
                         />
                       </div>
 

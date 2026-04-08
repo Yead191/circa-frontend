@@ -25,7 +25,7 @@ import TransactionDetailsModal, {
 } from '../../Earning/TransactionDetailsModal';
 
 const TransactionsPage = ({ transactionData, pagination }: { transactionData: Transaction[], pagination: Pagination }) => {
-  console.log(pagination)
+  // console.log(pagination)
   const router = useRouter();
   const searchParams = useSearchParams();
 

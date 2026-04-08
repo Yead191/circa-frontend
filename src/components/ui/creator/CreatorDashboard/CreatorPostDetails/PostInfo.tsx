@@ -154,7 +154,7 @@ const PostInfo = ({ post }: { post: Post }) => {
   const handleEditClick = () => {
     setMenuOpen(false);
     setIsEditModalOpen(true);
-    console.log('Edit clicked');
+    // console.log('Edit clicked');
   };
 
   const handleDeleteClick = () => {
@@ -164,13 +164,13 @@ const PostInfo = ({ post }: { post: Post }) => {
 
   const handleDeleteConfirm = async () => {
     setShowDeleteModal(false);
-    console.log('Deleting post id:', post._id);
+    // console.log('Deleting post id:', post._id);
     toast.promise(myFetch(`/post/${post._id}`, {
       method: 'DELETE',
     }), {
       loading: 'Deleting post...',
       success: (res) => {
-        console.log(res)
+        // console.log(res)
         if (res?.success) {
           revalidateTags(['post', 'posts']);
           router.back();
@@ -201,7 +201,7 @@ const PostInfo = ({ post }: { post: Post }) => {
       toast.error("Failed to like post");
     }
 
-    console.log('Liking post id:', res);
+    // console.log('Liking post id:', res);
     // Hit API logic here
   };
 
