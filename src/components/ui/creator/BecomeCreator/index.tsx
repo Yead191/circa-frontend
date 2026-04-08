@@ -43,7 +43,7 @@ export default function BecomeCreator({ categories }: { categories: any[] }) {
 
     if (vibeData) {
       if (vibeData.categories) {
-        vibeData.categories.forEach((cat) => formData.append("categories", cat));
+        vibeData.categories.forEach((cat) => formData.append("categories[]", cat));
       }
       formData.append(
         "friends_and_flirty_mode",

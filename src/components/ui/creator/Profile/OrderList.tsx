@@ -180,7 +180,7 @@ export default function OrderList({ orderList }: { orderList: Order[] }) {
   return (
     <>
       <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-        {orderList.map((order) => (
+        {orderList?.map((order) => (
           <button
             key={order._id}
             onClick={() => setSelected(order)}

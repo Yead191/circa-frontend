@@ -3,7 +3,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
-const SOCIAL_TAGS = ["Friends", "Flirty", "Passionate"];
+const SOCIAL_TAGS = ["Friends", "Flirty", "Passonate"];
 
 interface VibeData {
   categories: string[];
