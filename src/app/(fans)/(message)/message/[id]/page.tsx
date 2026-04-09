@@ -1,56 +1,52 @@
-"use client";
-
-import { useEffect, useState, use } from "react";
 import { ChatMessages } from "@/components/ui/message/ChatMessages";
 import { ChatInput } from "@/components/ui/message/ChatInput";
 import getProfile from "@/utils/getProfile";
 import { myFetch } from "../../../../../../helpers/myFetch";
 
-
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function ChatDetailPage({ params }: PageProps) {
-  const { id } = use(params);
-  const [currentUserId, setCurrentUserId] = useState<string>("");
-  const [activeUser, setActiveUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export default async function ChatDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  let activeUser = null;
+  let currentUserId = "";
+  let initialMessages = [];
+  let loadingError = false;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const profile = await getProfile();
-        if (profile?._id) {
-          setCurrentUserId(profile._id);
-          const room = await myFetch(`/chat/${id}`, { method: "GET", tags: ["chat"], cache: "no-store" });
-          // console.log(room, "room")
-          if (room?.success) setActiveUser(room.data);
+  try {
+    const profile = await getProfile();
+    if (profile?._id) {
+      currentUserId = profile._id;
+      
+      // Fetch chat room details
+      const room = await myFetch(`/chat/${id}`, { 
+        method: "GET", 
+        tags: ["chat", `chat-${id}`], 
+        cache: "no-store" 
+      });
+      
+      if (room?.success) {
+        activeUser = room.data;
+        
+        // Fetch initial messages
+        const msgRes = await myFetch(`/message/${id}?page=1`, {
+          method: "GET",
+          tags: ["message", `message-${id}`],
+          cache: "no-store",
+        });
+        
+        if (msgRes?.success) {
+          initialMessages = msgRes.data || [];
         }
-      } catch (error) {
-        console.error("Failed to fetch chat details:", error);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchData();
-  }, [id]);
-
-  if (loading) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#0d0e14] h-full">
-        <div className="relative">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-indigo-500" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-4 w-4 bg-indigo-500/20 rounded-full animate-pulse" />
-          </div>
-        </div>
-        <p className="mt-4 text-gray-500 text-sm font-medium animate-pulse">Loading conversation...</p>
-      </div>
-    );
+    }
+  } catch (error) {
+    console.error("Failed to fetch chat details on server:", error);
+    loadingError = true;
   }
 
-  if (!activeUser) {
+  if (loadingError || !activeUser) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-[#0d0e14] h-full p-8 text-center">
         <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 mb-4 shadow-lg shadow-red-500/5">
@@ -72,6 +68,7 @@ export default function ChatDetailPage({ params }: PageProps) {
           chatId={id}
           currentUserId={currentUserId}
           activeUser={activeUser}
+          initialMessages={initialMessages}
         />
       </div>
 

@@ -57,8 +57,21 @@ export function ChatSidebar({ chatRooms, currentUserId, isCreator, search, setSe
 
       {/* Conversations List */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {chatRooms?.length > 0 ? (
-          chatRooms.map(room => {
+        {chatRooms?.filter(room => {
+          // If there's a search query, show all results
+          if (search.trim()) return true;
+          // Always show the currently active chat room
+          if (pathname.includes(room._id)) return true;
+          // Otherwise, only show rooms that have at least one message
+          return !!room.lastMessage;
+        }).length > 0 ? (
+          chatRooms
+            .filter(room => {
+              if (search.trim()) return true;
+              if (pathname.includes(room._id)) return true;
+              return !!room.lastMessage;
+            })
+            .map(room => {
             const otherParticipant = Array.isArray(room.participants)
               ? room.participants.find((p: any) => p._id !== currentUserId)
               : room.participants;

@@ -25,11 +25,38 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
 
     useEffect(() => {
         socket.on(`chatList::${userId}`, (data) => {
-            // console.log(data, 'chat room data');
+            console.log(data, 'chat room data received');
+            if (!data) return;
 
-            setChatRooms((prev) => [...prev, data]);
+            setChatRooms((prev) => {
+                let updatedRooms = [...prev];
+                const incomingRooms = Array.isArray(data) ? data : [data];
+
+                incomingRooms.forEach((newRoom) => {
+                    if (!newRoom?._id) return;
+                    
+                    const roomIndex = updatedRooms.findIndex((r) => r._id === newRoom._id);
+                    if (roomIndex !== -1) {
+                        // Update existing room with new data, merging fields
+                        updatedRooms[roomIndex] = { ...updatedRooms[roomIndex], ...newRoom };
+                    } else {
+                        // Add new room to the list
+                        updatedRooms = [newRoom, ...updatedRooms];
+                    }
+                });
+
+                // Keep the list sorted by most recent message
+                return updatedRooms.sort((a, b) => {
+                    const timeA = a.lastMessage?.createdAt ? new Date(a.lastMessage.createdAt).getTime() : 0;
+                    const timeB = b.lastMessage?.createdAt ? new Date(b.lastMessage.createdAt).getTime() : 0;
+                    return timeB - timeA;
+                });
+            });
         });
-        return () => { socket.off(`chatList::${userId}`); };
+
+        return () => {
+            socket.off(`chatList::${userId}`);
+        };
     }, [socket, userId]);
 
     useEffect(() => {
@@ -39,7 +66,14 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
                 if (profile?._id) {
                     setCurrentUserId(profile._id);
                     const rooms = await myFetch(`/chat?searchTerm=${search}`, { method: "GET", tags: ["chat"] });
-                    if (rooms?.success) setChatRooms(rooms.data);
+                    if (rooms?.success) {
+                        const sortedRooms = [...(rooms.data || [])].sort((a, b) => {
+                            const timeA = a.lastMessage?.createdAt ? new Date(a.lastMessage.createdAt).getTime() : 0;
+                            const timeB = b.lastMessage?.createdAt ? new Date(b.lastMessage.createdAt).getTime() : 0;
+                            return timeB - timeA;
+                        });
+                        setChatRooms(sortedRooms);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch chat data:", error);
@@ -58,7 +92,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
         );
     }
     return (
-        <div className="flex h-[calc(100vh-115px)] overflow-hidden bg-[#0a0a10] ">
+        <div className="flex h-[calc(100vh-118px)] overflow-hidden bg-[#0a0a10] ">
             {/* Sidebar - Persistent */}
             <div className="w-full lg:w-1/3 xl:w-1/4 shrink-0 h-full">
                 <ChatSidebar chatRooms={chatRooms} currentUserId={currentUserId} isCreator={true} search={search} setSearch={setSearch} />

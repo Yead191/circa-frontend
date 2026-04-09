@@ -36,9 +36,22 @@ function Avatar({ src, size = 10, online }: { src: string; size?: number; online
   );
 }
 
-export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: string; currentUserId: string; activeUser: any }) {
+export function ChatMessages({ 
+  chatId, 
+  currentUserId, 
+  activeUser, 
+  initialMessages = [] 
+}: { 
+  chatId: string; 
+  currentUserId: string; 
+  activeUser: any; 
+  initialMessages?: any[];
+}) {
+  const router = useRouter();
   console.log(activeUser)
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>(() => {
+    return [...initialMessages].reverse();
+  });
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -48,9 +61,22 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
   const containerRef = useRef<HTMLDivElement>(null);
   const prevScrollHeightRef = useRef<number>(0);
   const updateSourceRef = useRef<"initial" | "pagination" | "new-message">("initial");
-  const router = useRouter();
 
   const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://68.178.164.48:5005"), []);
+
+  // Sync state when initialMessages prop changes (after router.refresh())
+  useEffect(() => {
+    if (initialMessages && initialMessages.length > 0) {
+      setMessages((prev) => {
+        const reversedInitial = [...initialMessages].reverse();
+        // Simple logic: if the newest message in props is already in state, don't overwrite
+        // but for safety with Next.js Server Components, we can just replace or merge
+        // Replacing is safer for consistency with the server's truth
+        return reversedInitial;
+      });
+      setIsInitialLoad(false);
+    }
+  }, [initialMessages]);
 
   const scrollToBottom = () => {
     if (containerRef.current) {
@@ -58,15 +84,27 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
     }
   };
 
-  const [messageGet, setMessageGet] = useState<boolean>(false)
+  // const [messageGet, setMessageGet] = useState<boolean>(false)
 
   useEffect(() => {
     socket.on(`getMessage::${chatId}`, (data) => {
-      console.log(data)
-      setMessageGet(!messageGet)
+      console.log("New message received via socket:", data);
+      if (data) {
+        updateSourceRef.current = "new-message";
+        setMessages((prev) => {
+          const isDuplicate = prev.some(msg => msg._id === data._id);
+          if (isDuplicate) return prev;
+          return [...prev, data];
+        });
+        // Trigger server-side revalidation to keep credits and state in sync
+        router.refresh();
+      }
     });
-    return () => { socket.off(`getMessage::${chatId}`); };
-  }, [socket, chatId]);
+
+    return () => {
+      socket.off(`getMessage::${chatId}`);
+    };
+  }, [socket, chatId, router]);
 
   const fetchMessages = async (pageNumber: number, isMore: boolean = false) => {
     if (isMore) setIsLoadingMore(true);
@@ -111,7 +149,7 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
     setHasMore(true);
     setIsInitialLoad(true);
     fetchMessages(1);
-  }, [chatId, messageGet]);
+  }, [chatId]);
 
   const handleScroll = () => {
     if (containerRef.current && containerRef.current.scrollTop === 0 && hasMore && !isLoadingMore) {

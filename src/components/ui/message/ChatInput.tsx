@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { revalidateTags } from "../../../../helpers/revalidateTags";
 
 export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: any }) {
+  const router = useRouter();
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [isSending, setIsSending] = useState(false);
@@ -50,10 +51,9 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
         setText("");
         setFiles([]);
         revalidateTags(["message",])
+        router.refresh();
       } else if (!res?.success && res?.message === "You don't have enough credits") {
-        setTimeout(() => {
-          window.location.reload()
-        }, 500)
+        router.refresh();
         return toast.error(res?.message || "Failed to send message");
       }
     } catch (error) {
@@ -73,9 +73,7 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
       console.log(res)
       if (res?.success) {
         toast.success("Credits purchased successfully!");
-        setTimeout(() => {
-          window.location.reload()
-        }, 500)
+        router.refresh();
       } else {
         toast.error(res?.message || "Purchase failed");
       }
