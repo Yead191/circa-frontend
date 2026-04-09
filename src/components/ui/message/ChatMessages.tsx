@@ -20,6 +20,7 @@ import { ReportModal } from "@/components/ui/ReportModal";
 import { useRouter } from "next/navigation";
 import { myFetch } from "../../../../helpers/myFetch";
 import { CgUnblock } from "react-icons/cg";
+import { revalidate } from "../../../../helpers/revalidateHelper";
 
 // Sub-components for better organization
 function Avatar({ src, size = 10, online }: { src: string; size?: number; online?: boolean }) {
@@ -57,11 +58,12 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
     }
   };
 
+  const [messageGet, setMessageGet] = useState<boolean>(false)
+
   useEffect(() => {
     socket.on(`getMessage::${chatId}`, (data) => {
-      // console.log(data, 'message data');
-
-      setMessages((prev) => [...prev, data]);
+      console.log(data)
+      setMessageGet(!messageGet)
     });
     return () => { socket.off(`getMessage::${chatId}`); };
   }, [socket, chatId]);
@@ -72,7 +74,6 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
       const res = await myFetch(`/message/${chatId}?page=${pageNumber}`, {
         method: "GET",
         cache: "no-store",
-        tags: ["message"]
       });
 
       if (res?.success) {
@@ -110,7 +111,7 @@ export function ChatMessages({ chatId, currentUserId, activeUser }: { chatId: st
     setHasMore(true);
     setIsInitialLoad(true);
     fetchMessages(1);
-  }, [chatId]);
+  }, [chatId, messageGet]);
 
   const handleScroll = () => {
     if (containerRef.current && containerRef.current.scrollTop === 0 && hasMore && !isLoadingMore) {

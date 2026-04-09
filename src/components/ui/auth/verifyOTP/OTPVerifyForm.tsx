@@ -31,7 +31,7 @@ export default function OTPVerifyForm() {
   const userType = searchParams.get("userType");
   const router = useRouter();
 
-  
+
   const handleChange = (index: number, value: string): void => {
     if (!/^\d*$/.test(value)) return;
 
@@ -127,15 +127,15 @@ export default function OTPVerifyForm() {
     setError("");
     setIsExpired(false);
     setTimeout(() => inputRefs.current[0]?.focus(), 100);
-     // ⏱️ OTP valid for 2 minutes
-      const expiryTime = Date.now() + 3 * 60 * 1000;
-      Cookies.set("otpExpiry", expiryTime.toString());
+    // ⏱️ OTP valid for 2 minutes
+    const expiryTime = Date.now() + 3 * 60 * 1000;
+    Cookies.set("otpExpiry", expiryTime.toString());
   };
 
   const isOtpComplete = !otp.includes("");
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-gradient-to-b from-[#0F0F0F] to-black text-white font-sans">
+    <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-linear-to-b from-[#0F0F0F] to-black text-white font-sans">
       <div className="w-full max-w-md">
         <div
           className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-5"
@@ -169,7 +169,7 @@ export default function OTPVerifyForm() {
         </div>
 
         <div className="bg-[#141414] p-8 rounded-2xl border border-white/5 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-primary/40 to-transparent" />
 
           <form onSubmit={handleVerify} className="space-y-8">
             <div className="space-y-4">
@@ -206,12 +206,12 @@ export default function OTPVerifyForm() {
                 ))}
               </div>
             </div>
-           
+
             {/* Submit button */}
             <Button
               type="submit"
               className="w-full"
-            disabled={isLoading || !isOtpComplete || isExpired}
+              disabled={isLoading || !isOtpComplete || isExpired}
             >
               {isLoading ? (
                 <span className="flex items-center">
@@ -226,7 +226,7 @@ export default function OTPVerifyForm() {
             {/* Reusable countdown + resend */}
             <OtpCountdown
               email={email}
-              onExpire={() => setIsExpired(true)}              
+              onExpire={() => setIsExpired(true)}
               onResendSuccess={handleResendSuccess}
             />
 

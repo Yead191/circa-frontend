@@ -7,7 +7,7 @@ export default function MessagePage() {
     <div className="flex-1 flex flex-col items-center justify-center gap-6 text-center px-6 h-full bg-[#0d0e14] relative">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-      
+
       <div className="relative group">
         <div className="absolute -inset-4 bg-indigo-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
         <div className="w-20 h-20 rounded-3xl bg-[#1a1b26] border border-white/8 flex items-center justify-center shadow-xl relative overflow-hidden">

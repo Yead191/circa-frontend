@@ -45,13 +45,16 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
         method: "POST",
         body: formData,
       });
-
+      console.log(res)
       if (res?.success) {
         setText("");
         setFiles([]);
         revalidateTags(["message",])
-      } else {
-        toast.error(res?.message || "Failed to send message");
+      } else if (!res?.success && res?.message === "You don't have enough credits") {
+        setTimeout(() => {
+          window.location.reload()
+        }, 500)
+        return toast.error(res?.message || "Failed to send message");
       }
     } catch (error) {
       toast.error("Something went wrong");
