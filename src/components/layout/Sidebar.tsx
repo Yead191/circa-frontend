@@ -10,7 +10,6 @@ import { IoMdWallet } from "react-icons/io";
 import { IoDiamondSharp, IoSettingsOutline } from "react-icons/io5";
 import Cookies from "js-cookie";
 import { myFetch } from "../../../helpers/myFetch";
-import { CloudCog } from "lucide-react";
 import getProfile from "../../../helpers/getProfile";
 
 interface SidebarProps {
@@ -33,20 +32,20 @@ const navItems: NavItem[] = [
 ];
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
-  const [creditData, setCreditData] = React.useState(0); 
-  const [profileData, setProfileData] = React.useState<any>(null); 
+  const [creditData, setCreditData] = React.useState(0);
+  const [profileData, setProfileData] = React.useState<any>(null);
   const userRole = profileData?.role || "FAN";
   const handleLogout = () => {
     Cookies.remove("accessToken");
     window.location.href = "/login";
-  }; 
+  };
 
   const filteredNavItems = navItems.filter((item) => {
-  if (userRole === "CREATOR") {
-    return item.href !== "/profile" && item.href !== "/explore";
-  }
-  return true;
-}); 
+    if (userRole === "CREATOR") {
+      return item.href !== "/profile" && item.href !== "/explore";
+    }
+    return true;
+  });
 
   React.useEffect(() => {
     const fetchCredit = async () => {
@@ -59,7 +58,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     };
 
     fetchCredit();
-  }, []); 
+  }, []);
 
   React.useEffect(() => {
     const getProfileData = async () => {

@@ -49,7 +49,7 @@ export function ChatMessages({
   initialMessages?: any[];
 }) {
   const router = useRouter();
-  // console.log(activeUser)
+  console.log(activeUser)
   const [messages, setMessages] = useState<any[]>(() => {
     return [...initialMessages].reverse();
   });
@@ -71,7 +71,7 @@ export function ChatMessages({
     if (initialMessages) {
       setMessages((prev) => {
         const reversedInitial = [...initialMessages].reverse();
-        
+
         // Merge strategy: Use server's truth + local messages not yet in server's truth
         const merged = [...reversedInitial];
         prev.forEach(localMsg => {
@@ -105,7 +105,7 @@ export function ChatMessages({
           if (isDuplicate) return prev;
           return [...prev, data];
         });
-        
+
         // Use a slight delay to allow the DB to catch up before revalidating server state
         setTimeout(() => {
           router.refresh();
@@ -257,17 +257,23 @@ export function ChatMessages({
                 <Flag size={16} className="text-amber-500" />
                 <span>Report User</span>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleBlock}
-                className="gap-3 cursor-pointer focus:bg-red-500/10 focus:text-red-400 text-red-400"
-              >
-                {activeUser?.status === "block" && activeUser?.blockByMe ? (
-                  <CgUnblock size={16} />
-                ) : (
-                  <Ban size={16} />
-                )}
-                <span>{activeUser?.status === "block" && activeUser?.blockByMe ? "Unblock User" : "Block User"}</span>
-              </DropdownMenuItem>
+              {!(activeUser?.status === "block" && !activeUser?.blockByMe) && (
+                <DropdownMenuItem
+                  onClick={handleBlock}
+                  className="gap-3 cursor-pointer focus:bg-red-500/10 focus:text-red-400 text-red-400"
+                >
+                  {activeUser?.status === "block" && activeUser?.blockByMe ? (
+                    <CgUnblock size={16} />
+                  ) : (
+                    <Ban size={16} />
+                  )}
+                  <span>
+                    {activeUser?.status === "block" && activeUser?.blockByMe
+                      ? "Unblock User"
+                      : "Block User"}
+                  </span>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -56,9 +56,19 @@ export function ChatInput({ chatId, activeUser, profile }: { chatId: string; act
         setTimeout(() => {
           inputRef.current?.focus();
         }, 100);
-      } else if (!res?.success && res?.message === "You don't have enough credits") {
-        router.refresh();
-        return toast.error(res?.message || "Failed to send message");
+      }
+      else if (res?.message === "You don't have enough credit to send messages" ||
+        res?.message === "blocked by user") {
+        toast.error(res.message);
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 300);
+
+        return;
+      }
+      else {
+        toast.error(res?.message || "Failed to send message");
       }
     } catch (error) {
       toast.error("Something went wrong");

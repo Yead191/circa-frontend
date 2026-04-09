@@ -22,7 +22,7 @@ export function DashboardLayout({
   return (
     <div className="flex h-screen w-full text-white font-sans overflow-hidden">
       {/* LEFT SIDEBAR */}
-      <div className="hidden md:flex md:w-[220px] lg:w-[240px] xl:w-[260px] flex-shrink-0 h-screen sticky top-0">
+      <div className="hidden md:flex md:w-[220px] lg:w-[240px] xl:w-[260px] shrink-0 h-screen sticky top-0">
         <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
       </div>
 
