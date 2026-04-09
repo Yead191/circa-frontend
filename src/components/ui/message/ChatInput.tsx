@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { revalidateTags } from "../../../../helpers/revalidateTags";
 
 export function ChatInput({ chatId, activeUser, profile }: { chatId: string; activeUser: any, profile: any }) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -52,6 +53,9 @@ export function ChatInput({ chatId, activeUser, profile }: { chatId: string; act
         setFiles([]);
         revalidateTags(["message",])
         router.refresh();
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 100);
       } else if (!res?.success && res?.message === "You don't have enough credits") {
         router.refresh();
         return toast.error(res?.message || "Failed to send message");
@@ -159,6 +163,7 @@ export function ChatInput({ chatId, activeUser, profile }: { chatId: string; act
 
         <input
           type="text"
+          ref={inputRef}
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => e.key === "Enter" && !e.shiftKey && handleSend()}

@@ -3,6 +3,8 @@ import { ChatInput } from "@/components/ui/message/ChatInput";
 import getProfile from "@/utils/getProfile";
 import { myFetch } from "../../../../../../helpers/myFetch";
 
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

@@ -25,7 +25,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
 
     useEffect(() => {
         socket.on(`chatList::${userId}`, (data) => {
-            console.log(data, 'chat room data received');
+            // console.log(data, 'chat room data received');
             if (!data) return;
 
             setChatRooms((prev) => {
@@ -34,7 +34,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
 
                 incomingRooms.forEach((newRoom) => {
                     if (!newRoom?._id) return;
-                    
+
                     const roomIndex = updatedRooms.findIndex((r) => r._id === newRoom._id);
                     if (roomIndex !== -1) {
                         // Update existing room with new data, merging fields

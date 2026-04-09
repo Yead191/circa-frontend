@@ -49,11 +49,11 @@ export function ChatMessages({
   initialMessages?: any[];
 }) {
   const router = useRouter();
-  console.log(activeUser)
+  // console.log(activeUser)
   const [messages, setMessages] = useState<any[]>(() => {
     return [...initialMessages].reverse();
   });
-  console.log(messages)
+  // console.log(messages)
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -68,13 +68,20 @@ export function ChatMessages({
 
   // Sync state when initialMessages prop changes (after router.refresh())
   useEffect(() => {
-    if (initialMessages && initialMessages.length > 0) {
+    if (initialMessages) {
       setMessages((prev) => {
         const reversedInitial = [...initialMessages].reverse();
-        // Simple logic: if the newest message in props is already in state, don't overwrite
-        // but for safety with Next.js Server Components, we can just replace or merge
-        // Replacing is safer for consistency with the server's truth
-        return reversedInitial;
+        
+        // Merge strategy: Use server's truth + local messages not yet in server's truth
+        const merged = [...reversedInitial];
+        prev.forEach(localMsg => {
+          if (localMsg && localMsg._id && !merged.find(m => m._id === localMsg._id)) {
+            merged.push(localMsg);
+          }
+        });
+
+        // Ensure everything is sorted by creation date
+        return merged.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
       });
       setIsInitialLoad(false);
     }
@@ -98,11 +105,11 @@ export function ChatMessages({
           if (isDuplicate) return prev;
           return [...prev, data];
         });
-        // Trigger server-side revalidation to keep credits and state in sync
+        
+        // Use a slight delay to allow the DB to catch up before revalidating server state
         setTimeout(() => {
-          revalidateTags(["message"])
           router.refresh();
-        }, 400)
+        }, 100);
       }
     });
 
