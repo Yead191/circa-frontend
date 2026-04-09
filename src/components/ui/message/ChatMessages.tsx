@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { myFetch } from "../../../../helpers/myFetch";
 import { CgUnblock } from "react-icons/cg";
 import { revalidate } from "../../../../helpers/revalidateHelper";
+import { revalidateTags } from "../../../../helpers/revalidateTags";
 
 // Sub-components for better organization
 function Avatar({ src, size = 10, online }: { src: string; size?: number; online?: boolean }) {
@@ -36,15 +37,15 @@ function Avatar({ src, size = 10, online }: { src: string; size?: number; online
   );
 }
 
-export function ChatMessages({ 
-  chatId, 
-  currentUserId, 
-  activeUser, 
-  initialMessages = [] 
-}: { 
-  chatId: string; 
-  currentUserId: string; 
-  activeUser: any; 
+export function ChatMessages({
+  chatId,
+  currentUserId,
+  activeUser,
+  initialMessages = []
+}: {
+  chatId: string;
+  currentUserId: string;
+  activeUser: any;
   initialMessages?: any[];
 }) {
   const router = useRouter();
@@ -52,6 +53,7 @@ export function ChatMessages({
   const [messages, setMessages] = useState<any[]>(() => {
     return [...initialMessages].reverse();
   });
+  console.log(messages)
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -97,7 +99,10 @@ export function ChatMessages({
           return [...prev, data];
         });
         // Trigger server-side revalidation to keep credits and state in sync
-        router.refresh();
+        setTimeout(() => {
+          revalidateTags(["message"])
+          router.refresh();
+        }, 400)
       }
     });
 

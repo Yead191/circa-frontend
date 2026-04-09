@@ -14,8 +14,8 @@ export default async function ChatDetailPage({ params }: PageProps) {
   let initialMessages = [];
   let loadingError = false;
 
+  const profile = await getProfile();
   try {
-    const profile = await getProfile();
     if (profile?._id) {
       currentUserId = profile._id;
 
@@ -77,6 +77,7 @@ export default async function ChatDetailPage({ params }: PageProps) {
         <ChatInput
           chatId={id}
           activeUser={activeUser}
+          profile={profile}
         />
       </div>
 

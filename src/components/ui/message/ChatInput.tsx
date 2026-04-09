@@ -7,7 +7,7 @@ import { myFetch } from "../../../../helpers/myFetch";
 import { useRouter } from "next/navigation";
 import { revalidateTags } from "../../../../helpers/revalidateTags";
 
-export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: any }) {
+export function ChatInput({ chatId, activeUser, profile }: { chatId: string; activeUser: any, profile: any }) {
   const router = useRouter();
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -90,7 +90,7 @@ export function ChatInput({ chatId, activeUser }: { chatId: string; activeUser: 
   const theyBlockedMe = isBlocked && !iBlockedThem;
   const hasNoCredit = activeUser?.remaningMessage <= 0;
 
-  if (hasNoCredit && !isBlocked) {
+  if (hasNoCredit && !isBlocked && profile?.role === "FAN") {
     return (
       <div className="px-5 py-4 border-t border-white/8 bg-[#0d0e14] relative z-20">
         <div className="bg-[#1a1b26] border border-indigo-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_0_20px_rgba(79,70,229,0.1)]">

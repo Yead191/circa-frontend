@@ -13,29 +13,29 @@ export default async function ChatDetailPage({ params }: PageProps) {
   let currentUserId = "";
   let initialMessages = [];
   let loadingError = false;
+  const profile = await getProfile();
 
   try {
-    const profile = await getProfile();
     if (profile?._id) {
       currentUserId = profile._id;
-      
+
       // Fetch chat room details
-      const room = await myFetch(`/chat/${id}`, { 
-        method: "GET", 
-        tags: ["chat", `chat-${id}`], 
-        cache: "no-store" 
+      const room = await myFetch(`/chat/${id}`, {
+        method: "GET",
+        tags: ["chat", `chat-${id}`],
+        cache: "no-store"
       });
-      
+
       if (room?.success) {
         activeUser = room.data;
-        
+
         // Fetch initial messages
         const msgRes = await myFetch(`/message/${id}?page=1`, {
           method: "GET",
           tags: ["message", `message-${id}`],
           cache: "no-store",
         });
-        
+
         if (msgRes?.success) {
           initialMessages = msgRes.data || [];
         }
@@ -77,6 +77,7 @@ export default async function ChatDetailPage({ params }: PageProps) {
         <ChatInput
           chatId={id}
           activeUser={activeUser}
+          profile={profile}
         />
       </div>
 
