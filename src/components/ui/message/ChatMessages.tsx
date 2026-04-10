@@ -97,7 +97,7 @@ export function ChatMessages({
 
   useEffect(() => {
     socket.on(`getMessage::${chatId}`, (data) => {
-      console.log("New message received via socket:", data);
+      // console.log("New message received via socket:", data);
       if (data) {
         updateSourceRef.current = "new-message";
         setMessages((prev) => {

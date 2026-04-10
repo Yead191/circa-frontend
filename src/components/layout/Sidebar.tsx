@@ -15,6 +15,7 @@ import getProfile from "../../../helpers/getProfile";
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  creditData: number;
 }
 
 interface NavItem {
@@ -31,8 +32,7 @@ const navItems: NavItem[] = [
   { href: "/setting", label: "Setting", icon: IoSettingsOutline },
 ];
 
-export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
-  const [creditData, setCreditData] = React.useState(0);
+export function Sidebar({ isOpen = false, onClose, creditData = 0 }: SidebarProps) {
   const [profileData, setProfileData] = React.useState<any>(null);
   const userRole = profileData?.role || "FAN";
   const handleLogout = () => {
@@ -46,19 +46,6 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     }
     return true;
   });
-
-  React.useEffect(() => {
-    const fetchCredit = async () => {
-      try {
-        const res = await myFetch("/wallet");
-        setCreditData(res?.data?.credit || 0);
-      } catch (error) {
-        console.error("Failed to fetch credit", error);
-      }
-    };
-
-    fetchCredit();
-  }, []);
 
   React.useEffect(() => {
     const getProfileData = async () => {

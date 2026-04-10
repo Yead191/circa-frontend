@@ -8,8 +8,10 @@ import { useRouter } from "next/navigation";
 import { revalidateTags } from "../../../../helpers/revalidateTags";
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function ChatInput({ chatId, activeUser, profile }: { chatId: string; activeUser: any, profile: any }) {
+  // console.log(activeUser, 'chat input')
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [text, setText] = useState("");
@@ -49,7 +51,7 @@ export function ChatInput({ chatId, activeUser, profile }: { chatId: string; act
         method: "POST",
         body: formData,
       });
-      console.log(res)
+      // console.log(res)
       if (res?.success) {
         setText("");
         setFiles([]);
@@ -86,8 +88,9 @@ export function ChatInput({ chatId, activeUser, profile }: { chatId: string; act
       const res = await myFetch(`/message/purchase/${activeUser?._id}`, {
         method: "POST"
       });
-      console.log(res)
+      // console.log(res)
       if (res?.success) {
+        revalidateTags(["wallet"])
         toast.success("Credits purchased successfully!");
         router.refresh();
       } else {
@@ -207,6 +210,21 @@ export function ChatInput({ chatId, activeUser, profile }: { chatId: string; act
         />
 
         <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+          {activeUser?.remaningMessage !== undefined && profile?.role === "FAN" && (
+            <Tooltip>
+              <TooltipTrigger asChild disabled={isSending || isBlocked}>
+                <div className="flex items-center justify-center min-w-[20px] h-6 px-1.5 rounded-md bg-white/5 border border-white/10 cursor-help hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all group/credit">
+                  <span className="text-[10px] font-bold text-gray-400 group-hover/credit:text-indigo-400 transition-colors">
+                    {activeUser.remaningMessage}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="bg-[#1a1b26] border-white/10 text-gray-300">
+                <p className="text-xs font-medium">Remaining messages: <span className="text-white">{activeUser.remaningMessage}</span></p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
           <input
             type="file"
             ref={fileInputRef}

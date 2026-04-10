@@ -1,43 +1,19 @@
-"use client";
+// layout.tsx  (your route group layout)
+import { DashboardClientShell } from "@/components/layout/DashboardClientShell";
+import React from "react";
+import { myFetch } from "../../../helpers/myFetch";
 
-import { usePathname, useSearchParams } from "next/navigation";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import React, { ReactNode } from "react";
-import HomeRightSide from "@/components/ui/fans/home/HomeRightSide";
-import PostDetailsRightSide from "@/components/ui/fans/home/post-details/PostDetailsRightSide";
-import BrowseRightSide from "@/components/ui/fans/explore/Browse-Creators/BrowseRightSide";
-import MembershipRightSide from "@/components/ui/fans/explore/creator-profile/membership/MembershipRightSide";
-import { generateBreadcrumbs } from "@/utils/breadcrumbs";
-
-export default function DashboardGroup({
+export default async function DashboardGroup({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const exploreTab = searchParams.get("tab") || "browse";
-  const breadcrumbs = generateBreadcrumbs(pathname, exploreTab);
+  const walletRes = await myFetch("/wallet", {
+    method: "GET",
+    cache: "no-store",
+    tags: ["wallet"]
+  });
+  const creditData = walletRes?.data?.credit || 0;
 
-  const rightSidebarMap: Record<string, ReactNode> = {
-    "/explore": exploreTab === "browse" ? (
-      <BrowseRightSide />
-    ) : null,
-
-    "/home": <HomeRightSide />,
-    "/": <HomeRightSide />,
-    "/home/post-details": <PostDetailsRightSide />,
-    "/explore/creator-profile/post-details": <PostDetailsRightSide />,
-    "/explore/creator-profile/product-details": <PostDetailsRightSide />,
-    "/explore/creator-profile/membership": <MembershipRightSide />,
-    // "/explore/creator-profile/about": <PostDetailsRightSide />,
-  };
-
-  const rightSidebarContent = rightSidebarMap[pathname] || null;
-
-  return (
-    <DashboardLayout breadcrumbs={breadcrumbs} rightSidebar={rightSidebarContent}>
-      {children}
-    </DashboardLayout>
-  );
+  return <DashboardClientShell creditData={creditData}>{children}</DashboardClientShell>;
 }

@@ -63,7 +63,7 @@ const PostDetailsRightSide = () => {
                 method: "POST",
             });
             if (res?.success) {
-                console.log(res, 'chat res');
+                // console.log(res, 'chat res');
 
                 revalidateTags(["chat"]);
 
