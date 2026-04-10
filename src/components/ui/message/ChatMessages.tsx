@@ -2,11 +2,8 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import Image from "next/image";
-import {
-  Phone, MoreVertical, ChevronLeft, CheckCheck,
-  MessageSquare, Flag, Ban
-} from "lucide-react";
-import { io } from "socket.io-client";
+import { MoreVertical, ChevronLeft, CheckCheck, MessageSquare, Flag, Ban, Lock, Loader2, Phone } from "lucide-react";
+import { socketInstance } from "@/lib/socket";
 import { toast } from "sonner";
 import { getImageUrl } from "@/utils/getImageUrl";
 import {
@@ -20,7 +17,6 @@ import { ReportModal } from "@/components/ui/ReportModal";
 import { useRouter } from "next/navigation";
 import { myFetch } from "../../../../helpers/myFetch";
 import { CgUnblock } from "react-icons/cg";
-import { revalidate } from "../../../../helpers/revalidateHelper";
 import { revalidateTags } from "../../../../helpers/revalidateTags";
 
 // Sub-components for better organization
@@ -59,12 +55,12 @@ export function ChatMessages({
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [unlockingMessageId, setUnlockingMessageId] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const prevScrollHeightRef = useRef<number>(0);
   const updateSourceRef = useRef<"initial" | "pagination" | "new-message">("initial");
-
-  const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://68.178.164.48:5005"), []);
+  const socket = socketInstance();
 
   // Sync state when initialMessages prop changes (after router.refresh())
   useEffect(() => {
@@ -96,8 +92,11 @@ export function ChatMessages({
   // const [messageGet, setMessageGet] = useState<boolean>(false)
 
   useEffect(() => {
-    socket.on(`getMessage::${chatId}`, (data) => {
-      // console.log("New message received via socket:", data);
+    if (!socket) return;
+
+    const eventName = `getMessage::${chatId}`;
+
+    const onMessage = (data: any) => {
       if (data) {
         updateSourceRef.current = "new-message";
         setMessages((prev) => {
@@ -106,15 +105,16 @@ export function ChatMessages({
           return [...prev, data];
         });
 
-        // Use a slight delay to allow the DB to catch up before revalidating server state
         setTimeout(() => {
           router.refresh();
-        }, 100);
+        }, 300);
       }
-    });
+    };
+
+    socket.on(eventName, onMessage);
 
     return () => {
-      socket.off(`getMessage::${chatId}`);
+      socket.off(eventName, onMessage);
     };
   }, [socket, chatId, router]);
 
@@ -191,6 +191,33 @@ export function ChatMessages({
 
   const handleReport = () => {
     setIsReportModalOpen(true);
+  };
+
+  const handleUnlockImage = async (messageId: string) => {
+    if (unlockingMessageId) return;
+
+    setUnlockingMessageId(messageId);
+    try {
+      const res = await myFetch(`/message/purchase-image/${messageId}`, {
+        method: "POST"
+      });
+
+      if (res?.success) {
+        toast.success("Content unlocked successfully!");
+        revalidateTags(["message"]);
+        setTimeout(() => {
+          router.refresh();
+          // window.location.reload()
+        }, 500);
+      } else {
+        toast.error(res?.message || "Failed to unlock content");
+      }
+    } catch (error) {
+      toast.error("An error occurred while unlocking content");
+      console.error(error);
+    } finally {
+      setUnlockingMessageId(null);
+    }
   };
 
   const handleBlock = () => {
@@ -300,6 +327,7 @@ export function ChatMessages({
           </div>
         )}
         {messages?.map((msg, idx) => {
+          // console.log(messages)
           const isMe = msg.sender === currentUserId;
           const showAvatar = !isMe && (idx === 0 || messages[idx - 1]?.sender !== msg.sender);
 
@@ -363,8 +391,51 @@ export function ChatMessages({
                   )}
                   {/* Single image fallback */}
                   {msg.image && (!msg.docs || msg.docs.length === 0) && (
-                    <div className="mb-2 rounded-lg overflow-hidden border border-white/10">
-                      <Image src={getImageUrl(msg.image) || ""} alt="" width={300} height={200} className="w-full h-auto" />
+                    <div className="mb-2 rounded-lg overflow-hidden border border-white/10 relative group/img">
+                      {msg.image === "/asset/lock-photo.jpg" ? (
+                        <div className="relative aspect-video w-full overflow-hidden flex items-center justify-center">
+                          {/* Blurred Base Image */}
+                          <Image
+                            src={getImageUrl(msg.image) || ""}
+                            alt="Locked content"
+                            width={300}
+                            height={200}
+                            className="w-full h-auto blur-xl scale-110 opacity-50 transition-all duration-700"
+                          />
+
+                          {/* Glassmorphism Overlay */}
+                          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center p-4">
+                            <div className="mb-3 w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 animate-pulse">
+                              <Lock size={20} />
+                            </div>
+
+                            <h5 className="text-white font-bold text-sm mb-1 tracking-tight">Unlock Exclusive Content</h5>
+                            <p className="text-gray-400 text-[10px] mb-4 text-center max-w-[140px] leading-tight">This message contains premium content from the creator.</p>
+
+                            <button
+                              onClick={() => handleUnlockImage(msg._id)}
+                              disabled={unlockingMessageId === msg._id}
+                              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[12px] px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95 flex items-center gap-2 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {unlockingMessageId === msg._id ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : (
+                                <>
+                                  <span className="group-hover/btn:translate-x-0.5 transition-transform duration-300">10 Credits</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Image
+                          src={getImageUrl(msg.image) || ""}
+                          alt="Message content"
+                          width={300}
+                          height={200}
+                          className="w-full h-auto hover:scale-[1.02] transition-transform duration-500"
+                        />
+                      )}
                     </div>
                   )}
                   {msg.text && <p>{msg.text}</p>}

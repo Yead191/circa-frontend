@@ -65,7 +65,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
                 const profile = await getProfile();
                 if (profile?._id) {
                     setCurrentUserId(profile._id);
-                    const rooms = await myFetch(`/chat?searchTerm=${search}`, { method: "GET", tags: ["chat"] });
+                    const rooms = await myFetch(`/chat?searchTerm=${search}`, { method: "GET", tags: ["chat"], cache: "no-store" });
                     if (rooms?.success) {
                         const sortedRooms = [...(rooms.data || [])].sort((a, b) => {
                             const timeA = a.lastMessage?.createdAt ? new Date(a.lastMessage.createdAt).getTime() : 0;
