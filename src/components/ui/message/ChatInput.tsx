@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Smile, Paperclip, Image as ImageIcon, Send, X, Plus, CreditCard } from "lucide-react";
+import { Smile, Paperclip, Send, X, Plus, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { myFetch } from "../../../../helpers/myFetch";
 import { useRouter } from "next/navigation";
 import { revalidateTags } from "../../../../helpers/revalidateTags";
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
+import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 
 export function ChatInput({ chatId, activeUser, profile }: { chatId: string; activeUser: any, profile: any }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,6 +101,10 @@ export function ChatInput({ chatId, activeUser, profile }: { chatId: string; act
     }
   };
 
+  const onEmojiClick = (emojiData: EmojiClickData) => {
+    setText(prev => prev + emojiData.emoji);
+  };
+
   const isBlocked = activeUser?.status === "block";
   const iBlockedThem = activeUser?.blockByMe === true;
   const theyBlockedMe = isBlocked && !iBlockedThem;
@@ -164,12 +170,24 @@ export function ChatInput({ chatId, activeUser, profile }: { chatId: string; act
           ? "bg-[#14151e] border-white/6 opacity-50 cursor-not-allowed"
           : "bg-[#1a1b26] border-white/10 focus-within:border-indigo-500/40"}`}>
 
-        <button
-          disabled={isBlocked}
-          className="text-gray-500 hover:text-indigo-400 transition-colors shrink-0 disabled:pointer-events-none disabled:text-gray-700"
-        >
-          <Smile size={20} />
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              disabled={isBlocked}
+              className="text-gray-500 hover:text-indigo-400 transition-colors shrink-0 disabled:pointer-events-none disabled:text-gray-700"
+            >
+              <Smile size={20} />
+            </button>
+          </PopoverTrigger>
+
+          <PopoverContent
+            side="top"
+            align="end"
+            className="p-0 border-none bg-transparent"
+          >
+            <EmojiPicker onEmojiClick={onEmojiClick} />
+          </PopoverContent>
+        </Popover>
 
         <input
           type="text"
