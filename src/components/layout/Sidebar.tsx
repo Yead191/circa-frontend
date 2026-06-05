@@ -67,12 +67,12 @@ export function Sidebar({ isOpen = false, onClose, creditData = 0 }: SidebarProp
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:relative inset-y-0 left-0 h-full w-[240px] md:w-full border-r border-[#242424] flex flex-col pt-2 pb-8 px-4 z-40 bg-[#0a0a0a] transition-transform duration-300
+        className={`fixed md:relative inset-y-0 left-0 h-full w-60 md:w-full border-r border-[#242424] flex flex-col pt-2 pb-8 px-4 z-40 bg-[#0a0a0a] transition-transform duration-300
     ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between px-2 h-[85px] mb-5">
+          <div className="flex items-center justify-between px-2 h-21.25 mb-5">
             <Link href="/" className="flex items-center gap-3">
               <Image
                 src="/logo.png"

@@ -5,8 +5,15 @@ import { ChatSidebar } from "@/components/ui/message/ChatSidebar";
 import getProfile from "@/utils/getProfile";
 import { myFetch } from "../../../../../helpers/myFetch";
 import { io } from "socket.io-client";
+import { usePathname } from "next/navigation";
 
 export default function MessageLayoutWrapper({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname();
+    const isChatRoomActive = useMemo(() => {
+        const segments = pathname.split("/").filter(Boolean);
+        return segments.length > 1;
+    }, [pathname]);
+
     const [search, setSearch] = useState("");
     const [userId, setUser] = useState(null)
     const [chatRooms, setChatRooms] = useState<any[]>([]);
@@ -94,12 +101,12 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
     return (
         <div className="flex h-[calc(100vh-118px)] overflow-hidden bg-[#0a0a10] ">
             {/* Sidebar - Persistent */}
-            <div className="w-full lg:w-1/3 xl:w-1/4 shrink-0 h-full">
+            <div className={`w-full lg:w-1/3 xl:w-1/4 shrink-0 h-full ${isChatRoomActive ? "hidden lg:block" : "block"}`}>
                 <ChatSidebar chatRooms={chatRooms} currentUserId={currentUserId} isCreator={true} search={search} setSearch={setSearch} />
             </div>
 
             {/* Main Content (Conversations) */}
-            <div className="flex-1 h-full relative overflow-hidden bg-[#0d0e14]">
+            <div className={`flex-1 h-full relative overflow-hidden bg-[#0d0e14] ${isChatRoomActive ? "block" : "hidden lg:block"}`}>
                 {children}
             </div>
         </div>
