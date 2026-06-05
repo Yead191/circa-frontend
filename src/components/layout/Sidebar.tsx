@@ -9,7 +9,6 @@ import { FiHome, FiCompass, FiMessageCircle, FiUser, FiLogOut } from "react-icon
 import { IoMdWallet } from "react-icons/io";
 import { IoDiamondSharp, IoSettingsOutline } from "react-icons/io5";
 import Cookies from "js-cookie";
-import { myFetch } from "../../../helpers/myFetch";
 import getProfile from "../../../helpers/getProfile";
 
 interface SidebarProps {

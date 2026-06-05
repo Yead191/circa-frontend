@@ -410,7 +410,7 @@ export function ChatMessages({
                             </div>
 
                             <h5 className="text-white font-bold text-sm mb-1 tracking-tight">Unlock Exclusive Content</h5>
-                            <p className="text-gray-400 text-[10px] mb-4 text-center max-w-[140px] leading-tight">This message contains premium content from the creator.</p>
+                            <p className="text-gray-400 text-[10px] mb-4 text-center max-w-35 leading-tight">This message contains premium content from the creator.</p>
 
                             <button
                               onClick={() => handleUnlockImage(msg._id)}

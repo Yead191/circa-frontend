@@ -3,7 +3,7 @@ import { Coins } from "lucide-react";
 
 
 const Header = ({ user, balance }: { user: any, balance: any }) => {
-
+  // console.log(user)
   return (
     <nav className=" flex justify-between items-center mb-10">
       <div className="flex items-center gap-4">
