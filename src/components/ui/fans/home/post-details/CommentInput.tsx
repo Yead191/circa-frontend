@@ -3,13 +3,13 @@ import { SendHorizonal } from 'lucide-react'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import { toast } from 'sonner'
-import { imgUrl } from '../../../../../../helpers/imgUrl'
 import { myFetch } from '../../../../../../helpers/myFetch'
 import { revalidate } from '../../../../../../helpers/revalidateHelper'
 import { imageFormatter } from '../../../../../../helpers/imageFormatter'
 
 const CommentInput = ({ postId, profileData }: { postId: string, profileData: any }) => {
     // console.log("postId", postId);
+    // console.log(profileData)
 
     const [comment, setComment] = useState('');
     const [loading, setLoading] = useState(false);

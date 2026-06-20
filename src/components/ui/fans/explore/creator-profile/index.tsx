@@ -10,7 +10,7 @@ import { getImageUrl } from "@/utils/getImageUrl";
 
 const CreatorProfile = ({ creatorData, creatorId }: any) => {
 
-  console.log(creatorData)
+  // console.log(creatorData)
   return (
     <div className="w-full ">
       {/* Main Header Card */}

@@ -3,7 +3,6 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Heart } from 'lucide-react'
 import ReplyInput from './ReplyInput'
-import { imageFormatter } from '../../../../../../helpers/imageFormatter'
 import { getImageUrl } from '@/utils/getImageUrl'
 import { myFetch } from '../../../../../../helpers/myFetch'
 import { revalidateTags } from '../../../../../../helpers/revalidateTags'
@@ -82,7 +81,7 @@ const CommentCard = ({ comment, profileData }: CommentCardProps) => {
                 {comment.reply?.length > 0 && (
                     <div className="mt-4 space-y-4 pl-4 border-l border-gray-700">
                         {comment.reply.map((reply: any) => {
-                            const replyAuthor = reply?.user?.[0];
+                            const replyAuthor = reply?.user
                             return (
                                 <div key={reply._id} className="flex gap-3">
                                     <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 relative">
