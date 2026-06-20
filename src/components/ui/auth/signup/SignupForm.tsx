@@ -114,7 +114,7 @@ export function SignupForm() {
             className="flex items-center gap-3 rounded-xl px-4 py-3.5"
             style={{ background: '#1e1e27' }}
           >
-            <UserRound className="w-5 h-5 flex-shrink-0" style={{ color: '#6b6b7b' }} />
+            <UserRound className="w-5 h-5 shrink-0" style={{ color: '#6b6b7b' }} />
             <input
               type="text"
               value={name}
@@ -130,7 +130,7 @@ export function SignupForm() {
             className="flex items-center gap-3 rounded-xl px-4 py-3.5"
             style={{ background: '#1e1e27' }}
           >
-            <Mail className="w-5 h-5 flex-shrink-0" style={{ color: '#6b6b7b' }} />
+            <Mail className="w-5 h-5 shrink-0" style={{ color: '#6b6b7b' }} />
             <input
               type="email"
               value={email}
@@ -146,7 +146,7 @@ export function SignupForm() {
             className="flex items-center gap-3 rounded-xl px-4 py-3.5"
             style={{ background: '#1e1e27' }}
           >
-            <Phone className="w-5 h-5 flex-shrink-0" style={{ color: '#6b6b7b' }} />
+            <Phone className="w-5 h-5 shrink-0" style={{ color: '#6b6b7b' }} />
             <input
               type="tel"
               value={contact}
@@ -162,7 +162,7 @@ export function SignupForm() {
             className="flex items-center gap-3 rounded-xl px-4 py-3.5"
             style={{ background: '#1e1e27' }}
           >
-            <Lock className="w-5 h-5 flex-shrink-0" style={{ color: '#6b6b7b' }} />
+            <Lock className="w-5 h-5 hrink-0" style={{ color: '#6b6b7b' }} />
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}

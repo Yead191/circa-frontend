@@ -24,7 +24,7 @@ const CreatorProfile = ({ creatorData, creatorId }: any) => {
             alt={creatorData?.name}
             width={180}
             height={180}
-            className="rounded-full object-cover w-[120px] h-[120px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px]"
+            className="rounded-full object-cover w-30 h-30 md:w-40 md:h-40 lg:w-44 lg:h-44"
           />
         </div>
 
@@ -79,7 +79,7 @@ const CreatorProfile = ({ creatorData, creatorId }: any) => {
 
       <div className="mt-8">
         <Tabs defaultValue="post" className="w-full mt-4">
-          <TabsList className="grid grid-cols-4 w-full md:w-[600px] mb-6">
+          <TabsList className="grid grid-cols-4 w-full md:w-150 mb-6">
             <TabsTrigger value="post">Post</TabsTrigger>
             <TabsTrigger value="shop">Shop</TabsTrigger>
           </TabsList>
