@@ -65,7 +65,7 @@ export function RightSidebarNav() {
           <TopbarNotifications userId={profileData?._id} />
 
           <Link href="/add-to-card">
-            <button className="hidden sm:flex cursor-pointer relative w-11 h-11 rounded-full bg-[#15131A] border border-[#242424] justify-center items-center text-gray-400 hover:text-white transition-colors">
+            <button className="hidden sm:flex cursor-pointer relative w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800/80 justify-center items-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 hover:border-zinc-700/80 transition-all duration-200 shadow-inner">
               <LuShoppingCart size={21} />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
@@ -75,7 +75,7 @@ export function RightSidebarNav() {
             </button>
           </Link>
 
-          <Link href={`${userRole === "CREATOR" ? "/creator-home" : "/profile"}`} className="w-10.5 h-10.5 rounded-full bg-gray-100 overflow-hidden border border-[#242424] cursor-pointer">
+          <Link href={`${userRole === "CREATOR" ? "/creator-home" : "/profile"}`} className="w-10.5 h-10.5 rounded-xl bg-gray-100 overflow-hidden border border-[#242424] cursor-pointer">
             <Image
               src={getImageUrl(profileData?.image)}
               width={100}

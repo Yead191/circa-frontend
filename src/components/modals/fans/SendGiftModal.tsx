@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { myFetch } from "../../../../helpers/myFetch";
-import { imageFormatter } from "../../../../helpers/imageFormatter";
 import Image from "next/image";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 interface Gift {
   _id: string;
@@ -128,7 +128,7 @@ const SendGiftModal = () => {
                       {/* Gift Image */}
                       <div className=" rounded-full overflow-hidden  flex items-center justify-center">
                         <Image
-                          src={imageFormatter(gift.image)}
+                          src={getImageUrl(gift.image)}
                           height={80}
                           width={80}
                           alt={gift.name}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { myFetch } from "../../../../helpers/myFetch";
 import { toast } from "sonner";
+import { revalidateTags } from "../../../../helpers/revalidateTags";
 
 interface WowModalProps {
   children: React.ReactNode;
@@ -19,6 +20,7 @@ const WowModal = ({ children, friend }: WowModalProps) => {
 
       if (response?.success) {
         toast?.success(response?.message);
+        revalidateTags(["wallet"])
         setOpen(false)
       } else {
         if (response?.error && Array.isArray(response.error)) {

@@ -1,5 +1,4 @@
 'use client'
-import { FRIENDS_FLIRTING } from '@/constants/home-data'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { myFetch } from '../../../../../helpers/myFetch'

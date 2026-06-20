@@ -1,20 +1,20 @@
 
 import Image from "next/image";
-import { imageFormatter } from "../../../../../../helpers/imageFormatter";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 
-const MyCreator = ({creatorData}: any) => {  
+const MyCreator = ({ creatorData }: any) => {
   return (
     <div className="w-full">
       {/* Creator Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10">
-        {creatorData?.map((creator:any) => (
+        {creatorData?.map((creator: any) => (
           <div
             key={creator?._id}
             className="group relative rounded-2xl overflow-hidden border border-[#2A2A30] cursor-pointer bg-[#1c1c20]"
           >
             <Image
-              src={imageFormatter(creator?.image)}
+              src={getImageUrl(creator?.image)}
               alt={creator?.name}
               width={500}
               height={300}
@@ -28,7 +28,7 @@ const MyCreator = ({creatorData}: any) => {
               </h3>
               <p className="text-[#D4D4D8] text-[14px]">
                 {creator?.nickname}
-              </p>              
+              </p>
               <p className="text-[#A1A1AA] text-[13px] mt-0.5">
                 {creator?.members ?? 0} members
               </p>

@@ -2,7 +2,8 @@
 import ProfileMenu from "@/components/ui/fans/profile/ProfileMenu";
 import getProfile from "@/utils/getProfile";
 import Link from "next/link";
-import { imageFormatter } from "../../../../helpers/imageFormatter";
+import { getImageUrl } from "@/utils/getImageUrl";
+import Image from "next/image";
 
 
 export default async function ProfilePage() {
@@ -14,10 +15,12 @@ export default async function ProfilePage() {
 
         {/* Left */}
         <div className="flex flex-col items-center md:flex-row gap-3">
-          <img
-            src={imageFormatter(user?.image)}
-            alt=""
-            className="w-[58px] h-[58px] rounded-full object-cover border-[2.5px] border-[#8b7cf8] bg-[#1a1b2e]"
+          <Image
+            src={getImageUrl(user?.image)}
+            alt="profile img"
+            height={80}
+            width={80}
+            className="w-14.5 h-14.5 rounded-full object-cover border-[2.5px] border-[#8b7cf8] bg-[#1a1b2e]"
           />
 
           <div className="text-center md:text-left">

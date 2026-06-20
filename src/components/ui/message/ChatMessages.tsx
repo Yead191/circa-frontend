@@ -45,7 +45,7 @@ export function ChatMessages({
   initialMessages?: any[];
 }) {
   const router = useRouter();
-  console.log(activeUser)
+  // console.log(activeUser)
   const [messages, setMessages] = useState<any[]>(() => {
     return [...initialMessages].reverse();
   });

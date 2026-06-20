@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { X, Heart, Star, Filter, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Heart, Star, } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -12,7 +12,6 @@ import {
 
 import WowModal from "@/components/modals/fans/WowModal";
 import FilterDropdown from "./FilterDropdown";
-import { imageFormatter } from "../../../../../../helpers/imageFormatter";
 import { useRouter } from "next/navigation";
 import { myFetch } from "../../../../../../helpers/myFetch";
 import { toast } from "sonner";
@@ -67,7 +66,7 @@ const FriendsFlirting = ({ friendsData }: any) => {
     }
   }
 
-  console.log(friendsData)
+  // console.log(friendsData)
   return (
     <div className="w-full relative pb-10">
       {/* Top Filter Button */}
