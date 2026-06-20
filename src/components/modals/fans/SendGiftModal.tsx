@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { myFetch } from "../../../../helpers/myFetch";
 import Image from "next/image";
 import { getImageUrl } from "@/utils/getImageUrl";
+import { toast } from "sonner";
+import { revalidateTags } from "../../../../helpers/revalidateTags";
 
 interface Gift {
   _id: string;
@@ -13,7 +15,7 @@ interface Gift {
   status: string;
 }
 
-const SendGiftModal = () => {
+const SendGiftModal = ({ authorId }: { authorId: string }) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [gifts, setGifts] = useState<Gift[]>([]);
@@ -26,6 +28,7 @@ const SendGiftModal = () => {
     try {
       const response = await myFetch('/gift');
       if (response?.success) {
+
         setGifts(response?.data);
       }
     } catch (err) {
@@ -42,15 +45,30 @@ const SendGiftModal = () => {
   const handleSendGift = async () => {
     if (!selectedGift) return;
     setSending(true);
+    const gift = {
+      gift: selectedGift._id,
+      receivers: [authorId],
+      message: message,
+    }
     try {
-      const response = await myFetch('/gift/send', {
+      toast.promise(myFetch('/gift/send-gift', {
         method: 'POST',
-        body: JSON.stringify({ giftId: selectedGift._id, message }),
-      });
-      // console.log("Gift sent", response);
-      setOpen(false);
-      setSelectedGift(null);
-      setMessage("");
+        body: gift,
+      }), {
+        loading: "Sending gift...",
+        success: (res) => {
+          // console.log(res)
+          revalidateTags(['wallet'])
+          setOpen(false);
+          setSelectedGift(null);
+          setMessage("");
+          return res.message || "Gift sent successfully";
+        },
+        error: (err) => {
+          console.log(err)
+          return err.message || "Failed to send gift";
+        },
+      })
     } catch (err) {
       console.error("Failed to send gift", err);
     } finally {
@@ -67,7 +85,7 @@ const SendGiftModal = () => {
           </button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[540px] bg-[#1c1c20] border-none text-white p-6 sm:rounded-[24px] shadow-2xl [&>button]:text-zinc-400 [&>button]:hover:text-white">
+        <DialogContent className="sm:max-w-135 bg-[#1c1c20] border-none text-white p-6 sm:rounded-3xl shadow-2xl [&>button]:text-zinc-400 [&>button]:hover:text-white">
           <DialogHeader className="flex flex-col items-center justify-center p-0 space-y-0">
             <div className="relative mb-2 mt-2">
               <div className="text-[64px] leading-none" style={{ filter: "drop-shadow(0 0 25px rgba(255, 180, 0, 0.4))" }}>
@@ -106,11 +124,12 @@ const SendGiftModal = () => {
               <div className="grid grid-cols-3 gap-3">
                 {gifts.map((gift) => {
                   const isSelected = selectedGift?._id === gift._id;
+                  // console.log(gift)
                   return (
                     <button
                       key={gift._id}
                       onClick={() => setSelectedGift(isSelected ? null : gift)}
-                      className={`relative flex flex-col items-center gap-2 p-3 rounded-[16px] border transition-all duration-200 cursor-pointer
+                      className={`relative flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-200 cursor-pointer
                         ${isSelected
                           ? "border-[#9EA4F9] bg-[#9EA4F9]/10 ring-1 ring-[#9EA4F9]"
                           : "border-transparent bg-[#26262D] hover:bg-[#2e2e38]"
@@ -128,7 +147,7 @@ const SendGiftModal = () => {
                       {/* Gift Image */}
                       <div className=" rounded-full overflow-hidden  flex items-center justify-center">
                         <Image
-                          src={getImageUrl(gift.image)}
+                          src={getImageUrl(gift?.image)}
                           height={80}
                           width={80}
                           alt={gift.name}
@@ -143,7 +162,7 @@ const SendGiftModal = () => {
 
                       {/* Credit Cost */}
                       <div className="flex items-center gap-1 bg-[#2E2819] px-2 py-0.5 rounded-full">
-                        <span className="text-[#EFC341] text-[11px] font-semibold">{gift.credit} {gift.image}</span>
+                        <span className="text-[#EFC341] text-[11px] font-semibold">{gift.credit} </span>
                         <span className="text-[#EFC341] text-[10px]">coin{gift.credit !== 1 ? "s" : ""}</span>
                       </div>
                     </button>
@@ -156,7 +175,7 @@ const SendGiftModal = () => {
             {selectedGift && (
               <div className="mt-4 bg-[#26262D] rounded-[14px] p-3.5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="bg-[#F2C047] w-[22px] h-[22px] rounded-full flex items-center justify-center text-[#1E1E22] text-[12px] font-bold font-serif">
+                  <div className="bg-[#F2C047] w-5.5 h-5.5 rounded-full flex items-center justify-center text-[#1E1E22] text-[12px] font-bold font-serif">
                     $
                   </div>
                   <div>
@@ -181,7 +200,7 @@ const SendGiftModal = () => {
                   onChange={(e) => {
                     if (e.target.value.length <= 140) setMessage(e.target.value);
                   }}
-                  className="w-full bg-[#26262D] text-white p-4 pb-9 rounded-[16px] border border-transparent resize-none focus:ring-1 focus:ring-[#9DA8FD] focus:border-[#9DA8FD] outline-none placeholder:text-[#676771] min-h-[100px] text-[15px]"
+                  className="w-full bg-[#26262D] text-white p-4 pb-9 rounded-2xl border border-transparent resize-none focus:ring-1 focus:ring-[#9DA8FD] focus:border-[#9DA8FD] outline-none placeholder:text-[#676771] min-h-25 text-[15px]"
                   placeholder="Add a short message...(optional)"
                 />
                 <span className="absolute bottom-3 right-4 text-[13px] text-[#676771]">
@@ -194,7 +213,7 @@ const SendGiftModal = () => {
             <button
               onClick={handleSendGift}
               disabled={!selectedGift || sending}
-              className={`w-full mt-6 py-3.5 rounded-[12px] font-semibold text-[15.5px] transition-all duration-200
+              className={`w-full mt-6 py-3.5 rounded-xl font-semibold text-[15.5px] transition-all duration-200
                 ${selectedGift && !sending
                   ? "bg-[#9EA4F9] hover:bg-[#8D94F5] text-white cursor-pointer"
                   : "bg-[#9EA4F9]/40 text-white/50 cursor-not-allowed"

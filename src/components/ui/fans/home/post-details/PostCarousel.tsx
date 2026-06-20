@@ -9,9 +9,10 @@ import SendGiftModal from "@/components/modals/fans/SendGiftModal";
 interface PostCarouselProps {
   images: string[];
   title: string;
+  authorId: string
 }
 
-export default function PostCarousel({ images, title }: PostCarouselProps) {
+export default function PostCarousel({ images, title, authorId }: PostCarouselProps) {
   /* Carousel setup */
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -46,7 +47,7 @@ export default function PostCarousel({ images, title }: PostCarouselProps) {
               </div>
             ))
           ) : (
-            <div className="embla__slide flex-[0_0_100%] min-w-0 h-[400px] flex items-center justify-center text-gray-500">
+            <div className="embla__slide flex-[0_0_100%] min-w-0 h-100 flex items-center justify-center text-gray-500">
               No images available
             </div>
           )}
@@ -67,7 +68,7 @@ export default function PostCarousel({ images, title }: PostCarouselProps) {
         </div>
       )}
 
-      <SendGiftModal />
+      <SendGiftModal authorId={authorId} />
     </div>
   );
 }

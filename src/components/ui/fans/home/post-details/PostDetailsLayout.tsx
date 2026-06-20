@@ -4,7 +4,6 @@ import Image from "next/image";
 import PostComments from "./PostComments";
 import LikeCommentButton from "./LikeCommentButton";
 import { getImageUrl } from "@/utils/getImageUrl";
-import React from "react";
 import PostCarousel from "./PostCarousel";
 
 interface PostDetailsLayoutProps {
@@ -41,7 +40,7 @@ export default async function PostDetailsLayout({ post }: PostDetailsLayoutProps
           </div>
 
           {/* Main Content Carousel */}
-          <PostCarousel images={post?.images || []} title={post?.title || ""} />
+          <PostCarousel images={post?.images || []} title={post?.title || ""} authorId={post.user._id} />
 
           {/* Actions */}
           <LikeCommentButton post={post} />

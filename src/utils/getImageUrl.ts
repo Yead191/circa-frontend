@@ -6,7 +6,7 @@ export function getImageUrl(imageurl: string | null | undefined) {
     const baseUrl = (
       process.env.IMAGE_BASE_URL ||
       process.env.NEXT_PUBLIC_IMAGE_BASE_URL ||
-      "https://api.circa.chat/files"
+      "https://api.circa.chat"
     )?.replace("/files", "");
 
     return `${baseUrl}${imageurl}`;
