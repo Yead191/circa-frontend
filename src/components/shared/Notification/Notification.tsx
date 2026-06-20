@@ -129,27 +129,27 @@ export default function NotificationsPage() {
   return (
     <div className=" bg-[#0f0f11] text-white font-sans">
       {/* ── Header ── */}
-   
-        <div className="flex items-center justify-between flex-wrap gap-3 mx-auto px-4 sm:px-6 pb-4 ">
-          <div className="flex flex-col">
-            <h1 className="text-lg font-semibold ">
-              Notifications
-            </h1>
-            <p className="text-white/40 text-sm mt-1">
-              Recent activity and updates
-            </p>
-          </div>
 
-          <Button
-            size="sm"
-            onClick={handleReadAll}
-            disabled={unreadCount === 0}
-            className="flex items-center gap-2 text-sm text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          >
-            <CheckCheck className="w-4 h-4" />
-            Read all
-          </Button>
+      <div className="flex items-center justify-between flex-wrap gap-3 mx-auto px-4 sm:px-6 pb-4 ">
+        <div className="flex flex-col">
+          <h1 className="text-lg font-semibold ">
+            Notifications
+          </h1>
+          <p className="text-white/40 text-sm mt-1">
+            Recent activity and updates
+          </p>
         </div>
+
+        <Button
+          size="sm"
+          onClick={handleReadAll}
+          disabled={unreadCount === 0}
+          className="flex items-center gap-2 text-sm text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        >
+          <CheckCheck className="w-4 h-4" />
+          Read all
+        </Button>
+      </div>
 
 
       {/* ── Section Label ── */}
@@ -166,14 +166,14 @@ export default function NotificationsPage() {
                   className={cn(
                     "w-full text-left px-5 py-4 flex items-start gap-4 transition-colors duration-150 group",
                     notification.read
-                      ? "hover:bg-white/[0.03]"
-                      : "bg-white/[0.035] hover:bg-white/[0.06]"
+                      ? "hover:bg-white/3"
+                      : "bg-white/[0.035] hover:bg-white/6"
                   )}
                 >
                   {/* Icon */}
                   <div
                     className={cn(
-                      "mt-0.5 flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center",
+                      "mt-0.5 shrink-0 w-9 h-9 rounded-full flex items-center justify-center",
                       iconColorMap[notification.type]
                     )}
                   >
@@ -193,7 +193,7 @@ export default function NotificationsPage() {
                       >
                         {notification.title}
                       </p>
-                      <span className="text-xs text-white/30 flex-shrink-0 pt-0.5">
+                      <span className="text-xs text-white/30 shrink-0 pt-0.5">
                         {notification.time}
                       </span>
                     </div>
@@ -209,12 +209,12 @@ export default function NotificationsPage() {
 
                   {/* Unread dot */}
                   {!notification.read && (
-                    <span className="mt-2 flex-shrink-0 w-2 h-2 rounded-full bg-blue-400" />
+                    <span className="mt-2 shrink-0 w-2 h-2 rounded-full bg-blue-400" />
                   )}
                 </button>
 
                 {idx < paginated.length - 1 && (
-                  <Separator className="bg-white/[0.05] mx-5" />
+                  <Separator className="bg-white/5 mx-5" />
                 )}
               </div>
             );

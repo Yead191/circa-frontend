@@ -62,7 +62,7 @@ export function RightSidebarNav() {
     <header className="sticky top-0 z-10 bg-[#0a0a0a]/90 backdrop-blur-md h-25 flex items-center justify-between px-4 md:px-6">
       <div className="flex items-end justify-end w-full">
         <div className="flex items-center gap-2 md:gap-3">
-          {/* <TopbarNotifications userId={profileData?._id} /> */}
+          <TopbarNotifications userId={profileData?._id} />
 
           <Link href="/add-to-card">
             <button className="hidden sm:flex cursor-pointer relative w-11 h-11 rounded-full bg-[#15131A] border border-[#242424] justify-center items-center text-gray-400 hover:text-white transition-colors">
