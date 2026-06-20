@@ -4,13 +4,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Posts from "./Posts";
 import Shop from "./Shop";
 import Link from "next/link";
-import { imageFormatter } from "../../../../../../helpers/imageFormatter";
 import MessageButton from "./MessageButton";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 
 const CreatorProfile = ({ creatorData, creatorId }: any) => {
 
-
+  console.log(creatorData)
   return (
     <div className="w-full ">
       {/* Main Header Card */}
@@ -20,7 +20,7 @@ const CreatorProfile = ({ creatorData, creatorId }: any) => {
         {/* Avatar */}
         <div className="shrink-0 flex justify-center md:justify-start">
           <Image
-            src={imageFormatter(creatorData?.image)}
+            src={getImageUrl(creatorData?.image)}
             alt={creatorData?.name}
             width={180}
             height={180}
