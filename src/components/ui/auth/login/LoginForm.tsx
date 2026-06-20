@@ -18,6 +18,30 @@ export function LoginForm() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleResend = async () => {
+    if (!email) return;
+    try {
+      const res = await myFetch("/auth/forget-password", {
+        method: "POST",
+        body: { email },
+      });
+      if (res?.success) {
+        router.replace(`/verify-otp?email=${email}`);
+        toast.success(res?.message || "OTP resent successfully", {
+          id: "otp-resend",
+        });
+      } else {
+        toast.error(res?.message || "Failed to resend OTP", {
+          id: "otp-resend",
+        });
+      }
+    } catch {
+      toast.error("Something went wrong while resending OTP", {
+        id: "otp-resend",
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -25,7 +49,11 @@ export function LoginForm() {
 
     try {
       const response = await myFetch("/auth/login", { method: "POST", body: { email, password } })
-
+      if (!response?.success && response.message === "Account is not verified. Please check your email for verification code.") {
+        await handleResend();
+        setIsLoading(false);
+        return
+      }
       if (response?.success) {
         Cookies.set("accessToken", response?.data?.accessToken);
         Cookies.set("role", response?.data?.role);
