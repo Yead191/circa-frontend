@@ -51,24 +51,30 @@ const SendGiftModal = ({ authorId }: { authorId: string }) => {
       message: message,
     }
     try {
-      toast.promise(myFetch('/gift/send-gift', {
-        method: 'POST',
-        body: gift,
-      }), {
-        loading: "Sending gift...",
-        success: (res) => {
-          // console.log(res)
-          revalidateTags(['wallet'])
-          setOpen(false);
-          setSelectedGift(null);
-          setMessage("");
-          return res.message || "Gift sent successfully";
-        },
-        error: (err) => {
-          console.log(err)
-          return err.message || "Failed to send gift";
-        },
-      })
+      toast.promise(
+        myFetch('/gift/send-gift', {
+          method: 'POST',
+          body: gift,
+        }).then((res) => {
+          if (!res.success) {
+            throw new Error(res.message);
+          }
+          return res;
+        }),
+        {
+          loading: "Sending gift...",
+          success: (res) => {
+            revalidateTags(['wallet']);
+            setOpen(false);
+            setSelectedGift(null);
+            setMessage("");
+            return res.message || "Gift sent successfully";
+          },
+          error: (err) => {
+            return err.message || "Failed to send gift";
+          },
+        }
+      );
     } catch (err) {
       console.error("Failed to send gift", err);
     } finally {
