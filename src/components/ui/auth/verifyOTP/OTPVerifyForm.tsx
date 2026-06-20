@@ -2,20 +2,20 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AlertCircle, ArrowLeft, RefreshCcw } from "lucide-react";
+import { OtpCountdown } from "@/components/shared/Otpcountdown";
+import Cookies from "js-cookie";
+import { ArrowLeft, RefreshCcw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ChangeEvent,
   FormEvent,
   KeyboardEvent,
+  useEffect,
   useRef,
   useState,
 } from "react";
 import { myFetch } from "../../../../../helpers/myFetch";
 import { toast } from "sonner";
-import { OtpCountdown } from "@/components/shared/Otpcountdown";
-import Cookies from "js-cookie";
-
 
 const OTP_LENGTH = 4;
 
@@ -23,7 +23,6 @@ export default function OTPVerifyForm() {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isExpired, setIsExpired] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const searchParams = useSearchParams();
 
@@ -31,6 +30,10 @@ export default function OTPVerifyForm() {
   const userType = searchParams.get("userType");
   const router = useRouter();
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => inputRefs.current[0]?.focus(), 100);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const handleChange = (index: number, value: string): void => {
     if (!/^\d*$/.test(value)) return;
@@ -68,7 +71,8 @@ export default function OTPVerifyForm() {
       });
       setOtp(newOtp);
 
-      const nextIndex = pasteData.length < OTP_LENGTH ? pasteData.length : OTP_LENGTH - 1;
+      const nextIndex =
+        pasteData.length < OTP_LENGTH ? pasteData.length : OTP_LENGTH - 1;
       inputRefs.current[nextIndex]?.focus();
     }
   };
@@ -94,7 +98,7 @@ export default function OTPVerifyForm() {
         toast.success(response?.message || "OTP verified successfully", {
           id: "otp-verify",
         });
-        Cookies.remove("otpExpiry")
+        Cookies.remove("otpExpiry");
         if (userType === "forget") {
           router.push(`/new-password?token=${response?.data?.accessToken}`);
         } else {
@@ -125,11 +129,9 @@ export default function OTPVerifyForm() {
   const handleResendSuccess = () => {
     setOtp(Array(OTP_LENGTH).fill(""));
     setError("");
-    setIsExpired(false);
-    setTimeout(() => inputRefs.current[0]?.focus(), 100);
-    // ⏱️ OTP valid for 2 minutes
     const expiryTime = Date.now() + 3 * 60 * 1000;
     Cookies.set("otpExpiry", expiryTime.toString());
+    window.setTimeout(() => inputRefs.current[0]?.focus(), 100);
   };
 
   const isOtpComplete = !otp.includes("");
@@ -137,30 +139,6 @@ export default function OTPVerifyForm() {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-linear-to-b from-[#0F0F0F] to-black text-white font-sans">
       <div className="w-full max-w-md">
-        <div
-          className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-5"
-          style={{
-            background: "linear-gradient(145deg, #a89fe8, #7b6fd4)",
-            boxShadow: "0 8px 24px rgba(123, 111, 212, 0.35)",
-          }}
-        >
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <path
-              d="M27 16c0 6.075-4.925 11-11 11S5 22.075 5 16 9.925 5 16 5c3.3 0 6.263 1.452 8.3 3.75"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M22 3.5L24.5 8.5L19.5 9"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-
         <div className="text-center mb-8">
           <h1 className="text-4xl text-white mb-2">Verify OTP</h1>
           <p className="text-gray-400">
@@ -177,20 +155,16 @@ export default function OTPVerifyForm() {
                 Enter Verification Code
               </label>
 
-              {/* 4-digit OTP inputs — wider gaps since fewer boxes */}
-              <div
-                className="flex justify-center gap-4"
-                onPaste={handlePaste}
-              >
+              <div className="flex justify-center gap-4" onPaste={handlePaste}>
                 {otp.map((digit, index) => (
                   <Input
                     key={index}
-                    ref={(el: any) => {
-                      if (el) inputRefs.current[index] = el;
+                    ref={(el) => {
+                      inputRefs.current[index] = el;
                     }}
                     type="text"
                     inputMode="numeric"
-                    autoComplete="one-time-code"
+                    autoComplete={index === 0 ? "one-time-code" : "off"}
                     value={digit}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       handleChange(index, e.target.value)
@@ -198,20 +172,17 @@ export default function OTPVerifyForm() {
                     onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
                       handleKeyDown(index, e)
                     }
-                    disabled={isExpired}
                     maxLength={1}
-                    className={`w-16 h-16 text-center text-2xl font-bold ${isExpired ? "opacity-50" : ""
-                      }`}
+                    className="w-16 h-16 text-center text-2xl font-bold rounded-xl border border-[#D4AF37]/20 bg-[#1A1A1A] text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)] transition-all placeholder:text-gray-600 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 focus-visible:border-[#D4AF37] focus-visible:ring-2 focus-visible:ring-[#D4AF37]/20"
                   />
                 ))}
               </div>
             </div>
 
-            {/* Submit button */}
             <Button
               type="submit"
               className="w-full"
-              disabled={isLoading || !isOtpComplete || isExpired}
+              disabled={isLoading || !isOtpComplete}
             >
               {isLoading ? (
                 <span className="flex items-center">
@@ -223,42 +194,30 @@ export default function OTPVerifyForm() {
               )}
             </Button>
 
-            {/* Reusable countdown + resend */}
             <OtpCountdown
               email={email}
-              onExpire={() => setIsExpired(true)}
               onResendSuccess={handleResendSuccess}
             />
 
-            {error && !isExpired && (
-              <div className="text-xs text-red-500 text-center animate-shake">
-                {error}
-              </div>
+            {error && (
+              <Alert className="border-red-500/20 bg-red-500/10 text-red-100">
+                <AlertDescription className="text-sm">{error}</AlertDescription>
+              </Alert>
             )}
           </form>
 
-          <div className="mt-10 pt-6 border-t border-white/5 text-center">
+          <div className="mt-6 text-center">
             <button
+              type="button"
               onClick={() => window.history.back()}
-              className="inline-flex items-center text-sm text-gray-500 hover:text-primary transition-colors group"
+              className="inline-flex items-center text-sm text-gray-400 hover:text-[#D4AF37] transition-colors"
             >
-              <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Sign In
             </button>
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-4px); }
-          75% { transform: translateX(4px); }
-        }
-        .animate-shake {
-          animation: shake 0.2s ease-in-out 0s 2;
-        }
-      `}</style>
     </div>
   );
 }

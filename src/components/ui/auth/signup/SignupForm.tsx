@@ -20,6 +20,30 @@ export function SignupForm() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleResend = async () => {
+    if (!email) return;
+    try {
+      const res = await myFetch("/auth/forget-password", {
+        method: "POST",
+        body: { email },
+      });
+      if (res?.success) {
+        router.replace(`/verify-otp?email=${email}`);
+        toast.success(res?.message || "OTP resent successfully", {
+          id: "otp-resend",
+        });
+      } else {
+        toast.error(res?.message || "Failed to resend OTP", {
+          id: "otp-resend",
+        });
+      }
+    } catch {
+      toast.error("Something went wrong while resending OTP", {
+        id: "otp-resend",
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -27,14 +51,20 @@ export function SignupForm() {
 
     try {
       const response = await myFetch("/user", { method: "POST", body: { email, name, contact, password } })
+      // console.log(response)
+      if (!response?.success && response.message === "Account is not verified. Please check your email for verification code.") {
+        await handleResend();
+        setIsLoading(false);
+        return
+      }
       if (response?.success) {
-        toast.success(response?.message)        
+        toast.success(response?.message)
         router.replace(`/verify-otp?email=${email}`);
         setIsLoading(false);
       } else {
         // @ts-ignore
         setError(response?.error[0]?.message);
-         if (response?.error && Array.isArray(response.error)) {
+        if (response?.error && Array.isArray(response.error)) {
           response.error.forEach((err: { message: string }) => {
             toast.error(err.message, { id: "sign-up" });
           });
@@ -44,7 +74,7 @@ export function SignupForm() {
           });
         }
       }
-    } catch (err) {      
+    } catch (err) {
       console.error('Signup error:', err);
     } finally {
       setIsLoading(false);

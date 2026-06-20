@@ -1,4 +1,4 @@
-import React from 'react'
+
 import OTPVerifyForm from './OTPVerifyForm'
 
 const VerifyOTP = () => {

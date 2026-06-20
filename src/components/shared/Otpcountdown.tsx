@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 interface OtpCountdownProps {
   email: string | null;
   onExpire?: () => void;
-  onResendSuccess?: () => void;  
+  onResendSuccess?: () => void;
 }
 
 function getOtpExpiryFromCookie(): number | null {
@@ -36,7 +36,7 @@ function getRemainingSeconds(): number {
 export function OtpCountdown({
   email,
   onExpire,
-  onResendSuccess,  
+  onResendSuccess,
 }: OtpCountdownProps) {
   const [timeLeft, setTimeLeft] = useState<number>(() => getRemainingSeconds());
   const [isResending, setIsResending] = useState(false);
@@ -74,63 +74,48 @@ export function OtpCountdown({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-const handleResend = async () => {
-  if (!email) return;
-  setIsResending(true);
-  try {
-    const res = await myFetch("/auth/forget-password", {
-      method: "POST",
-      body: { email },
-    });
-    if (res?.success) {
-      toast.success(res?.message || "OTP resent successfully", {
+  const handleResend = async () => {
+    if (!email) return;
+    setIsResending(true);
+    try {
+      const res = await myFetch("/auth/forget-password", {
+        method: "POST",
+        body: { email },
+      });
+      if (res?.success) {
+        toast.success(res?.message || "OTP resent successfully", {
+          id: "otp-resend",
+        });
+
+        // ✅ Set a temporary non-zero value immediately so the
+        // timeLeft useEffect doesn't fire onExpire before the
+        // cookie is written and re-read.
+        setTimeLeft(180);
+
+        setTimeout(() => {
+          const newTime = getRemainingSeconds();
+          setTimeLeft(newTime > 0 ? newTime : 180);
+        }, 300);
+
+        onResendSuccess?.();
+        router.refresh();
+      } else {
+        toast.error(res?.message || "Failed to resend OTP", {
+          id: "otp-resend",
+        });
+      }
+    } catch {
+      toast.error("Something went wrong while resending OTP", {
         id: "otp-resend",
       });
-
-      // ✅ Set a temporary non-zero value immediately so the
-      // timeLeft useEffect doesn't fire onExpire before the
-      // cookie is written and re-read.
-      setTimeLeft(180);
-
-      setTimeout(() => {
-        const newTime = getRemainingSeconds();
-        setTimeLeft(newTime > 0 ? newTime : 180);
-      }, 300);
-
-      onResendSuccess?.();
-      router.refresh();
-    } else {
-      toast.error(res?.message || "Failed to resend OTP", {
-        id: "otp-resend",
-      });
+    } finally {
+      setIsResending(false);
     }
-  } catch {
-    toast.error("Something went wrong while resending OTP", {
-      id: "otp-resend",
-    });
-  } finally {
-    setIsResending(false);
-  }
-};
+  };
 
   return (
-    <div className="flex items-center justify-between text-xs md:text-sm">
-      {isExpired ? (
-        <span className="text-red-400 font-semibold animate-pulse">
-          Code expired
-        </span>
-      ) : (
-        <div className="flex items-center text-gray-500">
-          Code expires in:
-          <span
-            className={`ml-2 font-mono font-bold ${
-              timeLeft < 30 ? "text-red-400 animate-pulse" : "text-primary"
-            }`}
-          >
-            {formatTime(timeLeft)}
-          </span>
-        </div>
-      )}
+    <div className="flex items-center justify-end text-xs md:text-sm">
+
 
       <button
         type="button"

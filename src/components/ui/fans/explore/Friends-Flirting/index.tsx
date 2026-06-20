@@ -16,6 +16,8 @@ import { imageFormatter } from "../../../../../../helpers/imageFormatter";
 import { useRouter } from "next/navigation";
 import { myFetch } from "../../../../../../helpers/myFetch";
 import { toast } from "sonner";
+import { getImageUrl } from "@/utils/getImageUrl";
+import Image from "next/image";
 
 const FriendsFlirting = ({ friendsData }: any) => {
   const [api, setApi] = useState<CarouselApi>();
@@ -43,11 +45,11 @@ const FriendsFlirting = ({ friendsData }: any) => {
 
 
 
-  const handleMakeFavorite = async (friend:any) => {
+  const handleMakeFavorite = async (friend: any) => {
     try {
       const response = await myFetch(`/favorite/${friend?._id}`, { method: "POST" });
       if (response?.success) {
-        toast?.success(response?.message);        
+        toast?.success(response?.message);
       } else {
         if (response?.error && Array.isArray(response.error)) {
           response.error.forEach((err: { message: string }) => {
@@ -64,6 +66,8 @@ const FriendsFlirting = ({ friendsData }: any) => {
       console.log("error", error);
     }
   }
+
+  console.log(friendsData)
   return (
     <div className="w-full relative pb-10">
       {/* Top Filter Button */}
@@ -75,17 +79,19 @@ const FriendsFlirting = ({ friendsData }: any) => {
         {/* Main Carousel Area */}
         <Carousel
           setApi={setApi}
-          className="w-full max-w-[480px]"
+          className="w-full max-w-120"
         >
           <CarouselContent>
             {friendsData?.map((friend: any) => (
               <CarouselItem key={friend._id}>
-                <div className="bg-[#20232c] rounded-[24px] overflow-hidden border border-[#2E2E36] shadow-xl">
+                <div className="bg-[#20232c] rounded-3xl overflow-hidden border border-[#2E2E36] shadow-xl">
                   {/* Card Image */}
-                  <div className="relative w-full h-[410px]">
-                    <img
-                      src={imageFormatter(friend.imageUrl)}
+                  <div className="relative w-full h-102.5">
+                    <Image
+                      src={getImageUrl(friend?.image)}
                       alt={friend?.name}
+                      height={600}
+                      width={600}
                       className="object-cover w-full h-full"
                     />
                   </div>
