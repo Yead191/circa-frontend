@@ -1,4 +1,4 @@
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
 .pnp.*
@@ -8,48 +8,43 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
+# Testing
 /coverage
 
-# next.js
+# Next.js
 /.next/
 /out/
 
-# build
+# Production
 /build
 
-# turborepo
-.turbo
+# Misc
+.DS_Store
+*.pem
 
-# typescript
-*.tsbuildinfo
-
-# logs
-logs
-*.log
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# environment variables
+# Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# vercel
+# Vercel
 .vercel
 
-# IDE
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDEs
 .vscode/
 .idea/
 
-# misc
-.DS_Store
+# OS files
 Thumbs.db
-*.pem
-branch_structure.json
-temp_auto_push.bat
-temp_interactive_push.bat
