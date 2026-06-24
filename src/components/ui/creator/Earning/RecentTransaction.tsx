@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import TransactionDetailsModal from './TransactionDetailsModal';
+import { getImageUrl } from '@/utils/getImageUrl';
 
 // ─────────────────────────────────────────────
 // HELPERS
@@ -77,7 +78,7 @@ const RecentTransactions = ({ transactionData }: { transactionData: Transaction[
             {/* Transaction List */}
             <div className="space-y-2">
                 {transactionData?.length > 0 ? (
-                    transactionData.map((tx, index) => (
+                    transactionData?.map((tx, index) => (
                         <Dialog key={tx._id || index}>
                             <DialogTrigger asChild>
                                 <div
@@ -88,7 +89,7 @@ const RecentTransactions = ({ transactionData }: { transactionData: Transaction[
                                     <div className="relative shrink-0">
                                         <div className="w-12 h-12 rounded-xl overflow-hidden border border-[#2a2a35] bg-[#1a1a23]">
                                             <img
-                                                src={tx?.user?.image || "/api/placeholder/48/48"}
+                                                src={getImageUrl(tx?.user?.image) || "/api/placeholder/48/48"}
                                                 alt={tx?.user?.name || "User"}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             />

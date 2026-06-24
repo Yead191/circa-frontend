@@ -6,6 +6,7 @@ import { getImageUrl } from "@/utils/getImageUrl";
 import { myFetch } from "../../../../../../../helpers/myFetch";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { revalidateTags } from "../../../../../../../helpers/revalidateTags";
 
 const ProductDetails = ({ productDetails }: { productDetails: any }) => {
     const [quantity, setQuantity] = useState(1);
@@ -41,6 +42,7 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
 
             if (response?.success) {
                 toast.success(response?.message)
+                revalidateTags(["cart"])
             } else {
                 if (response?.error && Array.isArray(response.error)) {
                     response.error.forEach((err: { message: string }) => {
@@ -61,7 +63,7 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
     return (
         <div className="max-w-2xl mx-auto text-white pb-10">
             {/* Image */}
-            <div className="relative w-full h-[350px] md:h-[450px] lg:h-[550px] rounded-3xl overflow-hidden mb-8 border border-[#242424] bg-[#1c1c20]">
+            <div className="relative w-full h-87.5 md:h-112.5 lg:h-137.5 rounded-3xl overflow-hidden mb-8 border border-[#242424] bg-[#1c1c20]">
                 <Image
                     src={getImageUrl(productDetails?.image) || "/placeholder.png"}
                     fill
@@ -88,14 +90,14 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
                 <div className="flex items-center gap-4 mt-1.5">
                     <button
                         onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                        className="w-[34px] h-[34px] rounded border border-[#3A3A40] flex items-center justify-center text-[#A1A1AA] hover:text-white hover:border-[#5A5A60] transition-colors focus:outline-none"
+                        className="w-8.5 h-8.5 rounded border border-[#3A3A40] flex items-center justify-center text-[#A1A1AA] hover:text-white hover:border-[#5A5A60] transition-colors focus:outline-none"
                     >
                         <Minus size={16} />
                     </button>
                     <span className="text-[20px] font-medium w-4 text-center">{quantity}</span>
                     <button
                         onClick={() => setQuantity(q => q + 1)}
-                        className="w-[34px] h-[34px] rounded border border-[#3A3A40] flex items-center justify-center text-[#A1A1AA] hover:text-white hover:border-[#5A5A60] transition-colors focus:outline-none"
+                        className="w-8.5 h-8.5 rounded border border-[#3A3A40] flex items-center justify-center text-[#A1A1AA] hover:text-white hover:border-[#5A5A60] transition-colors focus:outline-none"
                     >
                         <Plus size={16} />
                     </button>

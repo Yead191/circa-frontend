@@ -47,9 +47,15 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
   }, [userId]);
 
   React.useEffect(() => {
-    if (!open) return;
-    void loadNotifications();
+    if (open) {
+      void loadNotifications();
+    }
   }, [loadNotifications, open]);
+
+  // Initial load on mount
+  React.useEffect(() => {
+    void loadNotifications();
+  }, [loadNotifications]);
 
   React.useEffect(() => {
     if (!userId) return;
@@ -125,9 +131,8 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
         >
           <Bell className="w-4.75 h-4.75" />
           {unreadCount > 0 && (
-            <span className="absolute top-2.5 right-2.5 flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
+              {unreadCount}
             </span>
           )}
         </Button>

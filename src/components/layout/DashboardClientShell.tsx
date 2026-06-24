@@ -10,7 +10,7 @@ import BrowseRightSide from "@/components/ui/fans/explore/Browse-Creators/Browse
 import MembershipRightSide from "@/components/ui/fans/explore/creator-profile/membership/MembershipRightSide";
 import { generateBreadcrumbs } from "@/utils/breadcrumbs";
 
-export function DashboardClientShell({ children, creditData }: { children: ReactNode, creditData: number }) {
+export function DashboardClientShell({ children, creditData, profileData, cartCount }: { children: ReactNode, creditData: number, profileData: any, cartCount: number }) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const exploreTab = searchParams.get("tab") || "browse";
@@ -29,7 +29,7 @@ export function DashboardClientShell({ children, creditData }: { children: React
     const rightSidebarContent = rightSidebarMap[pathname] ?? null;
 
     return (
-        <DashboardLayout breadcrumbs={breadcrumbs} rightSidebar={rightSidebarContent} creditData={creditData}>
+        <DashboardLayout breadcrumbs={breadcrumbs} rightSidebar={rightSidebarContent} creditData={creditData} cartCount={cartCount} profileData={profileData} >
             {children}
         </DashboardLayout>
     );

@@ -6,21 +6,20 @@ const page = async ({ searchParams }: { searchParams: Promise<{ [key: string]: s
   const { tier_type = 'month', message_type = 'month', shop_type = 'month' } = await searchParams;
 
   // tierRes, messageRes, shopRes
-  const [tierRes, messageRes, shopRes] = await Promise.all([
+  const [tierRes, messageRes, shopRes, statisticsRes, transactionRes] = await Promise.all([
     myFetch(`/dashboard/creator?type=${tier_type}&category=Membership`, { method: "GET", cache: "no-store" }),
     myFetch(`/dashboard/creator?type=${message_type}&category=Chat`, { method: "GET", cache: "no-store" }),
     myFetch(`/dashboard/creator?type=${shop_type}&category=Shop`, { method: "GET", cache: "no-store" }),
+    myFetch('/wallet', {
+      method: "GET",
+      cache: "no-store"
+    }),
+    myFetch('/transaction', {
+      method: "GET",
+      cache: "no-store"
+    })
   ]);
 
-  // BALANCE 
-  const statisticsRes = await myFetch('/wallet', {
-    method: "GET"
-  })
-  // TRANSACTION
-  const transactionRes = await myFetch('/transaction', {
-    method: "GET",
-    cache: "no-store"
-  })
 
   const statistics = statisticsRes?.data || {};
   const tierData = tierRes?.data || [];

@@ -5,6 +5,7 @@ import { MdOutlineNotificationsNone } from "react-icons/md";
 import { LuShoppingCart } from "react-icons/lu";
 import Image from "next/image";
 import { getImageUrl } from "@/utils/getImageUrl";
+import { TopbarNotifications } from "@/components/shared/Notification/TopbarNotifications";
 
 export default function Topbar({
   title = [],
@@ -30,14 +31,16 @@ export default function Topbar({
             <p className="text-primary/70 text-sm">{user?.role}</p>
           </div>
         </Link>
-        <Link href="/notifications">  <button className="hidden sm:flex cursor-pointer relative w-11 h-11 rounded-full bg-[#15131A] border border-[#242424] justify-center items-center text-gray-400 hover:text-white transition-colors">
+        {/* <Link href="/notifications">  <button className="hidden sm:flex cursor-pointer relative w-11 h-11 rounded-full bg-[#15131A] border border-[#242424] justify-center items-center text-gray-400 hover:text-white transition-colors">
           <MdOutlineNotificationsNone size={25} />
-          {/* Badge */}
+
           <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
             3
           </span>
         </button>
-        </Link>
+        </Link> */}
+        <TopbarNotifications userId={user?._id} />
+
         <Link href="/add-to-card">
           <button className="hidden sm:flex cursor-pointer relative w-11 h-11 rounded-full bg-[#15131A] border border-[#242424] justify-center items-center text-gray-400 hover:text-white transition-colors">
             <LuShoppingCart size={21} />

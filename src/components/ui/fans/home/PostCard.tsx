@@ -1,9 +1,7 @@
-import React from "react";
 import Image from "next/image";
-import { Heart, MessageCircle } from "lucide-react";
-import { imgUrl } from "../../../../../helpers/imgUrl";
 import { imageFormatter } from "../../../../../helpers/imageFormatter";
 import PostCardButton from "./PostCardButton";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 interface PostUser {
   _id: string;
@@ -38,7 +36,7 @@ interface Post {
 
 interface PostCardProps {
   post: Post;
-  
+
 }
 
 export default function PostCard({ post }: PostCardProps) {
@@ -51,7 +49,7 @@ export default function PostCard({ post }: PostCardProps) {
   };
 
   return (
-    <div      
+    <div
       className="bg-[#15131A] rounded-xl p-5 cursor-pointer"
     >
       {/* Header */}
@@ -59,7 +57,7 @@ export default function PostCard({ post }: PostCardProps) {
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10 rounded-full overflow-hidden">
             <Image
-              src={imageFormatter(post.user.image)}
+              src={getImageUrl(post.user.image)}
               alt={post.user.name}
               fill
               className="object-cover w-full h-full"
@@ -102,7 +100,7 @@ export default function PostCard({ post }: PostCardProps) {
             src={imageFormatter(coverImage)}
             alt={post.title || "Post Cover"}
             fill
-            className="object-cover w-full h-full"            
+            className="object-cover w-full h-full"
           />
           {isPremium && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20" />
@@ -111,7 +109,7 @@ export default function PostCard({ post }: PostCardProps) {
       )}
 
       {/* Footer Actions */}
-      <PostCardButton post={post}/>
+      <PostCardButton post={post} />
     </div>
   );
 }
