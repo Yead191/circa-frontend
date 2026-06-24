@@ -4,17 +4,17 @@ import { myFetch } from "../../../../../helpers/myFetch";
 
 interface pageProps {
     searchParams: Promise<{
-        [key:string]: string| string[] | undefined
+        [key: string]: string | string[] | undefined
     }>
 }
-const CreatorProfilePage = async({searchParams}: pageProps) => {
-    const params = await searchParams;    
-    const creatorData = await myFetch(`/user/creator/${params?.creatorId}`); 
+const CreatorProfilePage = async ({ searchParams }: pageProps) => {
+    const params = await searchParams;
+    const creatorData = await myFetch(`/user/creator/${params?.creatorId}`);
     const creatorId = params?.creatorId;
-    
+
     return (
         <div>
-            <CreatorProfile creatorData={creatorData?.data} creatorId={creatorId}/>
+            <CreatorProfile creatorData={creatorData?.data} creatorId={creatorId} />
         </div>
     );
 };

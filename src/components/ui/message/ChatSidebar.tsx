@@ -72,62 +72,62 @@ export function ChatSidebar({ chatRooms, currentUserId, isCreator, search, setSe
               return !!room.lastMessage;
             })
             .map(room => {
-            const otherParticipant = Array.isArray(room.participants)
-              ? room.participants.find((p: any) => p._id !== currentUserId)
-              : room.participants;
-            const isActive = pathname.includes(room._id);
+              const otherParticipant = Array.isArray(room.participants)
+                ? room.participants.find((p: any) => p._id !== currentUserId)
+                : room.participants;
+              const isActive = pathname.includes(room._id);
 
-            return (
-              <Link
-                key={room._id}
-                href={isCreator ? `/creator-message/${room._id}` : `/message/${room._id}`}
-                className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/5 transition-all border-b border-white/4 group ${isActive ? "bg-white/5 border-r-2 border-r-indigo-500" : ""}`}
-              >
-                <div className="relative shrink-0">
-                  <div className="w-11 h-11 rounded-full overflow-hidden bg-[#1e1f2e] border border-white/10">
-                    <Image
-                      src={getImageUrl(otherParticipant?.image) || "/user.png"}
-                      alt={otherParticipant?.name || "User"}
-                      width={44}
-                      height={44}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  {/* Mocking online status for now */}
-                  <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-[#0d0e14]" />
-                </div>
-
-                <div className="flex-1 min-w-0 text-left">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-white text-[14px] font-medium truncate group-hover:text-indigo-400 transition-colors flex items-center gap-1.5">
-                      {otherParticipant?.name}
-                      {room.todayisBirthDay && <span title="Birthday Today!" className="text-sm">🎂</span>}
-                    </span>
-                    <span className="text-gray-600 text-[11px] font-medium">
-                      {room.lastMessage ? new Date(room.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col min-w-0">
-                      <p className={`text-[13px] truncate ${room.unreadMessages ? "text-indigo-300 font-medium" : "text-gray-500"}`}>
-                        {room.lastMessage?.text || "No messages yet"}
-                      </p>
-                      {room.plan && (
-                        <span className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
-                          {room.plan.emoji} {room.plan.name} Plan
-                        </span>
-                      )}
+              return (
+                <Link
+                  key={room._id}
+                  href={isCreator ? `/creator-message/${room._id}` : `/message/${room._id}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/5 transition-all border-b border-white/4 group ${isActive ? "bg-white/5 border-r-2 border-r-indigo-500" : ""}`}
+                >
+                  <div className="relative shrink-0">
+                    <div className="w-11 h-11 rounded-full overflow-hidden bg-[#1e1f2e] border border-white/10">
+                      <Image
+                        src={getImageUrl(otherParticipant?.image) || "/user.png"}
+                        alt={otherParticipant?.name || "User"}
+                        width={44}
+                        height={44}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    {room.unreadMessages ? (
-                      <span className="w-5 h-5 rounded-full bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center shrink-0 ml-2">
-                        {room.unreadMessages}
-                      </span>
-                    ) : null}
+                    {/* Mocking online status for now */}
+                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-[#0d0e14]" />
                   </div>
-                </div>
-              </Link>
-            );
-          })
+
+                  <div className="flex-1 min-w-0 text-left">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-white text-[14px] font-medium truncate group-hover:text-indigo-400 transition-colors flex items-center gap-1.5">
+                        {otherParticipant?.name}
+                        {room.todayisBirthDay && <span title="Birthday Today!" className="text-sm">🎂</span>}
+                      </span>
+                      <span className="text-gray-600 text-[11px] font-medium">
+                        {room.lastMessage ? new Date(room.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-col min-w-0">
+                        <p className={`text-[13px] truncate ${room.unreadMessages ? "text-indigo-300 font-medium" : "text-gray-500"}`}>
+                          {room.lastMessage?.text || "No messages yet"}
+                        </p>
+                        {room.plan && (
+                          <span className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
+                            {room.plan.emoji} {room.plan.name} Plan
+                          </span>
+                        )}
+                      </div>
+                      {room.unreadMessages ? (
+                        <span className="w-5 h-5 rounded-full bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center shrink-0 ml-2">
+                          {room.unreadMessages}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
         ) : (
           <div className="p-8 text-center">
             <p className="text-gray-500 text-sm">No conversations found</p>

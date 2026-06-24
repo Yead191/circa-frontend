@@ -21,8 +21,11 @@ const MessageButton = ({ creatorId, variant }: MessageButtonProps) => {
       const res = await myFetch(`/chat/${creatorId}`, {
         method: "POST",
       });
+      // console.log(res)
       if (res?.success) {
-        router.push('/message');
+        setTimeout(() => {
+          router.push(`/message/${res?.data?._id}`);
+        }, 1000);
       } else {
         console.error("Failed to start chat:", res?.message);
       }

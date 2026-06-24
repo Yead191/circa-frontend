@@ -19,7 +19,7 @@ export default function MessageLayoutWrapper({ children }: { children: React.Rea
     const [chatRooms, setChatRooms] = useState<any[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string>("");
     const [loading, setLoading] = useState(true);
-    const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://68.178.164.48:5005"), []);
+    const socket = useMemo(() => io(process.env.NEXT_PUBLIC_SOCKET_URL ?? process.env.SOCKET_URL ?? "https://api.circa.chat"), []);
 
     useEffect(() => {
         const fetchUser = async () => {
