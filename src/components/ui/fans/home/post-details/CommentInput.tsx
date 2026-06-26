@@ -1,21 +1,22 @@
 'use client'
 import { SendHorizonal } from 'lucide-react'
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { myFetch } from '../../../../../../helpers/myFetch'
 import { revalidate } from '../../../../../../helpers/revalidateHelper'
 import { imageFormatter } from '../../../../../../helpers/imageFormatter'
+import { revalidateTags } from '../../../../../../helpers/revalidateTags'
 
 const CommentInput = ({ postId, profileData }: { postId: string, profileData: any }) => {
-    // console.log("postId", postId);
-    // console.log(profileData)
-
+    const router = useRouter();
     const [comment, setComment] = useState('');
     const [loading, setLoading] = useState(false);
+    const [, startTransition] = useTransition();
 
     const handleComment = async () => {
-        if (!comment.trim()) return;
+        if (!comment.trim() || loading) return;
         setLoading(true);
         try {
             const response = await myFetch(`/post/comment/${postId}`, {
@@ -24,8 +25,14 @@ const CommentInput = ({ postId, profileData }: { postId: string, profileData: an
             });
 
             if (response?.success) {
-                revalidate("comments");
+                // Clear the field immediately for a snappy feel.
                 setComment('');
+                // Invalidate the cached server data...
+                await revalidateTags(['single-post']);
+                await revalidate("comments");
+                // ...then re-fetch & repaint the server components so the new
+                // comment shows without a hard reload.
+                startTransition(() => router.refresh());
             } else {
                 if (response?.error && Array.isArray(response.error)) {
                     response.error.forEach((err: { message: string }) => {

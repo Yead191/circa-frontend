@@ -7,7 +7,7 @@ interface PageProps {
 
 export default async function PostDetailsPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const response = await myFetch(`/post/${params?.id}`, { tags: ['single-post'] })
+  const response = await myFetch(`/post/${params?.id}`, { tags: ['single-post'], cache: "no-store", })
   const post = response?.data || {}
   return (
     <div className="min-h-screen bg-[#0a0a0a] ">
