@@ -22,9 +22,10 @@ import Cookies from "js-cookie";
 
 interface TopbarNotificationsProps {
   userId?: string;
+  className?: string;
 }
 
-export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
+export function TopbarNotifications({ userId, className }: TopbarNotificationsProps) {
   const [notifications, setNotifications] = React.useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = React.useState(0);
   const [isFetching, setIsFetching] = React.useState(false);
@@ -127,7 +128,7 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
           variant="ghost"
           size="icon"
           aria-label="Notifications"
-          className="hidden sm:flex cursor-pointer relative w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800/80 justify-center items-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 hover:border-zinc-700/80 transition-all duration-200 shadow-inner"
+          className={className ?? "hidden sm:flex cursor-pointer relative w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800/80 justify-center items-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 hover:border-zinc-700/80 transition-all duration-200 shadow-inner"}
         >
           <Bell className="w-4.75 h-4.75" />
           {unreadCount > 0 && (
@@ -141,7 +142,7 @@ export function TopbarNotifications({ userId }: TopbarNotificationsProps) {
       <DropdownMenuContent
         align="end"
         sideOffset={10}
-        className="w-96 overflow-hidden rounded-2xl border border-zinc-800/60 bg-zinc-950 p-0 shadow-2xl shadow-black/80 backdrop-blur-md"
+        className="w-72 sm:w-96 overflow-hidden rounded-2xl border border-zinc-800/60 bg-zinc-950 p-0 shadow-2xl shadow-black/80 backdrop-blur-md"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3.5 bg-zinc-900/50">

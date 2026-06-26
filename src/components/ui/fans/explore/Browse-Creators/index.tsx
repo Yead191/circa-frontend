@@ -1,20 +1,25 @@
 "use client";
 import { creatorsData } from "@/constants/explore-data";
 import { useRouter } from "next/navigation";
-import { imageFormatter } from "../../../../../../helpers/imageFormatter";
 import CreatorFilter from "./CreatorFilter";
 import { getImageUrl } from "@/utils/getImageUrl";
 
 
-const BrowseCreators = ({ creatorData }: { creatorData: any }) => {
+const BrowseCreators = ({ creatorData, categories }: {
+  creatorData: any, categories?: {
+    _id: string;
+    name: string;
+    image: string;
+  }[]
+}) => {
   const router = useRouter()
   return (
     <div className="w-full">
 
-      <CreatorFilter />
+      <CreatorFilter categories={categories} />
 
       {/* Creator Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-5 pb-10">
         {creatorData?.map((creator: any) => (
           <div
             key={creator._id}
@@ -24,7 +29,7 @@ const BrowseCreators = ({ creatorData }: { creatorData: any }) => {
             <img
               src={getImageUrl(creator?.image)}
               alt={creator?.name}
-              className="object-cover w-full h-[300px] group-hover:scale-105 transition-transform duration-500"
+              className="object-cover w-full h-48 md:md:h-75 group-hover:scale-105 transition-transform duration-500"
             />
 
             {/* Gradient Dark Overlay */}

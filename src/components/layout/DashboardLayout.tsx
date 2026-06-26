@@ -40,7 +40,12 @@ export function DashboardLayout({
 
       {/* MIDDLE CONTENT */}
       <div className="flex-1 border-x border-[#242424] flex flex-col min-h-dvh overflow-y-auto w-full min-w-0">
-        <Navbar title={breadcrumbs} onMenuClick={() => setSidebarOpen(true)} />
+        <Navbar
+          title={breadcrumbs}
+          onMenuClick={() => setSidebarOpen(true)}
+          profileData={profileData}
+          cartCount={cartCount}
+        />
         <ContentWrapper>
           <main className="p-3 sm:p-4 w-full flex-1">{children}</main>
         </ContentWrapper>
