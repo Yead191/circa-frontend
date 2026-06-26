@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { imageFormatter } from "../../../../../helpers/imageFormatter";
 import PostCardButton from "./PostCardButton";
+import PostCardVideo from "./PostCardVideo";
 import { getImageUrl } from "@/utils/getImageUrl";
 
 interface PostUser {
@@ -94,8 +95,8 @@ export default function PostCard({ post }: PostCardProps) {
       <p className="text-gray-300 text-sm mb-4">{post.description}</p>
 
       {/* Image */}
-      {coverImage && (
-        <div className="relative w-full h-72 overflow-hidden mb-5 bg-black/40 rounded-lg">
+      {coverImage ? (
+        <div className="relative w-full h-72 lg:h-96 overflow-hidden mb-5 bg-black/40 rounded-lg">
           <Image
             src={imageFormatter(coverImage)}
             alt={post.title || "Post Cover"}
@@ -106,6 +107,9 @@ export default function PostCard({ post }: PostCardProps) {
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20" />
           )}
         </div>
+      ) : (
+        /* Video-only post — show the video player */
+        post.video && <PostCardVideo src={post.video} />
       )}
 
       {/* Footer Actions */}

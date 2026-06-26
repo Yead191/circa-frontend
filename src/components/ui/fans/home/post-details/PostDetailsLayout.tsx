@@ -40,7 +40,7 @@ export default async function PostDetailsLayout({ post }: PostDetailsLayoutProps
           </div>
 
           {/* Main Content Carousel */}
-          <PostCarousel images={post?.images || []} title={post?.title || ""} authorId={post.user._id} />
+          <PostCarousel images={post?.images || []} video={post?.video} title={post?.title || ""} authorId={post.user._id} />
 
           {/* Actions */}
           <LikeCommentButton post={post} />

@@ -2,10 +2,11 @@
 
 import React, { useState, useRef } from 'react';
 import {
-    X, Globe, Star, Image as ImageIcon, Palette, ChevronRight, Check, Lock, EyeOff, Calendar, Clock, Plus, Trash2
+    X, Globe, Star, Image as ImageIcon, Palette, ChevronRight, Check, Lock, EyeOff, Calendar, Clock, Plus, Trash2, Video as VideoIcon, Film
 } from 'lucide-react';
 import { getImageUrl } from '@/utils/getImageUrl';
 import { myFetch } from '../../../../../helpers/myFetch';
+import { uploadVideoChunk } from '../../../../../helpers/uploadVideoChunk';
 import { revalidateTags } from '../../../../../helpers/revalidateTags';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -69,6 +70,23 @@ interface ImageItem {
     file?: File;
 }
 
+interface VideoItem {
+    url: string; // local blob preview url
+    file: File;
+}
+
+// 5 MB per chunk
+const CHUNK_SIZE = 5 * 1024 * 1024;
+
+// Convert a 24h "HH:MM" value + meridiem into a "hh:mm AM/PM" string.
+const formatTimeWithMeridiem = (time24: string, meridiem: 'AM' | 'PM') => {
+    if (!time24) return '';
+    const [h, m] = time24.split(':').map(Number);
+    let hour12 = h % 12;
+    if (hour12 === 0) hour12 = 12;
+    return `${String(hour12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${meridiem}`;
+};
+
 const CreatePostModal: React.FC<CreatePostModalProps> = ({
     isOpen,
     onClose,
@@ -84,10 +102,17 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     const [images, setImages] = useState<ImageItem[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Video management
+    const [video, setVideo] = useState<VideoItem | null>(null);
+    const videoInputRef = useRef<HTMLInputElement>(null);
+    const [videoProgress, setVideoProgress] = useState(0);
+    const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+
     // Scheduling
     const [schedulePost, setSchedulePost] = useState(false);
     const [scduleDate, setScduleDate] = useState('');
     const [scheduleTime, setScheduleTime] = useState('');
+    const [meridiem, setMeridiem] = useState<'AM' | 'PM'>('AM');
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -108,6 +133,72 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         setImages(prev => prev.filter(img => img.id !== id));
     };
 
+    const handleAddVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        // revoke previous preview to avoid memory leaks
+        if (video?.url) URL.revokeObjectURL(video.url);
+        setVideo({ url: URL.createObjectURL(file), file });
+        // allow re-selecting the same file again later
+        e.target.value = '';
+    };
+
+    const removeVideo = () => {
+        if (video?.url) URL.revokeObjectURL(video.url);
+        setVideo(null);
+        setVideoProgress(0);
+    };
+
+    // Uploads a video in sequential chunks and resolves with the stored url.
+    const uploadVideoInChunks = async (file: File): Promise<string> => {
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const safeName = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${file.name.replace(/\s+/g, '_')}`;
+        let videoUrl = '';
+
+        for (let index = 0; index < totalChunks; index++) {
+            const start = index * CHUNK_SIZE;
+            const chunk = file.slice(start, start + CHUNK_SIZE);
+
+            const chunkForm = new FormData();
+            chunkForm.append('chunk', chunk, safeName);
+            chunkForm.append('originalname', safeName);
+            chunkForm.append('chunkIndex', String(index));
+            chunkForm.append('totalChunks', String(totalChunks));
+
+            const result = await uploadVideoChunk(chunkForm);
+            setVideoProgress(Math.round(((index + 1) / totalChunks) * 100));
+
+            if (result.done && result.url) {
+                videoUrl = result.url;
+            }
+        }
+
+        if (!videoUrl) {
+            throw new Error('Video upload did not complete');
+        }
+        return videoUrl;
+    };
+
+    // Keep the 24h time value and the AM/PM selection in sync.
+    const handleTimeChange = (value: string) => {
+        setScheduleTime(value);
+        if (value) {
+            setMeridiem(Number(value.split(':')[0]) >= 12 ? 'PM' : 'AM');
+        }
+    };
+
+    const handleMeridiemChange = (target: 'AM' | 'PM') => {
+        if (target === meridiem) return;
+        setMeridiem(target);
+        if (scheduleTime) {
+            const [h0, m] = scheduleTime.split(':').map(Number);
+            let h = h0;
+            if (target === 'PM' && h < 12) h += 12;
+            if (target === 'AM' && h >= 12) h -= 12;
+            setScheduleTime(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+        }
+    };
+
     const toggleEngagement = (val: string) => {
         setPostVisibility(prev =>
             prev.includes(val) ? prev.filter(item => item !== val) : [...prev, val]
@@ -121,9 +212,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         setPostVisibility([]);
         setIs18Plus(false);
         setImages([]);
+        if (video?.url) URL.revokeObjectURL(video.url);
+        setVideo(null);
+        setVideoProgress(0);
         setSchedulePost(false);
         setScduleDate('');
         setScheduleTime('');
+        setMeridiem('AM');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -136,26 +231,47 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
         setIsSubmitting(true);
 
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('who_can_see', whoCanSee);
-        postVisibility.forEach(v => formData.append('post_visibility[]', v));
-        formData.append('is_18_plus', String(is18Plus));
-        formData.append('schedule_post', String(schedulePost));
-        if (schedulePost) {
-            formData.append('scdule_date', scduleDate);
-            formData.append('schedule_time', scheduleTime);
-        }
-
-        // Handle Images
-        images.forEach(img => {
-            if (img.file) {
-                formData.append('image', img.file);
-            }
-        });
-
         try {
+            // 1) If a video is attached, upload it in chunks first and get its url.
+            let videoUrl = '';
+            if (video?.file) {
+                setIsUploadingVideo(true);
+                try {
+                    videoUrl = await toast.promise(uploadVideoInChunks(video.file), {
+                        loading: 'Uploading video…',
+                        success: 'Video uploaded',
+                        error: 'Video upload failed',
+                    }).unwrap();
+                } finally {
+                    setIsUploadingVideo(false);
+                }
+            }
+
+            // 2) Build the post payload.
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('who_can_see', whoCanSee);
+            postVisibility.forEach(v => formData.append('post_visibility[]', v));
+            formData.append('is_18_plus', String(is18Plus));
+            formData.append('schedule_post', String(schedulePost));
+            if (schedulePost) {
+                formData.append('scdule_date', scduleDate);
+                formData.append('schedule_time', formatTimeWithMeridiem(scheduleTime, meridiem));
+            }
+
+            // Handle Images
+            images.forEach(img => {
+                if (img.file) {
+                    formData.append('image', img.file);
+                }
+            });
+
+            // Attach the uploaded video url (string), not the file.
+            if (videoUrl) {
+                formData.append('video', videoUrl);
+            }
+
             toast.promise(myFetch('/post', {
                 method: 'POST',
                 body: formData,
@@ -185,7 +301,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
 
         } catch (error) {
-            toast.error('An error occurred while creating the post');
+            // Video-upload failures already surface their own toast above.
             console.error(error);
         } finally {
             setIsSubmitting(false);
@@ -242,8 +358,61 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                                     </div>
                                     <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Add Image</span>
                                 </button>
-                                <input type="file" ref={fileInputRef} onChange={handleAddImages} className="hidden" accept="image/*" multiple />
+                                <input type="file" ref={fileInputRef} onChange={handleAddImages} className="hidden" accept=".png, .jpg, .jpeg, image/png, image/jpeg"
+                                    multiple />
                             </div>
+                        </div>
+
+                        {/* Video Upload */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Video</label>
+
+                            {video ? (
+                                <div className="relative group rounded-2xl overflow-hidden border border-[#2a2a35] bg-[#1a1a24]">
+                                    <video
+                                        src={video.url}
+                                        controls
+                                        className="w-full max-h-72 bg-black object-contain"
+                                    />
+
+                                    {/* Upload progress overlay */}
+                                    {isUploadingVideo && (
+                                        <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-3">
+                                            <Film size={26} className="text-purple-400 animate-pulse" />
+                                            <div className="w-2/3 h-1.5 rounded-full bg-[#2a2a35] overflow-hidden">
+                                                <div
+                                                    className="h-full bg-linear-to-r from-purple-500 to-indigo-500 transition-all duration-200"
+                                                    style={{ width: `${videoProgress}%` }}
+                                                />
+                                            </div>
+                                            <span className="text-xs font-bold text-white">Uploading… {videoProgress}%</span>
+                                        </div>
+                                    )}
+
+                                    {!isUploadingVideo && (
+                                        <button
+                                            type="button"
+                                            onClick={removeVideo}
+                                            className="absolute top-3 right-3 p-2.5 bg-red-500 hover:bg-red-600 rounded-full text-white shadow-xl opacity-0 group-hover:opacity-100 transition-all"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => videoInputRef.current?.click()}
+                                    className="w-full rounded-2xl border-2 border-dashed border-[#2a2a35] hover:border-purple-500/50 hover:bg-purple-500/5 transition-all flex flex-col items-center justify-center gap-2 py-8 group"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-[#1a1a24] border border-[#2a2a35] flex items-center justify-center text-gray-400 group-hover:text-purple-400 group-hover:scale-110 transition-all">
+                                        <VideoIcon size={20} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Add Video</span>
+                                    <span className="text-[10px] text-gray-600">Uploaded in chunks · MP4, MOV, WebM</span>
+                                </button>
+                            )}
+                            <input type="file" ref={videoInputRef} onChange={handleAddVideo} className="hidden" accept="video/*" />
                         </div>
 
                         {/* Title & Description */}
@@ -353,14 +522,31 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Time</label>
-                                        <div className="relative">
-                                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
-                                            <input
-                                                type="time"
-                                                value={scheduleTime}
-                                                onChange={e => setScheduleTime(e.target.value)}
-                                                className="w-full bg-[#16161e] border border-[#2a2a35] rounded-xl py-2.5 pl-10 pr-4 text-white text-xs focus:outline-none focus:border-purple-500 scheme-dark"
-                                            />
+                                        <div className="flex items-center gap-2">
+                                            <div className="relative flex-1">
+                                                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+                                                <input
+                                                    type="time"
+                                                    value={scheduleTime}
+                                                    onChange={e => handleTimeChange(e.target.value)}
+                                                    className="w-full bg-[#16161e] border border-[#2a2a35] rounded-xl py-2.5 pl-10 pr-3 text-white text-xs focus:outline-none focus:border-purple-500 scheme-dark"
+                                                />
+                                            </div>
+                                            <div className="flex shrink-0 rounded-xl border border-[#2a2a35] bg-[#16161e] p-0.5">
+                                                {(['AM', 'PM'] as const).map(m => (
+                                                    <button
+                                                        key={m}
+                                                        type="button"
+                                                        onClick={() => handleMeridiemChange(m)}
+                                                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${meridiem === m
+                                                            ? 'bg-purple-600 text-white shadow-[0_0_12px_rgba(168,85,247,0.25)]'
+                                                            : 'text-gray-500 hover:text-gray-300'
+                                                            }`}
+                                                    >
+                                                        {m}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -369,34 +555,66 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     </div>
 
                     {/* ── Footer ── */}
-                    <div className="px-6 py-5 border-t border-[#2a2a35] bg-[#0d0d12] shrink-0">
+                    <div className="px-6 py-5 border-t border-[#2a2a35] bg-[#0d0d12] shrink-0 space-y-3">
+                        {/* Video upload progress bar */}
+                        {isUploadingVideo && (
+                            <div className="space-y-1.5 animate-in fade-in duration-200">
+                                <div className="flex items-center justify-between text-[11px] font-bold">
+                                    <span className="flex items-center gap-1.5 text-purple-300">
+                                        <Film size={13} className="animate-pulse" /> Uploading video…
+                                    </span>
+                                    <span className="text-gray-400 tabular-nums">{videoProgress}%</span>
+                                </div>
+                                <div className="h-2 w-full rounded-full bg-[#1a1a24] overflow-hidden">
+                                    <div
+                                        className="h-full rounded-full bg-linear-to-r from-purple-500 to-indigo-500 transition-all duration-200"
+                                        style={{ width: `${videoProgress}%` }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <button
                             type="submit"
                             disabled={isSubmitting || !title.trim()}
-                            className={`w-full relative font-bold py-3.5 rounded-full shadow-lg transition-all active:scale-[0.98] text-sm text-white ${showSuccess
+                            className={`w-full relative overflow-hidden font-bold py-3.5 rounded-full shadow-lg transition-all active:scale-[0.98] text-sm text-white ${showSuccess
                                 ? 'bg-emerald-600 shadow-emerald-500/20'
                                 : title.trim()
                                     ? 'bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-500/20'
                                     : 'bg-[#1a1a24] border border-[#2a2a35] text-gray-500 cursor-not-allowed'
                                 }`}
                         >
-                            {isSubmitting ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                                    </svg>
-                                    Creating Post…
-                                </span>
-                            ) : showSuccess ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <Check size={16} strokeWidth={3} /> Post Created
-                                </span>
-                            ) : (
-                                <span className="flex items-center justify-center gap-1.5">
-                                    Publish Post <ChevronRight size={16} />
-                                </span>
+                            {/* progress fill inside the button while uploading */}
+                            {isUploadingVideo && (
+                                <span
+                                    className="absolute inset-y-0 left-0 bg-white/15 transition-all duration-200"
+                                    style={{ width: `${videoProgress}%` }}
+                                />
                             )}
+                            <span className="relative">
+                                {isUploadingVideo ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <Film size={16} className="animate-pulse" />
+                                        Uploading Video… {videoProgress}%
+                                    </span>
+                                ) : isSubmitting ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                        </svg>
+                                        Creating Post…
+                                    </span>
+                                ) : showSuccess ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <Check size={16} strokeWidth={3} /> Post Created
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center justify-center gap-1.5">
+                                        Publish Post <ChevronRight size={16} />
+                                    </span>
+                                )}
+                            </span>
                         </button>
                     </div>
 

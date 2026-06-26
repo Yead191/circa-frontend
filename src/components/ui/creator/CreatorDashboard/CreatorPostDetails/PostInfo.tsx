@@ -15,6 +15,7 @@ import PostEditModal from './PostEditModal';
 import { useRouter } from 'next/navigation';
 import { Post } from '@/types';
 import { getImageUrl } from '@/utils/getImageUrl';
+import VideoPlayer from '@/components/shared/VideoPlayer';
 import { myFetch } from '../../../../../../helpers/myFetch';
 import { toast } from 'sonner';
 import { revalidateTags } from '../../../../../../helpers/revalidateTags';
@@ -215,7 +216,11 @@ const PostInfo = ({ post }: { post: Post }) => {
     }
   };
 
-  /* Carousel setup */
+  /* Carousel setup — images first, then the video as the last slide */
+  const imageCount = post?.images?.length || 0;
+  const mediaCount = imageCount + (post?.video ? 1 : 0);
+  const videoSlideIndex = post?.video ? imageCount : -1;
+
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -282,42 +287,53 @@ const PostInfo = ({ post }: { post: Post }) => {
         </div>
       </div>
 
-      {/* ── Main image slider ── */}
-      <div className="relative group mb-6">
-        <div className="rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl bg-[#1a1a24] embla" ref={emblaRef}>
-          <div className="embla__container flex">
-            {post?.images && post.images.length > 0 ? (
-              post.images.map((img, idx) => (
-                <div key={idx} className="embla__slide flex-[0_0_100%] min-w-0 relative">
+      {/* ── Main media carousel (images first, then video) ── */}
+      {mediaCount > 0 ? (
+        <div className="relative group mb-6">
+          <div className="rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl bg-[#1a1a24] embla" ref={emblaRef}>
+            <div className="embla__container flex">
+              {post?.images?.map((img, idx) => (
+                <div key={`img-${idx}`} className="embla__slide flex-[0_0_100%] min-w-0 relative">
                   <img
                     src={getImageUrl(img) || '/placeholder-image.png'}
                     alt={`${post.title} - ${idx + 1}`}
-                    className="w-full aspect-4/5 sm:aspect-square object-cover h-[500px] sm:h-[600px]"
+                    className="w-full aspect-4/5 sm:aspect-square object-cover h-125 sm:h-150"
                   />
                 </div>
-              ))
-            ) : (
-              <div className="embla__slide flex-[0_0_100%] min-w-0 h-[400px] flex items-center justify-center text-gray-500">
-                No images available
-              </div>
-            )}
-          </div>
-        </div>
+              ))}
 
-        {/* Carousel Indicators */}
-        {post?.images && post.images.length > 1 && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-            {post?.images?.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => emblaApi?.scrollTo(idx)}
-                className={`w-2 h-2 rounded-full transition-all ${idx === selectedIndex ? 'bg-purple-500 w-6' : 'bg-white/20'
-                  }`}
-              />
-            ))}
+              {post?.video && (
+                <div key="video" className="embla__slide flex-[0_0_100%] min-w-0 relative h-125 sm:h-150 bg-black">
+                  <VideoPlayer
+                    src={getImageUrl(post.video) || ''}
+                    fill
+                    active={selectedIndex === videoSlideIndex}
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        )}
-      </div>
+
+          {/* Carousel Indicators */}
+          {mediaCount > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30">
+              {Array.from({ length: mediaCount }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => emblaApi?.scrollTo(idx)}
+                  className={`h-2 rounded-full transition-all ${idx === selectedIndex ? 'bg-purple-500 w-6' : 'bg-white/20 w-2'
+                    }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* ── Empty media state ── */
+        <div className="mb-6 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl bg-[#1a1a24] h-100 flex items-center justify-center text-gray-500">
+          No media available
+        </div>
+      )}
 
       {/* ── Action buttons ── */}
       <div className="flex gap-4 mb-8">
