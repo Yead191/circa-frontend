@@ -2,19 +2,19 @@ import CreatorPostDetails from '@/components/ui/creator/CreatorDashboard/Creator
 import { myFetch } from '../../../../../../helpers/myFetch';
 import getProfile from '@/utils/getProfile';
 
-const page = async ({ params }: { params: Promise<{ id: string }> }) => {
+const CreatorPostPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   // console.log(id)
   const user = await getProfile()
   const postRes = await myFetch(`/post/${id}`, {
     method: "GET",
-    tags: ["post"],
-    cache: "no-cache"
+    tags: ["post", `single-post-${id}`],
+    cache: "no-store"
   })
   const commentRes = await myFetch(`/post/comment/${id}`, {
     method: "GET",
-    tags: ["post-comments"],
-    cache: "no-cache"
+    tags: ["post-comments", `post-comments-${id}`],
+    cache: "no-store"
   })
   const post = postRes?.data || {};
   const comments = commentRes?.data || [];
@@ -26,4 +26,4 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   )
 }
 
-export default page
+export default CreatorPostPage

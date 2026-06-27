@@ -46,7 +46,7 @@ const About = ({ id, data }: { id: string, data: any }) => {
               </span>
             </div>
             {index < stats.length - 1 && (
-              <div className="h-8 w-[1px] bg-[#99A1C666] shrink-0 mx-2" />
+              <div className="h-8 w-px bg-[#99A1C666] shrink-0 mx-2" />
             )}
           </React.Fragment>
         ))}

@@ -139,6 +139,17 @@ const PostInfo = ({ post }: { post: Post }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Local "optimistic" like state seeded from the server props.
+  const [liked, setLiked] = useState<boolean>(!!post?.isLike);
+  const [likeCount, setLikeCount] = useState<number>(post?.like_count ?? 0);
+  const [liking, setLiking] = useState(false);
+
+  // Re-sync with the server whenever fresh props arrive (e.g. after revalidation).
+  useEffect(() => {
+    setLiked(!!post?.isLike);
+    setLikeCount(post?.like_count ?? 0);
+  }, [post?.isLike, post?.like_count]);
+
   const menuRef = useRef<HTMLDivElement>(null);
 
   /* Close dropdown when clicking outside */
@@ -187,23 +198,39 @@ const PostInfo = ({ post }: { post: Post }) => {
   };
 
   const handleLike = async () => {
-    if (!post._id) return;
+    if (!post._id || liking) return;
 
-    const res = await myFetch(`/post/like/${post._id}`, {
-      method: "POST",
-      body: {
-        type: "post"
+    // Snapshot for rollback.
+    const prevLiked = liked;
+    const prevCount = likeCount;
+
+    // 1) Optimistically update the UI immediately.
+    setLiked(!prevLiked);
+    setLikeCount(Math.max(0, prevCount + (prevLiked ? -1 : 1)));
+    setLiking(true);
+
+    try {
+      const res = await myFetch(`/post/like/${post._id}`, {
+        method: "POST",
+        body: { type: "post" },
+      });
+
+      if (res?.success) {
+        // 2) Keep the server cache fresh for the next load.
+        revalidateTags(["post", `single-post-${post._id}`]);
+      } else {
+        // 3) Roll back on failure.
+        setLiked(prevLiked);
+        setLikeCount(prevCount);
+        toast.error("Failed to like post");
       }
-    })
-
-    if (res?.success) {
-      revalidateTags(["post"])
-    } else {
+    } catch {
+      setLiked(prevLiked);
+      setLikeCount(prevCount);
       toast.error("Failed to like post");
+    } finally {
+      setLiking(false);
     }
-
-    // console.log('Liking post id:', res);
-    // Hit API logic here
   };
 
   const scrollToComments = () => {
@@ -339,14 +366,15 @@ const PostInfo = ({ post }: { post: Post }) => {
       <div className="flex gap-4 mb-8">
         <button
           onClick={handleLike}
+          aria-pressed={liked}
           className="cursor-pointer flex items-center gap-2.5 bg-[#1a1a24] border border-[#2a2a35] px-6 py-3 rounded-full hover:border-purple-500/50 transition-all group active:scale-95"
         >
           <Heart
             size={18}
-            className={`text-purple-400 group-hover:scale-110 transition-transform ${post?.isLike ? "fill-purple-400" : ""}`}
+            className={`text-purple-400 group-hover:scale-110 transition-transform ${liked ? "fill-purple-400 scale-110" : ""}`}
           />
           <span className="text-purple-400 font-bold text-sm">
-            {post?.like_count || 0}
+            {likeCount}
           </span>
         </button>
         <button
