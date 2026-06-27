@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { myFetch } from '../../../../../../helpers/myFetch'
 import CommentInput from './CommentInput'
 import getProfile from '../../../../../../helpers/getProfile'
@@ -26,6 +26,7 @@ const PostComments = async ({ post }: any) => {
                         key={comment._id}
                         comment={comment}
                         profileData={profileData}
+                        postId={post._id}
                     />
                 ))}
             </div>

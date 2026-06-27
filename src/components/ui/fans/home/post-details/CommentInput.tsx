@@ -32,7 +32,7 @@ const CommentInput = ({ postId, profileData }: { postId: string, profileData: an
                 await revalidate("comments");
                 // ...then re-fetch & repaint the server components so the new
                 // comment shows without a hard reload.
-                startTransition(() => router.refresh());
+                // startTransition(() => router.refresh());
             } else {
                 if (response?.error && Array.isArray(response.error)) {
                     response.error.forEach((err: { message: string }) => {

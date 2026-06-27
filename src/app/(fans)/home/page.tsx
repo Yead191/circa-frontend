@@ -5,8 +5,12 @@ import { myFetch } from "../../../../helpers/myFetch";
 
 export default async function HomePage() {
 
-  const response = await myFetch("/post/feed", { tags: ['feed-posts'], cache: "no-store", });
-
+  const response = await myFetch("/post/feed", {
+    tags: ['feed-posts'], cache: "no-store", next: {
+      revalidate: 60
+    }
+  });
+  console.log(response, 'posts data')
   return (
     <div className="space-y-6 pb-10">
       <div

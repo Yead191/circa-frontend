@@ -10,9 +10,10 @@ import { revalidateTags } from '../../../../../../helpers/revalidateTags'
 interface CommentCardProps {
     comment: any;
     profileData: any;
+    postId: string
 }
 
-const CommentCard = ({ comment, profileData }: CommentCardProps) => {
+const CommentCard = ({ comment, profileData, postId }: CommentCardProps) => {
     const [showReply, setShowReply] = useState(false);
     // Format time
     const createdAt = new Date(comment.createdAt);
@@ -34,7 +35,7 @@ const CommentCard = ({ comment, profileData }: CommentCardProps) => {
             }
         })
         if (res?.success) {
-            revalidateTags(["single-post"])
+            revalidateTags(["single-post", `single-post-${postId}`, "feed-posts"])
         }
     }
 

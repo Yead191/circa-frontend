@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { myFetch } from '../../../../../../helpers/myFetch';
 import { toast } from 'sonner';
 import { FaHeart } from 'react-icons/fa';
+import { revalidateTags } from '../../../../../../helpers/revalidateTags';
 
 const formatCount = (count: number) =>
     count >= 1000 ? `${(count / 1000).toFixed(1)}k` : `${count}`;
@@ -46,7 +47,7 @@ const LikeCommentButton = ({ post }: any) => {
 
             if (response?.success) {
                 // 2) Reconcile with the server in the background.
-                startTransition(() => router.refresh());
+                revalidateTags([`single-post`, `single-post-${post?._id}`, 'feed-posts']);
             } else {
                 // 3) Roll back on failure.
                 setLiked(prevLiked);

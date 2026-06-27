@@ -26,7 +26,7 @@ export function Navbar({
     "flex cursor-pointer relative w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800/80 justify-center items-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 hover:border-zinc-700/80 active:scale-95 transition-all duration-200 shadow-inner";
 
   return (
-    <header className="sticky top-0 z-20 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-[#242424] h-16 md:h-25 flex items-center justify-between gap-3 px-4 md:px-6">
+    <header className="sticky top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-[#242424] h-16 md:h-25 flex items-center justify-between gap-3 px-4 md:px-6">
       {/* LEFT */}
       <div className="flex items-center gap-2.5 min-w-0">
         {/* Mobile menu button */}

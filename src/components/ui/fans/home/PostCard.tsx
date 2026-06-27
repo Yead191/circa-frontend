@@ -66,9 +66,9 @@ export default function PostCard({ post }: PostCardProps) {
           </div>
           <div>
             <h3 className="text-white font-semibold text-sm">
-              {post.user.name}
+              {post?.user?.name}
             </h3>
-            <p className="text-gray-400 text-xs">{post.timeAgo}</p>
+            <p className="text-gray-400 text-xs">{post?.timeAgo}</p>
           </div>
         </div>
         <div>

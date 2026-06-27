@@ -1,9 +1,10 @@
 'use client'
 import { Heart, MessageCircle } from 'lucide-react'
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useState, } from 'react'
 import { useRouter } from 'next/navigation'
 import { myFetch } from '../../../../../helpers/myFetch';
 import { toast } from 'sonner';
+import { revalidateTags } from '../../../../../helpers/revalidateTags';
 
 const formatCount = (count: number) =>
   count >= 1000 ? `${(count / 1000).toFixed(1)}k` : `${count}`;
@@ -15,7 +16,6 @@ const PostCardButton = ({ post }: { post: any }) => {
   const [liked, setLiked] = useState<boolean>(!!post?.isLiked);
   const [likeCount, setLikeCount] = useState<number>(post?.likeCount ?? 0);
   const [submitting, setSubmitting] = useState(false);
-  const [, startTransition] = useTransition();
 
   // Re-sync with the server whenever fresh props arrive (e.g. after router.refresh()).
   useEffect(() => {
@@ -43,7 +43,10 @@ const PostCardButton = ({ post }: { post: any }) => {
 
       if (response?.success) {
         // 2) Reconcile with the server in the background (counts from other users, etc.).
-        startTransition(() => router.refresh());
+        revalidateTags([`single-post-${post?._id}`, 'feed-posts']);
+        // startTransition(() => router.refresh());
+        // setLiked(!!response.data.isLiked);
+        // setLikeCount(response.data.likeCount ?? 0);
       } else {
         // 3) Roll back on failure.
         setLiked(prevLiked);
