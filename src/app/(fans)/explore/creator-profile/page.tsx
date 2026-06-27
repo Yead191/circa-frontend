@@ -11,7 +11,7 @@ const CreatorProfilePage = async ({ searchParams }: pageProps) => {
     const params = await searchParams;
     const creatorData = await myFetch(`/user/creator/${params?.creatorId}`);
     const creatorId = params?.creatorId;
-    console.log(creatorData)
+    // console.log(creatorData)
     return (
         <div>
             <CreatorProfile creatorData={creatorData?.data} creatorId={creatorId} />
