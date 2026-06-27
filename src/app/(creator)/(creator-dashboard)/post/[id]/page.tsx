@@ -18,7 +18,7 @@ const CreatorPostPage = async ({ params }: { params: Promise<{ id: string }> }) 
   })
   const post = postRes?.data || {};
   const comments = commentRes?.data || [];
-  console.log(post)
+  // console.log(post)
   return (
     <div>
       <CreatorPostDetails post={post} comments={comments} user={user} />
