@@ -5,6 +5,7 @@ import PostComments from "./PostComments";
 import LikeCommentButton from "./LikeCommentButton";
 import { getImageUrl } from "@/utils/getImageUrl";
 import PostCarousel from "./PostCarousel";
+import Link from "next/link";
 
 interface PostDetailsLayoutProps {
   post: any;
@@ -22,7 +23,7 @@ export default async function PostDetailsLayout({ post }: PostDetailsLayoutProps
         <div className="bg-[#1C1A24] rounded-2xl p-5 mb-6 border border-gray-800">
 
           {/* Header Row (Avatar, Name, Time) */}
-          <div className="flex items-center justify-between mb-4">
+          <Link href={`/explore/creator-profile?creatorId=${post.user?._id}`} className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden relative">
                 <Image
@@ -37,7 +38,7 @@ export default async function PostDetailsLayout({ post }: PostDetailsLayoutProps
                 <span className="text-gray-400 text-xs">{post.timeAgo}</span>
               </div>
             </div>
-          </div>
+          </Link>
 
           {/* Main Content Carousel */}
           <PostCarousel images={post?.images || []} video={post?.video} title={post?.title || ""} authorId={post.user._id} />

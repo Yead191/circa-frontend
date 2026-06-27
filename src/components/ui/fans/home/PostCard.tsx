@@ -3,6 +3,7 @@ import { imageFormatter } from "../../../../../helpers/imageFormatter";
 import PostCardButton from "./PostCardButton";
 import PostCardVideo from "./PostCardVideo";
 import { getImageUrl } from "@/utils/getImageUrl";
+import Link from "next/link";
 
 interface PostUser {
   _id: string;
@@ -55,7 +56,7 @@ export default function PostCard({ post }: PostCardProps) {
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
+        <Link href={`/explore/creator-profile?creatorId=${post.user?._id}`} className="flex items-center gap-3">
           <div className="relative w-10 h-10 rounded-full overflow-hidden">
             <Image
               src={getImageUrl(post.user.image)}
@@ -70,7 +71,7 @@ export default function PostCard({ post }: PostCardProps) {
             </h3>
             <p className="text-gray-400 text-xs">{post?.timeAgo}</p>
           </div>
-        </div>
+        </Link>
         <div>
           {isPremium ? (
             <span className="bg-[#351F26] text-[#FF8B94] text-xs px-3 py-1 rounded-full font-medium">
