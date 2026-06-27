@@ -52,11 +52,11 @@ export function CreatorSidebar() {
   return (
     <>
       {/* Mobile Menu Button */}
-     {!isMobileOpen && <button
+      {!isMobileOpen && <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed top-6 left-3 sm:left-4 z-50 p-2 text-white text-2xl transition-colors cursor-pointer"
-      >                    
-          ☰        
+        className="lg:hidden fixed top-2 left-3 sm:left-4 z-50 p-2 text-white text-2xl transition-colors cursor-pointer"
+      >
+        ☰
       </button>}
 
       {/* Mobile Overlay */}
@@ -97,7 +97,7 @@ export function CreatorSidebar() {
 
               <button
                 onClick={() => setIsMobileOpen(!isMobileOpen)}
-                className="md:hidden text-gray-400 hover:text-white text-xl p-1"
+                className="lg:hidden text-gray-400 hover:text-white text-xl p-1"
               >
                 ✕
               </button>

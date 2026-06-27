@@ -36,7 +36,7 @@ export function TopbarNotifications({ userId, className }: TopbarNotificationsPr
 
     setIsFetching(true);
     const res = await getNotificationsAction();
-
+    console.log(res)
     if (res.success && res.data) {
       setNotifications(res.data.data ?? []);
       setUnreadCount(res.data.unreadCount ?? 0);
