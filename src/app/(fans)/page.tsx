@@ -1,16 +1,17 @@
-import Link from "next/link";
-import PostCard from "@/components/ui/fans/home/PostCard";
+import FeedList from "@/components/ui/fans/home/FeedList";
 import { myFetch } from "../../../helpers/myFetch";
 
+const FEED_LIMIT = 10;
 
 export default async function HomePage() {
 
-  const response = await myFetch("/post/feed", {
-    tags: ['feed-posts'], cache: "no-store", next: {
-      revalidate: 60
-    }
+  // First page is rendered on the server for a fast initial paint;
+  // the rest is loaded on scroll by <FeedList /> via a server action.
+  const response = await myFetch(`/post/feed?page=1&limit=${FEED_LIMIT}`, {
+    tags: ['feed-posts'],
+    cache: "no-store",
   });
-  console.log(response, 'posts data')
+
   return (
     <div className="space-y-6 pb-10 max-w-2xl mx-auto">
       <div
@@ -34,15 +35,11 @@ export default async function HomePage() {
         </div>
       </div>
 
-
-      {/* Posts Feed Grid */}
-      <div className="grid grid-cols-1  gap-6">
-        {response?.data?.map((post: any) => (
-          <Link href={`/home/post-details?id=${post._id}&type=${post?.isPrimium ? "premium" : "free"}`} key={post._id}>
-            <PostCard post={post} />
-          </Link>
-        ))}
-      </div>
+      {/* Posts Feed — infinite scroll */}
+      <FeedList
+        initialPosts={response?.data ?? []}
+        initialPagination={response?.pagination ?? { total: 0, limit: FEED_LIMIT, page: 1, totalPage: 1 }}
+      />
     </div>
   );
 }
