@@ -5,7 +5,7 @@ import getProfile from '../../../../../../helpers/getProfile'
 import CommentCard from './CommentCard'
 
 const PostComments = async ({ post }: any) => {
-    const response = await myFetch(`/post/comment/${post?._id}?limit=5`, { tags: ['comments'] });
+    const response = await myFetch(`/post/comment/${post?._id}?limit=5`, { tags: ['comments'], cache: "no-store" });
     const comments = response?.data || [];
     const profileData = await getProfile();
     // console.log(comments)

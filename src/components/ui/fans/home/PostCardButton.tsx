@@ -43,7 +43,7 @@ const PostCardButton = ({ post }: { post: any }) => {
 
       if (response?.success) {
         // 2) Reconcile with the server in the background (counts from other users, etc.).
-        revalidateTags([`single-post-${post?._id}`, 'feed-posts']);
+        revalidateTags([`single-post-${post?._id}`,]);
         // startTransition(() => router.refresh());
         // setLiked(!!response.data.isLiked);
         // setLikeCount(response.data.likeCount ?? 0);

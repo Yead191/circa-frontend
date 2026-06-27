@@ -2,10 +2,15 @@ import Link from "next/link";
 import PostCard from "@/components/ui/fans/home/PostCard";
 import { myFetch } from "../../../helpers/myFetch";
 
+
 export default async function HomePage() {
 
-  const response = await myFetch("/post/feed", { tags: ['feed-posts'] });
-
+  const response = await myFetch("/post/feed", {
+    tags: ['feed-posts'], cache: "no-store", next: {
+      revalidate: 60
+    }
+  });
+  console.log(response, 'posts data')
   return (
     <div className="space-y-6 pb-10 max-w-2xl mx-auto">
       <div

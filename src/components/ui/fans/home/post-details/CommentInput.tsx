@@ -1,7 +1,7 @@
 'use client'
 import { SendHorizonal } from 'lucide-react'
 import Image from 'next/image'
-import React, { useState, useTransition } from 'react'
+import React, { useState, } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { myFetch } from '../../../../../../helpers/myFetch'
@@ -13,7 +13,6 @@ const CommentInput = ({ postId, profileData }: { postId: string, profileData: an
     const router = useRouter();
     const [comment, setComment] = useState('');
     const [loading, setLoading] = useState(false);
-    const [, startTransition] = useTransition();
 
     const handleComment = async () => {
         if (!comment.trim() || loading) return;
@@ -28,7 +27,7 @@ const CommentInput = ({ postId, profileData }: { postId: string, profileData: an
                 // Clear the field immediately for a snappy feel.
                 setComment('');
                 // Invalidate the cached server data...
-                await revalidateTags(['single-post']);
+                await revalidateTags(['single-post', `single-post-${postId}`, 'feed-posts']);
                 await revalidate("comments");
                 // ...then re-fetch & repaint the server components so the new
                 // comment shows without a hard reload.
