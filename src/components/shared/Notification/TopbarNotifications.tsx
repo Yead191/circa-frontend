@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Bell, Check, Sparkles, Inbox } from "lucide-react";
+import { Bell, Check, Sparkles, Inbox, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,27 +25,75 @@ interface TopbarNotificationsProps {
   className?: string;
 }
 
+const PAGE_LIMIT = 10;
+
 export function TopbarNotifications({ userId, className }: TopbarNotificationsProps) {
   const [notifications, setNotifications] = React.useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = React.useState(0);
   const [isFetching, setIsFetching] = React.useState(false);
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
   const [open, setOpen] = React.useState(false);
 
+  // Pagination
+  const [page, setPage] = React.useState(1);
+  const [totalPage, setTotalPage] = React.useState(1);
+  const loadingMoreRef = React.useRef(false);
+
+  const hasMore = page < totalPage;
+
+  // (Re)load from the first page — used on mount, on open, and on realtime events.
   const loadNotifications = React.useCallback(async () => {
     if (!userId) return;
 
     setIsFetching(true);
-    const res = await getNotificationsAction();
-    console.log(res)
+    const res = await getNotificationsAction(1, PAGE_LIMIT);
     if (res.success && res.data) {
       setNotifications(res.data.data ?? []);
       setUnreadCount(res.data.unreadCount ?? 0);
+      setPage(res.pagination?.page ?? 1);
+      setTotalPage(res.pagination?.totalPage ?? 1);
     } else {
       toast.error(res.message || "Failed to load notifications.");
     }
 
     setIsFetching(false);
   }, [userId]);
+
+  // Load the next page and append (deduped) — triggered when the sentinel scrolls into view.
+  const loadMore = React.useCallback(async () => {
+    if (loadingMoreRef.current || page >= totalPage) return;
+
+    loadingMoreRef.current = true;
+    setIsLoadingMore(true);
+    const nextPage = page + 1;
+
+    const res = await getNotificationsAction(nextPage, PAGE_LIMIT);
+    if (res.success && res.data) {
+      const incoming = res.data.data ?? [];
+      setNotifications((prev) => {
+        const seen = new Set(prev.map((n) => n._id));
+        const fresh = incoming.filter((n) => !seen.has(n._id));
+        return fresh.length ? [...prev, ...fresh] : prev;
+      });
+      setUnreadCount(res.data.unreadCount ?? 0);
+      setPage(res.pagination?.page ?? nextPage);
+      if (res.pagination?.totalPage) setTotalPage(res.pagination.totalPage);
+    }
+
+    loadingMoreRef.current = false;
+    setIsLoadingMore(false);
+  }, [page, totalPage]);
+
+  // Infinite scroll: when the list nears the bottom, fetch the next page.
+  const handleScroll = React.useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const el = e.currentTarget;
+      if (el.scrollHeight - el.scrollTop - el.clientHeight < 140) {
+        void loadMore();
+      }
+    },
+    [loadMore],
+  );
 
   React.useEffect(() => {
     if (open) {
@@ -98,10 +146,9 @@ export function TopbarNotifications({ userId, className }: TopbarNotificationsPr
       setNotifications(previous);
       setUnreadCount((current) => current + 1);
       toast.error(res.message || "Failed to update notification.");
-      return;
     }
-
-    void loadNotifications();
+    // Note: no full reload here — the optimistic update already reflects the
+    // change, and reloading would reset the scroll pagination back to page 1.
   };
 
   const handleReadAll = async () => {
@@ -114,11 +161,9 @@ export function TopbarNotifications({ userId, className }: TopbarNotificationsPr
     const res = await readAllNotificationsAction();
     if (!res.success) {
       setNotifications(previous);
+      setUnreadCount(previous.filter((item) => !item.isRead).length);
       toast.error(res.message || "Failed to update notifications.");
-      return;
     }
-
-    void loadNotifications();
   };
 
   return (
@@ -175,7 +220,7 @@ export function TopbarNotifications({ userId, className }: TopbarNotificationsPr
         <DropdownMenuSeparator className="bg-zinc-800/60 m-0" />
 
         {/* Content Container */}
-        <div className="max-h-105 overflow-y-auto chunk-scrollbar divide-y divide-zinc-900">
+        <div onScroll={handleScroll} className="max-h-105 overflow-y-auto chunk-scrollbar divide-y divide-zinc-900">
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
               <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center text-zinc-600 mb-3 border border-zinc-800/40">
@@ -185,7 +230,8 @@ export function TopbarNotifications({ userId, className }: TopbarNotificationsPr
               <p className="text-xs text-zinc-500 mt-1">You have no new notifications.</p>
             </div>
           ) : (
-            notifications.map((notification) => (
+            <>
+            {notifications.map((notification) => (
               <button
                 key={notification._id}
                 type="button"
@@ -226,7 +272,21 @@ export function TopbarNotifications({ userId, className }: TopbarNotificationsPr
                   </div>
                 </div>
               </button>
-            ))
+            ))}
+
+            {/* Load-more state */}
+            {isLoadingMore && (
+              <div className="flex items-center justify-center gap-2 py-3 text-xs text-zinc-500">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                Loading more…
+              </div>
+            )}
+            {!hasMore && notifications.length > 0 && (
+              <p className="py-3 text-center text-[11px] text-zinc-600">
+                No more notifications
+              </p>
+            )}
+            </>
           )}
         </div>
       </DropdownMenuContent>
