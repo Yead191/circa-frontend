@@ -29,8 +29,8 @@ export interface NotificationsResponse {
   };
 }
 
-export async function getNotificationsAction() {
-  return myFetch<NotificationsResponse["data"]>("/notification", {
+export async function getNotificationsAction(page = 1, limit = 10) {
+  return myFetch<NotificationsResponse["data"]>(`/notification?page=${page}&limit=${limit}`, {
     method: "GET",
     cache: "no-store",
     tags: ["notification"],
